@@ -18,26 +18,26 @@ export default function NavBar({ current }) {
     { label: "Projects", path: "/projects", icon: "📁" },
     { label: "Testing", path: "/testing", icon: "🧪" },
     { label: "Handoff", path: "/handoff", icon: "🤝" },
+    { label: "Analytics", path: "/intelligence", icon: "📊" },
   ]
 
   return (
     <div style={{ backgroundColor: "#1a1a2e", padding: "0 24px",
       display: "flex", alignItems: "center", justifyContent: "space-between",
       height: "64px", position: "sticky", top: 0, zIndex: 100 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
         <span onClick={() => navigate("/dashboard")}
           style={{ color: "white", fontWeight: "700", fontSize: "16px",
-            cursor: "pointer", marginRight: "16px", whiteSpace: "nowrap" }}>
+            cursor: "pointer", marginRight: "12px", whiteSpace: "nowrap" }}>
           ⚡ Ecalc OS
         </span>
         {navItems.map(item => (
-          <button key={item.path}
-            onClick={() => navigate(item.path)}
+          <button key={item.path} onClick={() => navigate(item.path)}
             style={{ backgroundColor: current === item.label ? "#ffffff20" : "transparent",
               border: "none", color: current === item.label ? "white" : "#94a3b8",
-              padding: "6px 12px", borderRadius: "6px", cursor: "pointer",
-              fontSize: "13px", fontWeight: current === item.label ? "600" : "400",
-              display: "flex", alignItems: "center", gap: "6px" }}>
+              padding: "6px 10px", borderRadius: "6px", cursor: "pointer",
+              fontSize: "12px", fontWeight: current === item.label ? "600" : "400",
+              display: "flex", alignItems: "center", gap: "4px", whiteSpace: "nowrap" }}>
             {item.icon} {item.label}
           </button>
         ))}
