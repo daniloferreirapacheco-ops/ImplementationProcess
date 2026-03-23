@@ -20,6 +20,7 @@ import TestCycleDetail from "./pages/TestCycleDetail"
 import Handoff from "./pages/Handoff"
 import NewHandoff from "./pages/NewHandoff"
 import HandoffDetail from "./pages/HandoffDetail"
+import Intelligence from "./pages/Intelligence"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -50,6 +51,7 @@ function AppRoutes() {
       <Route path="/handoff" element={<ProtectedRoute><Handoff /></ProtectedRoute>} />
       <Route path="/handoff/new" element={<ProtectedRoute><NewHandoff /></ProtectedRoute>} />
       <Route path="/handoff/:id" element={<ProtectedRoute><HandoffDetail /></ProtectedRoute>} />
+      <Route path="/intelligence" element={<ProtectedRoute><Intelligence /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
   )
