@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Opportunities from './pages/Opportunities'
+import NewOpportunity from './pages/NewOpportunity'
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -16,9 +18,13 @@ function AppRoutes() {
         user ? <Navigate to="/dashboard" /> : <Login />
       } />
       <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
+        <ProtectedRoute><Dashboard /></ProtectedRoute>
+      } />
+      <Route path="/opportunities" element={
+        <ProtectedRoute><Opportunities /></ProtectedRoute>
+      } />
+      <Route path="/opportunities/new" element={
+        <ProtectedRoute><NewOpportunity /></ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
