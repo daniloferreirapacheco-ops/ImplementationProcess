@@ -47,7 +47,7 @@ export default function NewOpportunity() {
     accountName: '',
     name: '',
     opportunity_type: 'new_implementation',
-    urgency: 'normal',
+    urgency: 'medium',
     estimated_value: '',
     target_close_date: '',
     target_golive_date: '',
@@ -139,7 +139,7 @@ export default function NewOpportunity() {
           qualification_score: score,
           complexity_level: getComplexity(score),
           discovery_depth: getDiscoveryDepth(score),
-          sales_owner: profile.id,
+          sales_owner_id: profile.id,
           created_by: profile.id
         })
         .select()
@@ -245,10 +245,10 @@ return (
                     onChange={e => updateForm('urgency', e.target.value)}
                     style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db',
                       borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}>
-                    <option value="low">Low</option>
-                    <option value="normal">Normal</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
+                   	<option value="low">Low</option>
+		   	<option value="medium">Medium</option>
+			<option value="high">High</option>
+			<option value="critical">Critical</option>
                   </select>
                 </div>
               </div>
