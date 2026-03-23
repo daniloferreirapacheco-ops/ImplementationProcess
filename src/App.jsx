@@ -11,6 +11,9 @@ import DiscoveryDetail from "./pages/DiscoveryDetail"
 import Projects from "./pages/Projects"
 import NewProject from "./pages/NewProject"
 import ProjectDetail from "./pages/ProjectDetail"
+import Scope from "./pages/Scope"
+import NewScope from "./pages/NewScope"
+import ScopeDetail from "./pages/ScopeDetail"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -29,6 +32,9 @@ function AppRoutes() {
       <Route path="/discovery" element={<ProtectedRoute><Discovery /></ProtectedRoute>} />
       <Route path="/discovery/new" element={<ProtectedRoute><NewDiscovery /></ProtectedRoute>} />
       <Route path="/discovery/:id" element={<ProtectedRoute><DiscoveryDetail /></ProtectedRoute>} />
+      <Route path="/scope" element={<ProtectedRoute><Scope /></ProtectedRoute>} />
+      <Route path="/scope/new" element={<ProtectedRoute><NewScope /></ProtectedRoute>} />
+      <Route path="/scope/:id" element={<ProtectedRoute><ScopeDetail /></ProtectedRoute>} />
       <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/projects/new" element={<ProtectedRoute><NewProject /></ProtectedRoute>} />
       <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
