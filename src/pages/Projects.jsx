@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
@@ -18,11 +18,25 @@ const statusColors = {
   blocked: "#dc2626", on_hold: "#78716c"
 }
 
+const thStyle = {
+  padding: '6px 12px', textAlign: 'left', fontSize: '12px', fontWeight: '600',
+  color: '#64748b', borderBottom: '2px solid #d1d5db', backgroundColor: '#f1f5f9',
+  position: 'sticky', top: 0, whiteSpace: 'nowrap', textTransform: 'uppercase',
+  letterSpacing: '0.5px', userSelect: 'none'
+}
+
+const tdStyle = {
+  padding: '5px 12px', fontSize: '13px', color: '#1e293b',
+  borderBottom: '1px solid #e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden',
+  textOverflow: 'ellipsis', maxWidth: '300px'
+}
+
 export default function Projects() {
   const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("active")
+  const [hoveredRow, setHoveredRow] = useState(null)
 
   useEffect(() => { fetchProjects() }, [])
 
@@ -46,35 +60,35 @@ export default function Projects() {
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Projects" />
-      <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "20px 24px", display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: "flex", justifyContent: "space-between",
-          alignItems: "center", marginBottom: "24px" }}>
+          alignItems: "center", marginBottom: "12px" }}>
           <div>
-            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
+            <h1 style={{ fontSize: "20px", fontWeight: "700", color: "#1e293b", margin: "0 0 2px 0" }}>
               Projects
             </h1>
-            <p style={{ color: "#64748b", margin: 0 }}>{projects.length} total projects</p>
+            <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{filtered.length} of {projects.length} projects</p>
           </div>
           <button onClick={() => navigate("/projects/new")}
             style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
-              padding: "12px 24px", borderRadius: "8px", cursor: "pointer",
-              fontWeight: "600", fontSize: "14px" }}>
+              padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+              fontWeight: "600", fontSize: "13px" }}>
             + New Project
           </button>
         </div>
 
-        <div style={{ display: "flex", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
           {[
             { key: "all", label: "All" },
             { key: "active", label: "Active" },
-            { key: "at_risk", label: "⚠️ At Risk" },
-            { key: "golive", label: "🚀 Go-Live" },
+            { key: "at_risk", label: "At Risk" },
+            { key: "golive", label: "Go-Live" },
             { key: "closed", label: "Closed" },
           ].map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)}
-              style={{ padding: "6px 16px", borderRadius: "20px", border: "none",
-                cursor: "pointer", fontSize: "13px", fontWeight: "500",
-                backgroundColor: filter === f.key ? "#1a1a2e" : "#e2e8f0",
+              style={{ padding: "4px 12px", borderRadius: "4px", border: '1px solid #d1d5db',
+                cursor: "pointer", fontSize: "12px", fontWeight: "500",
+                backgroundColor: filter === f.key ? "#1a1a2e" : "white",
                 color: filter === f.key ? "white" : "#475569" }}>
               {f.label}
             </button>
@@ -84,59 +98,63 @@ export default function Projects() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
-            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>📁</p>
-            <p style={{ color: "#64748b", fontSize: "18px", margin: "0 0 24px 0" }}>No projects found</p>
-            <button onClick={() => navigate("/projects/new")}
-              style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
-                padding: "12px 24px", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>
-              Create First Project
-            </button>
+          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
+            <p style={{ fontSize: '14px', margin: 0 }}>No projects found</p>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {filtered.map(project => (
-              <div key={project.id} onClick={() => navigate(`/projects/${project.id}`)}
-                style={{ backgroundColor: "white", borderRadius: "12px", padding: "20px 24px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)", border: "1px solid #e2e8f0",
-                  cursor: "pointer", display: "flex", justifyContent: "space-between",
-                  alignItems: "center", borderLeft: `4px solid ${healthColors[project.health] || "#94a3b8"}` }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)"}>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
-                    <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "600", color: "#1e293b" }}>
-                      {project.name}
-                    </h3>
-                    <span style={{ width: "10px", height: "10px", borderRadius: "50%",
-                      backgroundColor: healthColors[project.health] || "#94a3b8",
-                      display: "inline-block" }} />
-                  </div>
-                  <div style={{ display: "flex", gap: "16px" }}>
-                    <span style={{ color: "#64748b", fontSize: "14px" }}>
-                      🏢 {project.accounts?.name || "No account"}
-                    </span>
-                    {project.golive_target && (
-                      <span style={{ color: "#64748b", fontSize: "14px" }}>
-                        🚀 Go-live: {new Date(project.golive_target).toLocaleDateString()}
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+              <thead>
+                <tr>
+                  <th style={{ ...thStyle, width: '4%' }}>Health</th>
+                  <th style={{ ...thStyle, width: '26%' }}>Project Name</th>
+                  <th style={{ ...thStyle, width: '20%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '16%' }}>Status</th>
+                  <th style={{ ...thStyle, width: '14%' }}>Go-Live Date</th>
+                  <th style={{ ...thStyle, width: '20%' }}>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(project => (
+                  <tr key={project.id}
+                    onClick={() => navigate(`/projects/${project.id}`)}
+                    onMouseEnter={() => setHoveredRow(project.id)}
+                    onMouseLeave={() => setHoveredRow(null)}
+                    style={{
+                      cursor: 'pointer',
+                      backgroundColor: hoveredRow === project.id ? '#eff6ff' : 'white'
+                    }}>
+                    <td style={{ ...tdStyle, textAlign: 'center' }}>
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%',
+                        backgroundColor: healthColors[project.health] || '#94a3b8',
+                        display: 'inline-block' }} />
+                    </td>
+                    <td style={{ ...tdStyle, fontWeight: '500' }}>{project.name}</td>
+                    <td style={tdStyle}>{project.accounts?.name || '—'}</td>
+                    <td style={tdStyle}>
+                      <span style={{
+                        backgroundColor: (statusColors[project.status] || '#94a3b8') + '18',
+                        color: statusColors[project.status] || '#94a3b8',
+                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px',
+                        fontWeight: '600', textTransform: 'capitalize' }}>
+                        {project.status?.replace(/_/g, ' ')}
                       </span>
-                    )}
-                  </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <span style={{ backgroundColor: (statusColors[project.status] || "#94a3b8") + "20",
-                    color: statusColors[project.status] || "#94a3b8", padding: "4px 12px",
-                    borderRadius: "20px", fontSize: "12px", fontWeight: "600",
-                    textTransform: "capitalize" }}>
-                    {project.status?.replace(/_/g, " ")}
-                  </span>
-                  <span style={{ color: "#94a3b8" }}>→</span>
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td style={tdStyle}>
+                      {project.golive_target ? new Date(project.golive_target).toLocaleDateString() : '—'}
+                    </td>
+                    <td style={tdStyle}>
+                      {project.created_at ? new Date(project.created_at).toLocaleDateString() : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
+        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0' }}>
+          {filtered.length} record{filtered.length !== 1 ? 's' : ''} ({projects.length} total)
+        </div>
       </main>
     </div>
   )
