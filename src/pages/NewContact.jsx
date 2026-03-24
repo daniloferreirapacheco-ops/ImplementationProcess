@@ -59,10 +59,10 @@ export default function NewContact() {
     fontSize: '14px', color: '#374151' }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Contacts" />
 
-      <div style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
         <button onClick={() => navigate('/contacts')}
           style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
             fontSize: '14px', padding: 0, marginBottom: '16px' }}>
@@ -146,7 +146,7 @@ export default function NewContact() {
             </button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

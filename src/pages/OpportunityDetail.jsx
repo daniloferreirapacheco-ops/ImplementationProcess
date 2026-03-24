@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../supabase'
+import NavBar from '../components/layout/NavBar'
 
 const stageOptions = [
   { value: 'new', label: 'New' },
@@ -85,40 +86,33 @@ export default function OpportunityDetail() {
   }
 
   if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center',
-      alignItems: 'center', height: '100vh', color: '#64748b' }}>
-      Loading...
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+      <NavBar current="Opportunities" />
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center',
+          alignItems: 'center', height: 'calc(100vh - 64px)', color: '#64748b' }}>
+          Loading...
+        </div>
+      </main>
     </div>
   )
 
   if (!opp) return (
-    <div style={{ display: 'flex', justifyContent: 'center',
-      alignItems: 'center', height: '100vh', color: '#64748b' }}>
-      Opportunity not found
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+      <NavBar current="Opportunities" />
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center',
+          alignItems: 'center', height: 'calc(100vh - 64px)', color: '#64748b' }}>
+          Opportunity not found
+        </div>
+      </main>
     </div>
   )
 return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+      <NavBar current="Opportunities" />
 
-      {/* Nav */}
-      <div style={{ backgroundColor: '#1a1a2e', padding: '0 32px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <span onClick={() => navigate('/dashboard')}
-            style={{ color: 'white', fontWeight: '700', fontSize: '18px', cursor: 'pointer' }}>
-            ⚡ Ecalc Delivery OS
-          </span>
-          <span style={{ color: '#94a3b8', fontSize: '14px' }}>/ Opportunities / {opp.name}</span>
-        </div>
-        <button onClick={() => navigate('/opportunities')}
-          style={{ backgroundColor: 'transparent', border: '1px solid #475569',
-            color: '#94a3b8', padding: '6px 16px', borderRadius: '4px',
-            cursor: 'pointer', fontSize: '14px' }}>
-          ← Back
-        </button>
-      </div>
-
-      <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between',
@@ -360,7 +354,7 @@ return (
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

@@ -159,10 +159,10 @@ export default function TaskTemplates() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Templates" />
 
-      <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', margin: '0 0 4px 0' }}>
@@ -407,7 +407,7 @@ export default function TaskTemplates() {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   )
 }

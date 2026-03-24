@@ -60,16 +60,20 @@ export default function CustomerDetail() {
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Customers" />
-      <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Loading...</p>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px' }}>
+        <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Loading...</p>
+      </main>
     </div>
   )
 
   if (!account) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Customers" />
-      <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Customer not found</p>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px' }}>
+        <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Customer not found</p>
+      </main>
     </div>
   )
 
@@ -79,10 +83,10 @@ export default function CustomerDetail() {
     fontSize: '14px', color: '#374151' }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Customers" />
 
-      <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
@@ -314,7 +318,7 @@ export default function CustomerDetail() {
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   )
 }

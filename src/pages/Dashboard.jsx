@@ -82,9 +82,9 @@ export default function Dashboard() {
   const userWidgets = widgets[role] || widgets.consultant
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Dashboard" />
-      <div style={{ padding: "32px" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ marginBottom: "32px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 8px 0" }}>
             Welcome back, {profile?.full_name?.split(" ")[0] || "there"} 👋
@@ -162,7 +162,7 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

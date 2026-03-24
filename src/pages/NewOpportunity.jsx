@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
+import NavBar from '../components/layout/NavBar'
 
 const riskFlags = [
   'Aggressive timeline',
@@ -156,28 +157,10 @@ export default function NewOpportunity() {
   const complexity = getComplexity(score)
   const discoveryDepth = getDiscoveryDepth(score)
 return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-      <div style={{
-        backgroundColor: '#1a1a2e', padding: '0 32px',
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', height: '64px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <span onClick={() => navigate('/dashboard')}
-            style={{ color: 'white', fontWeight: '700', fontSize: '18px', cursor: 'pointer' }}>
-            ⚡ Ecalc Delivery OS
-          </span>
-          <span style={{ color: '#94a3b8', fontSize: '14px' }}>/ Opportunities / New</span>
-        </div>
-        <button onClick={() => navigate('/opportunities')}
-          style={{ backgroundColor: 'transparent', border: '1px solid #475569',
-            color: '#94a3b8', padding: '6px 16px', borderRadius: '4px',
-            cursor: 'pointer', fontSize: '14px' }}>
-          ← Back
-        </button>
-      </div>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+      <NavBar current="Opportunities" />
 
-      <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '24px' }}>
 
           <div>
@@ -397,7 +380,7 @@ return (
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

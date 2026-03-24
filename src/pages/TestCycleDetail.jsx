@@ -67,10 +67,12 @@ export default function TestCycleDetail() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Testing" />
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center",
-        height: "calc(100vh - 64px)", color: "#64748b" }}>Loading...</div>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center",
+          height: "calc(100vh - 64px)", color: "#64748b" }}>Loading...</div>
+      </main>
     </div>
   )
 
@@ -98,9 +100,9 @@ export default function TestCycleDetail() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Testing" />
-      <div style={{ padding: "32px", maxWidth: "1100px", margin: "0 auto" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
 
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "flex-start", marginBottom: "24px" }}>
@@ -331,7 +333,7 @@ export default function TestCycleDetail() {
             )}
           </div>
         )}
-      </div>
+      </main>
     </div>
   )
 }
