@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -44,8 +44,9 @@ export default function NewOpportunity() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [accounts, setAccounts] = useState([])
   const [form, setForm] = useState({
-    accountName: '',
+    account_id: '',
     name: '',
     opportunity_type: 'new_implementation',
     urgency: 'medium',
@@ -56,6 +57,14 @@ export default function NewOpportunity() {
     selectedModules: [],
     selectedRisks: []
   })
+
+  useEffect(() => {
+    const loadAccounts = async () => {
+      const { data } = await supabase.from('accounts').select('id, name').order('name')
+      setAccounts(data || [])
+    }
+    loadAccounts()
+  }, [])
 
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
@@ -99,35 +108,18 @@ export default function NewOpportunity() {
   }
 
   const handleSubmit = async () => {
-    if (!form.accountName || !form.name) {
-      setError('Account name and opportunity name are required')
+    if (!form.account_id || !form.name) {
+      setError('Customer and opportunity name are required')
       return
     }
     setLoading(true)
     setError('')
     try {
-      let accountId
-      const { data: existingAccount } = await supabase
-        .from('accounts')
-        .select('id')
-        .ilike('name', form.accountName)
-        .single()
-      if (existingAccount) {
-        accountId = existingAccount.id
-      } else {
-        const { data: newAccount, error: accountError } = await supabase
-          .from('accounts')
-          .insert({ name: form.accountName, created_by: profile.id })
-          .select()
-          .single()
-        if (accountError) throw accountError
-        accountId = newAccount.id
-      }
       const score = calculateScore()
       const { data, error: oppError } = await supabase
         .from('opportunities')
         .insert({
-          account_id: accountId,
+          account_id: form.account_id,
           name: form.name,
           opportunity_type: form.opportunity_type,
           urgency: form.urgency,
@@ -181,14 +173,28 @@ return (
                 Basic Information
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px',
+                    fontWeight: '500', fontSize: '14px', color: '#374151' }}>
+                    Customer *
+                  </label>
+                  <select value={form.account_id}
+                    onChange={e => updateForm('account_id', e.target.value)}
+                    style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db',
+                      borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}>
+                    <option value="">— Select a customer —</option>
+                    {accounts.map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </select>
+                </div>
                 {[
-                  { label: 'Account / Company Name *', field: 'accountName', placeholder: 'e.g. Acme Printing Co.', type: 'text' },
                   { label: 'Opportunity Name *', field: 'name', placeholder: 'e.g. Acme - Full Monarch Implementation', type: 'text' },
                   { label: 'Estimated Value ($)', field: 'estimated_value', placeholder: 'e.g. 50000', type: 'number' },
                   { label: 'Target Close Date', field: 'target_close_date', placeholder: '', type: 'date' },
                   { label: 'Target Go-Live Date', field: 'target_golive_date', placeholder: '', type: 'date' },
                 ].map(item => (
-                  <div key={item.field} style={{ gridColumn: item.field === 'target_golive_date' ? '1 / -1' : 'auto' }}>
+                  <div key={item.field}>
                     <label style={{ display: 'block', marginBottom: '6px',
                       fontWeight: '500', fontSize: '14px', color: '#374151' }}>
                       {item.label}

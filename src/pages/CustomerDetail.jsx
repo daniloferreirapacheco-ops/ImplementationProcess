@@ -12,6 +12,8 @@ export default function CustomerDetail() {
   const [contacts, setContacts] = useState([])
   const [opportunities, setOpportunities] = useState([])
   const [projects, setProjects] = useState([])
+  const [machines, setMachines] = useState([])
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
@@ -22,11 +24,13 @@ export default function CustomerDetail() {
   }, [id])
 
   const loadData = async () => {
-    const [accountRes, contactsRes, oppsRes, projRes] = await Promise.all([
+    const [accountRes, contactsRes, oppsRes, projRes, machinesRes, productsRes] = await Promise.all([
       supabase.from('accounts').select('*').eq('id', id).single(),
       supabase.from('contacts').select('*').eq('account_id', id).order('name'),
       supabase.from('opportunities').select('*').eq('account_id', id).order('created_at', { ascending: false }),
-      supabase.from('projects').select('*').eq('account_id', id).order('created_at', { ascending: false })
+      supabase.from('projects').select('*').eq('account_id', id).order('created_at', { ascending: false }),
+      supabase.from('machines').select('*').eq('account_id', id).order('name'),
+      supabase.from('products').select('*').eq('account_id', id).order('name')
     ])
     if (accountRes.data) {
       setAccount(accountRes.data)
@@ -35,6 +39,8 @@ export default function CustomerDetail() {
     setContacts(contactsRes.data || [])
     setOpportunities(oppsRes.data || [])
     setProjects(projRes.data || [])
+    setMachines(machinesRes.data || [])
+    setProducts(productsRes.data || [])
     setLoading(false)
   }
 
@@ -138,17 +144,21 @@ export default function CustomerDetail() {
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', borderBottom: '1px solid #e2e8f0' }}>
-          {['overview', 'contacts', 'opportunities', 'projects'].map(t => (
-            <button key={t} onClick={() => setTab(t)}
+          {[
+            { key: 'overview', label: 'Overview', count: null },
+            { key: 'contacts', label: 'Contacts', count: contacts.length },
+            { key: 'machines', label: 'Machines', count: machines.length },
+            { key: 'products', label: 'Products', count: products.length },
+            { key: 'opportunities', label: 'Opportunities', count: opportunities.length },
+            { key: 'projects', label: 'Projects', count: projects.length }
+          ].map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)}
               style={{ padding: '10px 20px', border: 'none', cursor: 'pointer', fontSize: '14px',
-                fontWeight: tab === t ? '600' : '400',
-                color: tab === t ? '#3b82f6' : '#64748b',
+                fontWeight: tab === t.key ? '600' : '400',
+                color: tab === t.key ? '#3b82f6' : '#64748b',
                 backgroundColor: 'transparent',
-                borderBottom: tab === t ? '2px solid #3b82f6' : '2px solid transparent',
-                textTransform: 'capitalize' }}>
-              {t} {t === 'contacts' ? `(${contacts.length})` :
-                    t === 'opportunities' ? `(${opportunities.length})` :
-                    t === 'projects' ? `(${projects.length})` : ''}
+                borderBottom: tab === t.key ? '2px solid #3b82f6' : '2px solid transparent' }}>
+              {t.label} {t.count !== null ? `(${t.count})` : ''}
             </button>
           ))}
         </div>
@@ -329,6 +339,120 @@ export default function CustomerDetail() {
                 </span>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Machines Tab */}
+        {tab === 'machines' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+              <button onClick={() => navigate(`/machines?account=${id}`)}
+                style={{ padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white',
+                  border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                + Manage Machines
+              </button>
+            </div>
+            {machines.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
+                backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '36px', margin: '0 0 8px 0' }}>&#9881;</p>
+                <p>No machines registered for this customer</p>
+                <p style={{ fontSize: '13px' }}>Go to Machines to add equipment for this account</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '12px' }}>
+                {machines.map(m => (
+                  <div key={m.id} style={{ backgroundColor: 'white', borderRadius: '12px',
+                    padding: '20px', border: '1px solid #e2e8f0',
+                    opacity: m.active ? 1 : 0.5 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px 0' }}>
+                        {m.name}
+                      </h3>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {m.complexity_signal && (
+                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                            backgroundColor: m.complexity_signal === 'high' ? '#fee2e2' : m.complexity_signal === 'medium' ? '#fef3c7' : '#dcfce7',
+                            color: m.complexity_signal === 'high' ? '#dc2626' : m.complexity_signal === 'medium' ? '#d97706' : '#16a34a',
+                            fontWeight: '600' }}>
+                            {m.complexity_signal.toUpperCase()}
+                          </span>
+                        )}
+                        {!m.active && (
+                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                            backgroundColor: '#f1f5f9', color: '#94a3b8', fontWeight: '600' }}>
+                            INACTIVE
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', fontSize: '13px', color: '#64748b' }}>
+                      {m.machine_type && <span>Type: <strong style={{ color: '#1e293b' }}>{m.machine_type}</strong></span>}
+                      <span>Brand: <strong style={{ color: '#1e293b' }}>{m.brand}</strong></span>
+                      {m.model && <span>Model: <strong style={{ color: '#1e293b' }}>{m.model}</strong></span>}
+                      {m.year && <span>Year: <strong style={{ color: '#1e293b' }}>{m.year}</strong></span>}
+                      {m.max_format && <span>Format: <strong style={{ color: '#1e293b' }}>{m.max_format}</strong></span>}
+                      {m.colors && <span>Colors: <strong style={{ color: '#1e293b' }}>{m.colors}</strong></span>}
+                    </div>
+                    {m.notes && (
+                      <p style={{ fontSize: '12px', color: '#94a3b8', margin: '8px 0 0 0', fontStyle: 'italic' }}>
+                        {m.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Products Tab */}
+        {tab === 'products' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+              <button onClick={() => navigate(`/products?account=${id}`)}
+                style={{ padding: '10px 20px', backgroundColor: '#8b5cf6', color: 'white',
+                  border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                + Manage Products
+              </button>
+            </div>
+            {products.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
+                backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '36px', margin: '0 0 8px 0' }}>&#128230;</p>
+                <p>No products registered for this customer</p>
+                <p style={{ fontSize: '13px' }}>Go to Products to add product lines for this account</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '12px' }}>
+                {products.map(p => (
+                  <div key={p.id} style={{ backgroundColor: 'white', borderRadius: '12px',
+                    padding: '20px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px 0' }}>
+                        {p.name}
+                      </h3>
+                      <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                        backgroundColor: p.complexity === 'high' ? '#fee2e2' : p.complexity === 'medium' ? '#fef3c7' : '#dcfce7',
+                        color: p.complexity === 'high' ? '#dc2626' : p.complexity === 'medium' ? '#d97706' : '#16a34a',
+                        fontWeight: '600' }}>
+                        {(p.complexity || 'low').toUpperCase()}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#64748b' }}>
+                      {p.category && <p style={{ margin: '0 0 4px 0' }}>Category: <strong style={{ color: '#1e293b' }}>{p.category}</strong></p>}
+                      {p.volume && <p style={{ margin: '0 0 4px 0' }}>Volume: <strong style={{ color: '#1e293b' }}>{p.volume}</strong></p>}
+                      {p.description && <p style={{ margin: '0 0 4px 0' }}>{p.description}</p>}
+                    </div>
+                    {p.notes && (
+                      <p style={{ fontSize: '12px', color: '#94a3b8', margin: '8px 0 0 0', fontStyle: 'italic' }}>
+                        {p.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </main>
