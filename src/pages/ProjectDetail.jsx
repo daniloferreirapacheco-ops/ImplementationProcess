@@ -37,6 +37,7 @@ export default function ProjectDetail() {
   const [project, setProject] = useState(null)
   const [milestones, setMilestones] = useState([])
   const [blockers, setBlockers] = useState([])
+  const [timeEntries, setTimeEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
   const [newMilestone, setNewMilestone] = useState({ name: "", due_date: "" })
@@ -46,14 +47,16 @@ export default function ProjectDetail() {
   useEffect(() => { fetchAll() }, [id])
 
   const fetchAll = async () => {
-    const [{ data: proj }, { data: miles }, { data: blocks }] = await Promise.all([
+    const [{ data: proj }, { data: miles }, { data: blocks }, { data: times }] = await Promise.all([
       supabase.from("projects").select("*, accounts(name)").eq("id", id).single(),
       supabase.from("milestones").select("*").eq("project_id", id).order("due_date"),
-      supabase.from("blockers").select("*").eq("project_id", id).order("created_at", { ascending: false })
+      supabase.from("blockers").select("*").eq("project_id", id).order("created_at", { ascending: false }),
+      supabase.from("time_entries").select("*").eq("project_id", id)
     ])
     setProject(proj)
     setMilestones(miles || [])
     setBlockers(blocks || [])
+    setTimeEntries(times || [])
     setLoading(false)
   }
 
@@ -127,6 +130,41 @@ export default function ProjectDetail() {
   const completedMilestones = milestones.filter(m => m.status === "completed").length
   const progress = milestones.length > 0 ? Math.round((completedMilestones / milestones.length) * 100) : 0
 
+  // Cost calculations
+  const totalHours = timeEntries.reduce((sum, t) => sum + (Number(t.hours) || 0), 0)
+  const totalCost = timeEntries.reduce((sum, t) => sum + (Number(t.cost) || 0), 0)
+  const budgetHours = Number(project?.budget_hours) || 0
+  const budgetCost = Number(project?.budget_cost) || 0
+  const hoursUsedPct = budgetHours > 0 ? Math.round((totalHours / budgetHours) * 100) : 0
+  const costUsedPct = budgetCost > 0 ? Math.round((totalCost / budgetCost) * 100) : 0
+  const hoursRemaining = budgetHours > 0 ? budgetHours - totalHours : null
+  const costRemaining = budgetCost > 0 ? budgetCost - totalCost : null
+
+  // Burn rate (avg cost per week based on project start)
+  const startDate = project?.start_date ? new Date(project.start_date) : null
+  const weeksElapsed = startDate ? Math.max(1, Math.round((new Date() - startDate) / (7 * 86400000))) : null
+  const weeklyBurnRate = weeksElapsed ? totalCost / weeksElapsed : 0
+  const weeksOfBudgetLeft = weeklyBurnRate > 0 && costRemaining !== null ? Math.round(costRemaining / weeklyBurnRate) : null
+
+  // Auto risk score (0-100, higher = more risk)
+  const openBlockers = blockers.filter(b => b.status === "open")
+  const criticalBlockers = openBlockers.filter(b => b.severity === "critical").length
+  const highBlockers = openBlockers.filter(b => b.severity === "high").length
+  const overdueMilestones = milestones.filter(m => m.status === "pending" && m.due_date && new Date(m.due_date) < new Date()).length
+  const riskScore = Math.min(100,
+    (criticalBlockers * 25) +
+    (highBlockers * 15) +
+    (openBlockers.length * 5) +
+    (overdueMilestones * 10) +
+    (costUsedPct > 90 ? 20 : costUsedPct > 75 ? 10 : 0) +
+    (hoursUsedPct > 90 ? 15 : hoursUsedPct > 75 ? 8 : 0) +
+    (project?.health === "red" ? 15 : project?.health === "yellow" ? 5 : 0)
+  )
+  const riskLevel = riskScore >= 60 ? "Critical" : riskScore >= 35 ? "Elevated" : riskScore >= 15 ? "Moderate" : "Low"
+  const riskColor = riskScore >= 60 ? "#dc2626" : riskScore >= 35 ? "#f59e0b" : riskScore >= 15 ? "#f97316" : "#10b981"
+
+  const fmt = (n) => n != null ? `$${Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "—"
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Projects" />
@@ -179,66 +217,210 @@ export default function ProjectDetail() {
         </div>
 
         {activeTab === "overview" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-            <div style={cardStyle}>
-              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
-                Project Details
-              </h2>
-              {[
-                { label: "Start Date", value: project?.start_date ? new Date(project.start_date).toLocaleDateString() : "Not set" },
-                { label: "Planned End", value: project?.planned_end_date ? new Date(project.planned_end_date).toLocaleDateString() : "Not set" },
-                { label: "Go-Live Target", value: project?.golive_target ? new Date(project.golive_target).toLocaleDateString() : "Not set" },
-                { label: "Health", value: project?.health || "green" },
-                { label: "Readiness Score", value: `${project?.readiness_score || 0}%` },
-              ].map(item => (
-                <div key={item.label} style={{ display: "flex", justifyContent: "space-between",
-                  padding: "8px 0", borderBottom: "1px solid #f1f5f9" }}>
-                  <span style={{ fontSize: "14px", color: "#64748b" }}>{item.label}</span>
-                  <span style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b",
-                    textTransform: "capitalize" }}>{item.value}</span>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+
+            {/* Risk Score Card */}
+            <div style={{ ...cardStyle, borderLeft: `4px solid ${riskColor}`, gridColumn: "1 / -1",
+              display: "flex", alignItems: "center", gap: "24px", padding: "20px 24px" }}>
+              <div style={{ minWidth: "80px", height: "80px", borderRadius: "50%",
+                background: `conic-gradient(${riskColor} ${riskScore * 3.6}deg, #e2e8f0 0deg)`,
+                display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: "60px", height: "60px", borderRadius: "50%", backgroundColor: "white",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "22px", fontWeight: "700", color: riskColor }}>{riskScore}</div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+                  <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#1e293b", margin: 0 }}>
+                    Risk Score
+                  </h2>
+                  <span style={{ fontSize: "13px", fontWeight: "600", padding: "2px 10px",
+                    borderRadius: "12px", backgroundColor: riskColor + "18", color: riskColor }}>
+                    {riskLevel}
+                  </span>
                 </div>
-              ))}
+                <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", fontSize: "13px", color: "#64748b" }}>
+                  {criticalBlockers > 0 && <span style={{ color: "#dc2626", fontWeight: "600" }}>{criticalBlockers} critical blocker{criticalBlockers > 1 ? "s" : ""}</span>}
+                  {highBlockers > 0 && <span style={{ color: "#ef4444", fontWeight: "600" }}>{highBlockers} high blocker{highBlockers > 1 ? "s" : ""}</span>}
+                  {overdueMilestones > 0 && <span style={{ color: "#f59e0b", fontWeight: "600" }}>{overdueMilestones} overdue milestone{overdueMilestones > 1 ? "s" : ""}</span>}
+                  {costUsedPct > 75 && <span style={{ color: costUsedPct > 90 ? "#dc2626" : "#f59e0b", fontWeight: "600" }}>{costUsedPct}% budget used</span>}
+                  {riskScore === 0 && <span style={{ color: "#10b981", fontWeight: "600" }}>No risk signals detected</span>}
+                </div>
+              </div>
             </div>
+
+            {/* Cost Tracker Card */}
+            <div style={{ ...cardStyle, gridColumn: "1 / 3" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: 0 }}>
+                  Cost Tracker
+                </h2>
+                <button onClick={() => navigate("/time")}
+                  style={{ fontSize: "12px", color: "#3b82f6", background: "none", border: "none",
+                    cursor: "pointer", fontWeight: "500" }}>
+                  View Time Entries →
+                </button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+                <div style={{ backgroundColor: "#f8fafc", borderRadius: "8px", padding: "16px" }}>
+                  <p style={{ fontSize: "12px", color: "#64748b", margin: "0 0 4px 0", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.5px" }}>Cost Spent</p>
+                  <p style={{ fontSize: "28px", fontWeight: "700", color: costUsedPct > 90 ? "#dc2626" : "#1e293b", margin: 0 }}>{fmt(totalCost)}</p>
+                  {budgetCost > 0 && <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0" }}>of {fmt(budgetCost)} budget</p>}
+                </div>
+                <div style={{ backgroundColor: "#f8fafc", borderRadius: "8px", padding: "16px" }}>
+                  <p style={{ fontSize: "12px", color: "#64748b", margin: "0 0 4px 0", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.5px" }}>Hours Used</p>
+                  <p style={{ fontSize: "28px", fontWeight: "700", color: hoursUsedPct > 90 ? "#dc2626" : "#1e293b", margin: 0 }}>{totalHours.toFixed(1)}h</p>
+                  {budgetHours > 0 && <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0" }}>of {budgetHours}h budget</p>}
+                </div>
+              </div>
+              {/* Budget bars */}
+              {budgetCost > 0 && (
+                <div style={{ marginBottom: "12px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
+                    <span style={{ color: "#64748b" }}>Budget</span>
+                    <span style={{ fontWeight: "600", color: costUsedPct > 90 ? "#dc2626" : costUsedPct > 75 ? "#f59e0b" : "#1e293b" }}>{costUsedPct}%</span>
+                  </div>
+                  <div style={{ height: "10px", backgroundColor: "#e2e8f0", borderRadius: "5px", overflow: "hidden" }}>
+                    <div style={{ width: `${Math.min(100, costUsedPct)}%`, height: "100%", borderRadius: "5px",
+                      backgroundColor: costUsedPct > 90 ? "#dc2626" : costUsedPct > 75 ? "#f59e0b" : "#3b82f6",
+                      transition: "width 0.3s" }} />
+                  </div>
+                </div>
+              )}
+              {budgetHours > 0 && (
+                <div style={{ marginBottom: "12px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
+                    <span style={{ color: "#64748b" }}>Hours</span>
+                    <span style={{ fontWeight: "600", color: hoursUsedPct > 90 ? "#dc2626" : hoursUsedPct > 75 ? "#f59e0b" : "#1e293b" }}>{hoursUsedPct}%</span>
+                  </div>
+                  <div style={{ height: "10px", backgroundColor: "#e2e8f0", borderRadius: "5px", overflow: "hidden" }}>
+                    <div style={{ width: `${Math.min(100, hoursUsedPct)}%`, height: "100%", borderRadius: "5px",
+                      backgroundColor: hoursUsedPct > 90 ? "#dc2626" : hoursUsedPct > 75 ? "#f59e0b" : "#10b981",
+                      transition: "width 0.3s" }} />
+                  </div>
+                </div>
+              )}
+              {/* Burn rate & forecast */}
+              <div style={{ display: "flex", gap: "16px", marginTop: "16px", borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
+                {weeklyBurnRate > 0 && (
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 2px 0", textTransform: "uppercase", letterSpacing: "0.5px" }}>Weekly Burn</p>
+                    <p style={{ fontSize: "16px", fontWeight: "700", color: "#1e293b", margin: 0 }}>{fmt(weeklyBurnRate)}/wk</p>
+                  </div>
+                )}
+                {costRemaining !== null && (
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 2px 0", textTransform: "uppercase", letterSpacing: "0.5px" }}>Remaining</p>
+                    <p style={{ fontSize: "16px", fontWeight: "700", color: costRemaining < 0 ? "#dc2626" : "#1e293b", margin: 0 }}>{fmt(costRemaining)}</p>
+                  </div>
+                )}
+                {weeksOfBudgetLeft !== null && (
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 2px 0", textTransform: "uppercase", letterSpacing: "0.5px" }}>Runway</p>
+                    <p style={{ fontSize: "16px", fontWeight: "700", color: weeksOfBudgetLeft <= 2 ? "#dc2626" : weeksOfBudgetLeft <= 4 ? "#f59e0b" : "#1e293b", margin: 0 }}>
+                      {weeksOfBudgetLeft <= 0 ? "Over budget" : `${weeksOfBudgetLeft} wk${weeksOfBudgetLeft !== 1 ? "s" : ""}`}
+                    </p>
+                  </div>
+                )}
+                {!budgetCost && !budgetHours && (
+                  <p style={{ fontSize: "12px", color: "#94a3b8", fontStyle: "italic", margin: 0 }}>
+                    Set a budget to see burn rate and runway forecasts
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Progress Card */}
             <div style={cardStyle}>
               <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
                 Progress
               </h2>
-              <div style={{ textAlign: "center", padding: "20px 0" }}>
-                <div style={{ fontSize: "48px", fontWeight: "700",
+              <div style={{ textAlign: "center", padding: "8px 0" }}>
+                <div style={{ fontSize: "42px", fontWeight: "700",
                   color: progress >= 70 ? "#10b981" : progress >= 40 ? "#f59e0b" : "#64748b" }}>
                   {progress}%
                 </div>
-                <p style={{ color: "#64748b", margin: "8px 0 0 0" }}>
-                  {completedMilestones} of {milestones.length} milestones completed
+                <p style={{ color: "#64748b", margin: "4px 0 0 0", fontSize: "13px" }}>
+                  {completedMilestones} of {milestones.length} milestones
                 </p>
-                <div style={{ marginTop: "16px", backgroundColor: "#e2e8f0",
-                  borderRadius: "8px", height: "12px", overflow: "hidden" }}>
+                <div style={{ marginTop: "12px", backgroundColor: "#e2e8f0",
+                  borderRadius: "8px", height: "10px", overflow: "hidden" }}>
                   <div style={{ width: `${progress}%`, height: "100%",
                     backgroundColor: progress >= 70 ? "#10b981" : progress >= 40 ? "#f59e0b" : "#94a3b8",
                     transition: "width 0.3s" }} />
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px",
+                borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
                 <div style={{ textAlign: "center" }}>
-                  <p style={{ fontSize: "24px", fontWeight: "700", color: "#ef4444", margin: 0 }}>
-                    {blockers.filter(b => b.status === "open").length}
+                  <p style={{ fontSize: "22px", fontWeight: "700", color: "#ef4444", margin: 0 }}>
+                    {openBlockers.length}
                   </p>
-                  <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0" }}>Open Blockers</p>
+                  <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>Blockers</p>
                 </div>
                 <div style={{ textAlign: "center" }}>
-                  <p style={{ fontSize: "24px", fontWeight: "700", color: "#f59e0b", margin: 0 }}>
-                    {milestones.filter(m => m.status === "pending" && m.due_date && new Date(m.due_date) < new Date()).length}
+                  <p style={{ fontSize: "22px", fontWeight: "700", color: "#f59e0b", margin: 0 }}>
+                    {overdueMilestones}
                   </p>
-                  <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0" }}>Overdue</p>
+                  <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>Overdue</p>
                 </div>
                 <div style={{ textAlign: "center" }}>
-                  <p style={{ fontSize: "24px", fontWeight: "700", color: "#10b981", margin: 0 }}>
+                  <p style={{ fontSize: "22px", fontWeight: "700", color: "#10b981", margin: 0 }}>
                     {completedMilestones}
                   </p>
-                  <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0" }}>Completed</p>
+                  <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>Done</p>
                 </div>
               </div>
             </div>
+
+            {/* Project Details Card */}
+            <div style={{ ...cardStyle, gridColumn: "1 / 3" }}>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+                Project Details
+              </h2>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
+                {[
+                  { label: "Start Date", value: project?.start_date ? new Date(project.start_date).toLocaleDateString() : "Not set" },
+                  { label: "Planned End", value: project?.planned_end_date ? new Date(project.planned_end_date).toLocaleDateString() : "Not set" },
+                  { label: "Go-Live Target", value: project?.golive_target ? new Date(project.golive_target).toLocaleDateString() : "Not set" },
+                  { label: "Health", value: project?.health || "grey" },
+                  { label: "Budget Hours", value: budgetHours ? `${budgetHours}h` : "Not set" },
+                  { label: "Budget Cost", value: budgetCost ? fmt(budgetCost) : "Not set" },
+                ].map(item => (
+                  <div key={item.label} style={{ display: "flex", justifyContent: "space-between",
+                    padding: "8px 0", borderBottom: "1px solid #f1f5f9" }}>
+                    <span style={{ fontSize: "13px", color: "#64748b" }}>{item.label}</span>
+                    <span style={{ fontSize: "13px", fontWeight: "600", color: "#1e293b",
+                      textTransform: "capitalize" }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Budget Edit Card */}
+            <div style={cardStyle}>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+                Edit Budget
+              </h2>
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "12px", color: "#64748b", display: "block", marginBottom: "4px" }}>Budget Hours</label>
+                <input type="number" min="0" step="1"
+                  defaultValue={project?.budget_hours || ""}
+                  onBlur={e => updateProject("budget_hours", e.target.value ? Number(e.target.value) : null)}
+                  style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }}
+                  placeholder="e.g. 200" />
+              </div>
+              <div>
+                <label style={{ fontSize: "12px", color: "#64748b", display: "block", marginBottom: "4px" }}>Budget Cost ($)</label>
+                <input type="number" min="0" step="100"
+                  defaultValue={project?.budget_cost || ""}
+                  onBlur={e => updateProject("budget_cost", e.target.value ? Number(e.target.value) : null)}
+                  style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }}
+                  placeholder="e.g. 30000" />
+              </div>
+            </div>
+
+            {/* Notes */}
             {project?.notes && (
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
                 <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>

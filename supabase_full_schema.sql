@@ -209,6 +209,8 @@ CREATE TABLE IF NOT EXISTS projects (
   health TEXT DEFAULT 'grey' CHECK (health IN ('green', 'yellow', 'red', 'grey')),
   notes TEXT,
   readiness_score NUMERIC,
+  budget_hours NUMERIC,
+  budget_cost NUMERIC,
   created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -225,6 +227,8 @@ DO $$ BEGIN
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS health TEXT DEFAULT 'grey';
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS notes TEXT;
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS readiness_score NUMERIC;
+  ALTER TABLE projects ADD COLUMN IF NOT EXISTS budget_hours NUMERIC;
+  ALTER TABLE projects ADD COLUMN IF NOT EXISTS budget_cost NUMERIC;
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS created_by UUID;
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();

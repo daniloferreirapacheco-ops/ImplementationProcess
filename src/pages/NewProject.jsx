@@ -20,7 +20,9 @@ export default function NewProject() {
     golive_target: "",
     notes: "",
     status: "not_started",
-    health: "green"
+    health: "green",
+    budget_hours: "",
+    budget_cost: ""
   })
 
   useEffect(() => { fetchData() }, [])
@@ -50,6 +52,8 @@ export default function NewProject() {
       if (!payload.planned_end_date) payload.planned_end_date = null
       if (!payload.golive_target) payload.golive_target = null
       if (!payload.notes) payload.notes = null
+      payload.budget_hours = payload.budget_hours ? Number(payload.budget_hours) : null
+      payload.budget_cost = payload.budget_cost ? Number(payload.budget_cost) : null
       const { data, error: err } = await supabase
         .from("projects")
         .insert(payload)
@@ -139,6 +143,18 @@ export default function NewProject() {
                 <option value="configuration">Configuration</option>
                 <option value="testing">Testing</option>
               </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Budget Hours</label>
+              <input type="number" min="0" step="1" value={form.budget_hours}
+                onChange={e => update("budget_hours", e.target.value)}
+                placeholder="e.g. 200" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Budget Cost ($)</label>
+              <input type="number" min="0" step="0.01" value={form.budget_cost}
+                onChange={e => update("budget_cost", e.target.value)}
+                placeholder="e.g. 30000" style={inputStyle} />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Notes</label>
