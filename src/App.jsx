@@ -14,6 +14,7 @@ import ScopeDetail from "./pages/ScopeDetail"
 import Projects from "./pages/Projects"
 import NewProject from "./pages/NewProject"
 import ProjectDetail from "./pages/ProjectDetail"
+import ProjectUseCases from "./pages/ProjectUseCases"
 import Testing from "./pages/Testing"
 import NewTestCycle from "./pages/NewTestCycle"
 import TestCycleDetail from "./pages/TestCycleDetail"
@@ -55,6 +56,7 @@ function AppRoutes() {
       <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/projects/new" element={<ProtectedRoute><NewProject /></ProtectedRoute>} />
       <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+      <Route path="/projects/:id/usecases" element={<ProtectedRoute><ProjectUseCases /></ProtectedRoute>} />
       <Route path="/testing" element={<ProtectedRoute><Testing /></ProtectedRoute>} />
       <Route path="/testing/new" element={<ProtectedRoute><NewTestCycle /></ProtectedRoute>} />
       <Route path="/testing/:id" element={<ProtectedRoute><TestCycleDetail /></ProtectedRoute>} />

@@ -118,7 +118,8 @@ export default function ProjectDetail() {
     { id: "overview", label: "Overview" },
     { id: "milestones", label: `Milestones (${milestones.length})` },
     { id: "blockers", label: `Blockers (${blockers.filter(b => b.status === "open").length})` },
-    { id: "testing", label: "Testing" },
+    { id: "usecases", label: "Use Cases & Testing" },
+    { id: "testing", label: "Testing (Legacy)" },
     { id: "handoff", label: "Handoff" }
   ]
 
@@ -570,12 +571,31 @@ export default function ProjectDetail() {
           </div>
         )}
 
+        {activeTab === "usecases" && (
+          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
+            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>&#9745;</p>
+            <p style={{ color: "#1e293b", fontSize: "18px", fontWeight: "600", margin: "0 0 8px 0" }}>
+              Use Cases & Testing
+            </p>
+            <p style={{ color: "#64748b", fontSize: "14px", margin: "0 0 24px 0" }}>
+              Validate workflows, track test cycles, manage defects, and collect signoffs
+            </p>
+            <button onClick={() => navigate(`/projects/${id}/usecases`)}
+              style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
+                padding: "12px 28px", borderRadius: "8px", cursor: "pointer", fontWeight: "600",
+                fontSize: "15px" }}>
+              Open Use Cases & Testing
+            </button>
+          </div>
+        )}
+
         {activeTab === "testing" && (
           <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
             borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>🧪</p>
+            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>&#129514;</p>
             <p style={{ color: "#64748b", fontSize: "18px", margin: "0 0 24px 0" }}>
-              Testing module coming soon
+              Legacy Testing Center
             </p>
             <button onClick={() => navigate("/testing")}
               style={{ backgroundColor: "#06b6d4", color: "white", border: "none",
