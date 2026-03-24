@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider, useAuth } from "./contexts/AuthContext"
 import Login from "./pages/Login"
 import Dashboard from "./pages/Dashboard"
@@ -21,6 +21,10 @@ import Handoff from "./pages/Handoff"
 import NewHandoff from "./pages/NewHandoff"
 import HandoffDetail from "./pages/HandoffDetail"
 import Intelligence from "./pages/Intelligence"
+import MachineList from "./pages/MachineList"
+import ProductList from "./pages/ProductList"
+import TaskTemplates from "./pages/TaskTemplates"
+import TimeTracking from "./pages/TimeTracking"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -52,6 +56,10 @@ function AppRoutes() {
       <Route path="/handoff/new" element={<ProtectedRoute><NewHandoff /></ProtectedRoute>} />
       <Route path="/handoff/:id" element={<ProtectedRoute><HandoffDetail /></ProtectedRoute>} />
       <Route path="/intelligence" element={<ProtectedRoute><Intelligence /></ProtectedRoute>} />
+      <Route path="/machines" element={<ProtectedRoute><MachineList /></ProtectedRoute>} />
+      <Route path="/products" element={<ProtectedRoute><ProductList /></ProtectedRoute>} />
+      <Route path="/templates" element={<ProtectedRoute><TaskTemplates /></ProtectedRoute>} />
+      <Route path="/time" element={<ProtectedRoute><TimeTracking /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
   )
