@@ -54,6 +54,7 @@ ALTER TABLE opportunities ALTER COLUMN created_by DROP NOT NULL;
 -- ============================================================
 ALTER TABLE projects ALTER COLUMN account_id DROP NOT NULL;
 ALTER TABLE projects ALTER COLUMN opportunity_id DROP NOT NULL;
+ALTER TABLE projects ALTER COLUMN scope_id DROP NOT NULL;
 ALTER TABLE projects ALTER COLUMN start_date DROP NOT NULL;
 ALTER TABLE projects ALTER COLUMN planned_end_date DROP NOT NULL;
 ALTER TABLE projects ALTER COLUMN golive_target DROP NOT NULL;

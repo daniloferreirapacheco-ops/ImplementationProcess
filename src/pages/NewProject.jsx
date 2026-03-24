@@ -46,6 +46,10 @@ export default function NewProject() {
     try {
       const payload = { ...form, created_by: profile.id }
       if (!payload.opportunity_id) payload.opportunity_id = null
+      if (!payload.start_date) payload.start_date = null
+      if (!payload.planned_end_date) payload.planned_end_date = null
+      if (!payload.golive_target) payload.golive_target = null
+      if (!payload.notes) payload.notes = null
       const { data, error: err } = await supabase
         .from("projects")
         .insert(payload)
