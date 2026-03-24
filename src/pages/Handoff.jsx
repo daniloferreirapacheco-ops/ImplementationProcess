@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
@@ -8,10 +8,30 @@ const statusColors = {
   awaiting_review: "#3b82f6", approved: "#10b981", completed: "#6366f1"
 }
 
+const thStyle = {
+  padding: '6px 12px', textAlign: 'left', fontSize: '12px', fontWeight: '600',
+  color: '#64748b', borderBottom: '2px solid #d1d5db', backgroundColor: '#f1f5f9',
+  position: 'sticky', top: 0, whiteSpace: 'nowrap', textTransform: 'uppercase',
+  letterSpacing: '0.5px', userSelect: 'none'
+}
+
+const tdStyle = {
+  padding: '5px 12px', fontSize: '13px', color: '#1e293b',
+  borderBottom: '1px solid #e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden',
+  textOverflow: 'ellipsis', maxWidth: '300px'
+}
+
+const PER_PAGE = 25
+const statusFilters = ['all', 'not_started', 'in_preparation', 'awaiting_review', 'approved', 'completed']
+
 export default function Handoff() {
   const navigate = useNavigate()
   const [handoffs, setHandoffs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [hoveredRow, setHoveredRow] = useState(null)
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
 
   useEffect(() => { fetchHandoffs() }, [])
 
@@ -24,72 +44,158 @@ export default function Handoff() {
     setLoading(false)
   }
 
+  const filtered = handoffs.filter(h => {
+    const q = search.toLowerCase()
+    const matchesSearch = !q ||
+      (h.projects?.name || '').toLowerCase().includes(q) ||
+      (h.projects?.accounts?.name || '').toLowerCase().includes(q)
+    const matchesFilter = filter === 'all' || h.approval_status === filter
+    return matchesSearch && matchesFilter
+  })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const paged = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
+
+  const exportCSV = () => {
+    const headers = ['Project', 'Account', 'Status', 'Created', 'Updated']
+    const rows = filtered.map(h => [
+      h.projects?.name || '',
+      h.projects?.accounts?.name || '',
+      h.approval_status?.replace(/_/g, ' ') || '',
+      h.created_at ? new Date(h.created_at).toLocaleDateString() : '',
+      h.updated_at ? new Date(h.updated_at).toLocaleDateString() : ''
+    ])
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'handoff_packages.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Handoff" />
-      <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "20px 24px", display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: "flex", justifyContent: "space-between",
-          alignItems: "center", marginBottom: "24px" }}>
+          alignItems: "center", marginBottom: "12px" }}>
           <div>
-            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
+            <h1 style={{ fontSize: "20px", fontWeight: "700", color: "#1e293b", margin: "0 0 2px 0" }}>
               Support Handoff
             </h1>
-            <p style={{ color: "#64748b", margin: 0 }}>{handoffs.length} handoff packages</p>
+            <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{filtered.length} of {handoffs.length} handoff packages</p>
           </div>
           <button onClick={() => navigate("/handoff/new")}
             style={{ backgroundColor: "#14b8a6", color: "white", border: "none",
-              padding: "12px 24px", borderRadius: "8px", cursor: "pointer",
-              fontWeight: "600", fontSize: "14px" }}>
+              padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+              fontWeight: "600", fontSize: "13px" }}>
             + New Handoff Package
           </button>
         </div>
 
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
-        ) : handoffs.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
-            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>🤝</p>
-            <p style={{ color: "#64748b", fontSize: "18px", margin: "0 0 24px 0" }}>
-              No handoff packages yet
-            </p>
-            <button onClick={() => navigate("/handoff/new")}
-              style={{ backgroundColor: "#14b8a6", color: "white", border: "none",
-                padding: "12px 24px", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>
-              Create First Handoff
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {handoffs.map(h => (
-              <div key={h.id} onClick={() => navigate(`/handoff/${h.id}`)}
-                style={{ backgroundColor: "white", borderRadius: "12px", padding: "20px 24px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)", border: "1px solid #e2e8f0",
-                  cursor: "pointer", display: "flex", justifyContent: "space-between",
-                  alignItems: "center" }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)"}>
-                <div>
-                  <h3 style={{ margin: "0 0 4px 0", fontSize: "16px", fontWeight: "600", color: "#1e293b" }}>
-                    {h.projects?.name || "Untitled Handoff"}
-                  </h3>
-                  <span style={{ color: "#64748b", fontSize: "14px" }}>
-                    🏢 {h.projects?.accounts?.name || "No account"}
-                  </span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <span style={{ backgroundColor: (statusColors[h.approval_status] || "#94a3b8") + "20",
-                    color: statusColors[h.approval_status] || "#94a3b8",
-                    padding: "4px 12px", borderRadius: "20px", fontSize: "12px",
-                    fontWeight: "600", textTransform: "capitalize" }}>
-                    {h.approval_status?.replace(/_/g, " ")}
-                  </span>
-                  <span style={{ color: "#94a3b8" }}>→</span>
-                </div>
-              </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Search project or account..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1) }}
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '240px' }}
+          />
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {statusFilters.map(s => (
+              <button key={s} onClick={() => { setFilter(s); setPage(1) }}
+                style={{
+                  padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                  cursor: 'pointer', fontSize: '12px', fontWeight: '500',
+                  backgroundColor: filter === s ? '#1a1a2e' : 'white',
+                  color: filter === s ? 'white' : '#475569',
+                  textTransform: 'capitalize'
+                }}>
+                {s.replace(/_/g, ' ')}
+              </button>
             ))}
           </div>
+        </div>
+
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
+            <p style={{ fontSize: '14px', margin: 0 }}>No handoff packages found</p>
+          </div>
+        ) : (
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+              <thead>
+                <tr>
+                  <th style={{ ...thStyle, width: '28%' }}>Project</th>
+                  <th style={{ ...thStyle, width: '22%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '18%' }}>Status</th>
+                  <th style={{ ...thStyle, width: '16%' }}>Created</th>
+                  <th style={{ ...thStyle, width: '16%' }}>Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paged.map(h => (
+                  <tr key={h.id}
+                    onClick={() => navigate(`/handoff/${h.id}`)}
+                    onMouseEnter={() => setHoveredRow(h.id)}
+                    onMouseLeave={() => setHoveredRow(null)}
+                    style={{
+                      cursor: 'pointer',
+                      backgroundColor: hoveredRow === h.id ? '#eff6ff' : 'white'
+                    }}>
+                    <td style={{ ...tdStyle, fontWeight: '500' }}>
+                      {h.projects?.name || 'Untitled Handoff'}
+                    </td>
+                    <td style={tdStyle}>{h.projects?.accounts?.name || '—'}</td>
+                    <td style={tdStyle}>
+                      <span style={{
+                        backgroundColor: (statusColors[h.approval_status] || '#94a3b8') + '18',
+                        color: statusColors[h.approval_status] || '#94a3b8',
+                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px',
+                        fontWeight: '600', textTransform: 'capitalize' }}>
+                        {h.approval_status?.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td style={tdStyle}>
+                      {h.created_at ? new Date(h.created_at).toLocaleDateString() : '—'}
+                    </td>
+                    <td style={tdStyle}>
+                      {h.updated_at ? new Date(h.updated_at).toLocaleDateString() : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', fontSize: '12px', color: '#64748b', borderTop: '1px solid #e2e8f0' }}>
+          <button onClick={exportCSV}
+            style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+              cursor: 'pointer', fontSize: '12px', fontWeight: '500',
+              backgroundColor: 'white', color: '#475569' }}>
+            Export CSV
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage <= 1}
+              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                cursor: safePage <= 1 ? 'default' : 'pointer', fontSize: '12px', fontWeight: '500',
+                backgroundColor: 'white', color: safePage <= 1 ? '#cbd5e1' : '#475569' }}>
+              Prev
+            </button>
+            <span style={{ fontSize: '12px' }}>Page {safePage} of {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}
+              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                cursor: safePage >= totalPages ? 'default' : 'pointer', fontSize: '12px', fontWeight: '500',
+                backgroundColor: 'white', color: safePage >= totalPages ? '#cbd5e1' : '#475569' }}>
+              Next
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   )

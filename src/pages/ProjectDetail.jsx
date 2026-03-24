@@ -90,6 +90,12 @@ export default function ProjectDetail() {
     setSaving(false)
   }
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this project and all its milestones and blockers? This action cannot be undone.')) return
+    const { error } = await supabase.from('projects').delete().eq('id', id)
+    if (!error) navigate('/projects')
+  }
+
   const resolveBlocker = async (bId) => {
     await supabase.from("blockers").update({ status: "resolved" }).eq("id", bId)
     setBlockers(prev => prev.map(b => b.id === bId ? { ...b, status: "resolved" } : b))
@@ -151,6 +157,12 @@ export default function ProjectDetail() {
                 backgroundColor: "white", cursor: "pointer" }}>
               {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
+            <button onClick={handleDelete}
+              style={{ padding: "8px 16px", backgroundColor: "#fee2e2", color: "#dc2626",
+                border: "1px solid #fecaca", borderRadius: "8px", cursor: "pointer",
+                fontSize: "13px", fontWeight: "600" }}>
+              Delete
+            </button>
           </div>
         </div>
 

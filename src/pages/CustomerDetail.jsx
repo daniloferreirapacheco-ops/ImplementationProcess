@@ -59,6 +59,12 @@ export default function CustomerDetail() {
 
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) return
+    const { error } = await supabase.from('accounts').delete().eq('id', id)
+    if (!error) navigate('/customers')
+  }
+
   if (loading) return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Customers" />
@@ -101,11 +107,18 @@ export default function CustomerDetail() {
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             {!editing ? (
-              <button onClick={() => setEditing(true)}
-                style={{ padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white',
-                  border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
-                Edit
-              </button>
+              <>
+                <button onClick={() => setEditing(true)}
+                  style={{ padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white',
+                    border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                  Edit
+                </button>
+                <button onClick={handleDelete}
+                  style={{ padding: '10px 20px', backgroundColor: '#fee2e2', color: '#dc2626',
+                    border: '1px solid #fecaca', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                  Delete
+                </button>
+              </>
             ) : (
               <>
                 <button onClick={() => { setEditing(false); setForm(account) }}
