@@ -25,6 +25,12 @@ import MachineList from "./pages/MachineList"
 import ProductList from "./pages/ProductList"
 import TaskTemplates from "./pages/TaskTemplates"
 import TimeTracking from "./pages/TimeTracking"
+import Customers from "./pages/Customers"
+import NewCustomer from "./pages/NewCustomer"
+import CustomerDetail from "./pages/CustomerDetail"
+import Contacts from "./pages/Contacts"
+import NewContact from "./pages/NewContact"
+import ContactDetail from "./pages/ContactDetail"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -56,6 +62,12 @@ function AppRoutes() {
       <Route path="/handoff/new" element={<ProtectedRoute><NewHandoff /></ProtectedRoute>} />
       <Route path="/handoff/:id" element={<ProtectedRoute><HandoffDetail /></ProtectedRoute>} />
       <Route path="/intelligence" element={<ProtectedRoute><Intelligence /></ProtectedRoute>} />
+      <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+      <Route path="/customers/new" element={<ProtectedRoute><NewCustomer /></ProtectedRoute>} />
+      <Route path="/customers/:id" element={<ProtectedRoute><CustomerDetail /></ProtectedRoute>} />
+      <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
+      <Route path="/contacts/new" element={<ProtectedRoute><NewContact /></ProtectedRoute>} />
+      <Route path="/contacts/:id" element={<ProtectedRoute><ContactDetail /></ProtectedRoute>} />
       <Route path="/machines" element={<ProtectedRoute><MachineList /></ProtectedRoute>} />
       <Route path="/products" element={<ProtectedRoute><ProductList /></ProtectedRoute>} />
       <Route path="/templates" element={<ProtectedRoute><TaskTemplates /></ProtectedRoute>} />

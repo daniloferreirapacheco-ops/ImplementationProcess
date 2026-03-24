@@ -12,6 +12,8 @@ export default function NavBar({ current }) {
 
   const navItems = [
     { label: "Dashboard", path: "/dashboard", icon: "⚡" },
+    { label: "Customers", path: "/customers", icon: "🏢" },
+    { label: "Contacts", path: "/contacts", icon: "👤" },
     { label: "Opportunities", path: "/opportunities", icon: "💼" },
     { label: "Discovery", path: "/discovery", icon: "🔍" },
     { label: "Scope", path: "/scope", icon: "📋" },
