@@ -16,19 +16,19 @@ const roleLabels = {
 
 const widgets = {
   admin: [
-    { title: "Pending Approvals", value: "0", icon: "✅", color: "#6366f1", link: "/approvals" },
+    { title: "Pending Approvals", value: "0", icon: "✅", color: "#6366f1", link: "/scope" },
     { title: "Active Projects", value: "0", icon: "📁", color: "#3b82f6", link: "/projects" },
     { title: "Open Opportunities", value: "0", icon: "💼", color: "#f59e0b", link: "/opportunities" },
     { title: "Pending Handoffs", value: "0", icon: "🤝", color: "#ef4444", link: "/handoff" },
     { title: "Projects At Risk", value: "0", icon: "⚠️", color: "#dc2626", link: "/projects" },
-    { title: "Team Capacity", value: "0%", icon: "👥", color: "#10b981", link: "/capacity" },
+    { title: "Team Capacity", value: "0%", icon: "👥", color: "#10b981", link: "/time" },
   ],
   leadership: [
     { title: "Portfolio Health", value: "Good", icon: "📊", color: "#8b5cf6", link: "/projects" },
     { title: "Active Projects", value: "0", icon: "📁", color: "#3b82f6", link: "/projects" },
     { title: "Projects At Risk", value: "0", icon: "⚠️", color: "#dc2626", link: "/projects" },
-    { title: "Pending Approvals", value: "0", icon: "✅", color: "#6366f1", link: "/approvals" },
-    { title: "Estimate Accuracy", value: "0%", icon: "🎯", color: "#10b981", link: "/analytics" },
+    { title: "Pending Approvals", value: "0", icon: "✅", color: "#6366f1", link: "/scope" },
+    { title: "Estimate Accuracy", value: "0%", icon: "🎯", color: "#10b981", link: "/intelligence" },
     { title: "Upcoming Go-Lives", value: "0", icon: "🚀", color: "#f59e0b", link: "/projects" },
   ],
   project_manager: [
@@ -50,7 +50,7 @@ const widgets = {
   sales: [
     { title: "Open Opportunities", value: "0", icon: "💼", color: "#f59e0b", link: "/opportunities" },
     { title: "Needs Discovery", value: "0", icon: "🔍", color: "#3b82f6", link: "/opportunities" },
-    { title: "Scopes Pending Approval", value: "0", icon: "✅", color: "#6366f1", link: "/approvals" },
+    { title: "Scopes Pending Approval", value: "0", icon: "✅", color: "#6366f1", link: "/scope" },
     { title: "High Risk Deals", value: "0", icon: "⚠️", color: "#dc2626", link: "/opportunities" },
     { title: "Ready to Convert", value: "0", icon: "🚀", color: "#10b981", link: "/opportunities" },
     { title: "Closed This Month", value: "0", icon: "🏆", color: "#8b5cf6", link: "/opportunities" },
@@ -64,10 +64,10 @@ const widgets = {
     { title: "Support Sensitive", value: "0", icon: "⚡", color: "#8b5cf6", link: "/projects" },
   ],
   product_specialist: [
-    { title: "Technical Reviews Due", value: "0", icon: "🔬", color: "#06b6d4", link: "/approvals" },
+    { title: "Technical Reviews Due", value: "0", icon: "🔬", color: "#06b6d4", link: "/scope" },
     { title: "Advanced Requests", value: "0", icon: "⚙️", color: "#6366f1", link: "/opportunities" },
     { title: "Integration Reviews", value: "0", icon: "🔗", color: "#3b82f6", link: "/projects" },
-    { title: "Custom Logic Pending", value: "0", icon: "💡", color: "#f59e0b", link: "/approvals" },
+    { title: "Custom Logic Pending", value: "0", icon: "💡", color: "#f59e0b", link: "/scope" },
     { title: "Open Technical Risks", value: "0", icon: "⚠️", color: "#dc2626", link: "/projects" },
     { title: "Pending Sign-offs", value: "0", icon: "✅", color: "#10b981", link: "/testing" },
   ]
@@ -145,11 +145,11 @@ export default function Dashboard() {
               </button>
             )}
             {role === "admin" && (
-              <button onClick={() => navigate("/admin/users")}
+              <button onClick={() => navigate("/customers")}
                 style={{ backgroundColor: "#6366f1", color: "white", border: "none",
                   padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
                   fontWeight: "600", fontSize: "14px" }}>
-                👥 Manage Users
+                👥 Manage Customers
               </button>
             )}
             {(role === "consultant" || role === "admin") && (

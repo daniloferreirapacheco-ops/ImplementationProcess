@@ -35,12 +35,13 @@ const stageColors = {
 
 const urgencyColors = {
   low: '#10b981',
-  normal: '#3b82f6',
+  medium: '#3b82f6',
   high: '#f59e0b',
   critical: '#ef4444'
 }
 
 const complexityColors = {
+  low: '#10b981',
   standard: '#10b981',
   medium: '#f59e0b',
   high: '#ef4444'

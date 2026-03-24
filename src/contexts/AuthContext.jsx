@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe()
   }, [])
 
-const fetchProfile = async (userId) => {
+  const fetchProfile = async (userId) => {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')

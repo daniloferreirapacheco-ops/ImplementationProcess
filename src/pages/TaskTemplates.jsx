@@ -59,7 +59,7 @@ export default function TaskTemplates() {
       .from('task_templates')
       .select('*')
       .eq('project_id', projectId)
-      .order('phase, sort_order')
+      .order('sort_order')
     if (data && data.length > 0) {
       setTasks(data)
     } else {

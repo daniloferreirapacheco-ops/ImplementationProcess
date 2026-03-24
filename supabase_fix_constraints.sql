@@ -213,6 +213,14 @@ ALTER TABLE handoff_packages ALTER COLUMN created_by DROP NOT NULL;
 ALTER TABLE handoff_packages ALTER COLUMN completed_at DROP NOT NULL;
 
 -- ============================================================
+-- ADD MISSING COLUMNS
+-- ============================================================
+
+-- task_templates: missing estimated_hours and is_custom
+ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS estimated_hours NUMERIC;
+ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS is_custom BOOLEAN DEFAULT false;
+
+-- ============================================================
 -- REFRESH SCHEMA CACHE
 -- ============================================================
 NOTIFY pgrst, 'reload schema';

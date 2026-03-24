@@ -21,7 +21,7 @@ const stageLabels = {
 }
 
 const urgencyColors = {
-  low: '#10b981', normal: '#3b82f6', high: '#f59e0b', critical: '#ef4444'
+  low: '#10b981', medium: '#3b82f6', high: '#f59e0b', critical: '#ef4444'
 }
 
 const thStyle = {
