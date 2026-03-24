@@ -78,9 +78,9 @@ export default function NewHandoff() {
     padding: "24px", marginBottom: "20px", border: "1px solid #e2e8f0" }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Handoff" />
-      <div style={{ padding: "32px", maxWidth: "900px", margin: "0 auto" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "center", marginBottom: "24px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: 0 }}>
@@ -182,7 +182,7 @@ export default function NewHandoff() {
             opacity: loading ? 0.7 : 1 }}>
           {loading ? "Creating..." : "Create Handoff Package"}
         </button>
-      </div>
+      </main>
     </div>
   )
 }

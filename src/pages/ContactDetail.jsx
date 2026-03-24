@@ -56,16 +56,20 @@ export default function ContactDetail() {
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Contacts" />
-      <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Loading...</p>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px' }}>
+        <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Loading...</p>
+      </main>
     </div>
   )
 
   if (!contact) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Contacts" />
-      <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Contact not found</p>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px' }}>
+        <p style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>Contact not found</p>
+      </main>
     </div>
   )
 
@@ -75,10 +79,10 @@ export default function ContactDetail() {
     fontSize: '14px', color: '#374151' }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <NavBar current="Contacts" />
 
-      <div style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
+      <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
         <button onClick={() => navigate('/contacts')}
           style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
             fontSize: '14px', padding: 0, marginBottom: '16px' }}>
@@ -204,7 +208,7 @@ export default function ContactDetail() {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }

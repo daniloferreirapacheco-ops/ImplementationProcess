@@ -62,9 +62,9 @@ export default function NewProject() {
     fontWeight: "500", fontSize: "14px", color: "#374151" }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Projects" />
-      <div style={{ padding: "32px", maxWidth: "800px", margin: "0 auto" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "center", marginBottom: "24px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: 0 }}>
@@ -149,7 +149,7 @@ export default function NewProject() {
             {loading ? "Creating..." : "Create Project"}
           </button>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

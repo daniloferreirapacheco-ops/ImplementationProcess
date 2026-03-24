@@ -25,9 +25,9 @@ export default function Handoff() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Handoff" />
-      <div style={{ padding: "32px" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "center", marginBottom: "24px" }}>
           <div>
@@ -90,7 +90,7 @@ export default function Handoff() {
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   )
 }

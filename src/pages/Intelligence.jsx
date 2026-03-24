@@ -80,9 +80,9 @@ export default function Intelligence() {
   )
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Dashboard" />
-      <div style={{ padding: "32px" }}>
+      <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ marginBottom: "32px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
             Intelligence Dashboard
@@ -225,7 +225,7 @@ export default function Intelligence() {
             </div>
           </>
         )}
-      </div>
+      </main>
     </div>
   )
 }
