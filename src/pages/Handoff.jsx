@@ -21,11 +21,17 @@ const tdStyle = {
   textOverflow: 'ellipsis', maxWidth: '300px'
 }
 
+const PER_PAGE = 25
+const statusFilters = ['all', 'not_started', 'in_preparation', 'awaiting_review', 'approved', 'completed']
+
 export default function Handoff() {
   const navigate = useNavigate()
   const [handoffs, setHandoffs] = useState([])
   const [loading, setLoading] = useState(true)
   const [hoveredRow, setHoveredRow] = useState(null)
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
 
   useEffect(() => { fetchHandoffs() }, [])
 
@@ -38,6 +44,38 @@ export default function Handoff() {
     setLoading(false)
   }
 
+  const filtered = handoffs.filter(h => {
+    const q = search.toLowerCase()
+    const matchesSearch = !q ||
+      (h.projects?.name || '').toLowerCase().includes(q) ||
+      (h.projects?.accounts?.name || '').toLowerCase().includes(q)
+    const matchesFilter = filter === 'all' || h.approval_status === filter
+    return matchesSearch && matchesFilter
+  })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const paged = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
+
+  const exportCSV = () => {
+    const headers = ['Project', 'Account', 'Status', 'Created', 'Updated']
+    const rows = filtered.map(h => [
+      h.projects?.name || '',
+      h.projects?.accounts?.name || '',
+      h.approval_status?.replace(/_/g, ' ') || '',
+      h.created_at ? new Date(h.created_at).toLocaleDateString() : '',
+      h.updated_at ? new Date(h.updated_at).toLocaleDateString() : ''
+    ])
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'handoff_packages.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Handoff" />
@@ -48,7 +86,7 @@ export default function Handoff() {
             <h1 style={{ fontSize: "20px", fontWeight: "700", color: "#1e293b", margin: "0 0 2px 0" }}>
               Support Handoff
             </h1>
-            <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{handoffs.length} handoff packages</p>
+            <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{filtered.length} of {handoffs.length} handoff packages</p>
           </div>
           <button onClick={() => navigate("/handoff/new")}
             style={{ backgroundColor: "#14b8a6", color: "white", border: "none",
@@ -58,11 +96,35 @@ export default function Handoff() {
           </button>
         </div>
 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Search project or account..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1) }}
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '240px' }}
+          />
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {statusFilters.map(s => (
+              <button key={s} onClick={() => { setFilter(s); setPage(1) }}
+                style={{
+                  padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                  cursor: 'pointer', fontSize: '12px', fontWeight: '500',
+                  backgroundColor: filter === s ? '#1a1a2e' : 'white',
+                  color: filter === s ? 'white' : '#475569',
+                  textTransform: 'capitalize'
+                }}>
+                {s.replace(/_/g, ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
-        ) : handoffs.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>No handoff packages yet</p>
+            <p style={{ fontSize: '14px', margin: 0 }}>No handoff packages found</p>
           </div>
         ) : (
           <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
@@ -77,7 +139,7 @@ export default function Handoff() {
                 </tr>
               </thead>
               <tbody>
-                {handoffs.map(h => (
+                {paged.map(h => (
                   <tr key={h.id}
                     onClick={() => navigate(`/handoff/${h.id}`)}
                     onMouseEnter={() => setHoveredRow(h.id)}
@@ -111,8 +173,28 @@ export default function Handoff() {
             </table>
           </div>
         )}
-        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0' }}>
-          {handoffs.length} record{handoffs.length !== 1 ? 's' : ''}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', fontSize: '12px', color: '#64748b', borderTop: '1px solid #e2e8f0' }}>
+          <button onClick={exportCSV}
+            style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+              cursor: 'pointer', fontSize: '12px', fontWeight: '500',
+              backgroundColor: 'white', color: '#475569' }}>
+            Export CSV
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage <= 1}
+              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                cursor: safePage <= 1 ? 'default' : 'pointer', fontSize: '12px', fontWeight: '500',
+                backgroundColor: 'white', color: safePage <= 1 ? '#cbd5e1' : '#475569' }}>
+              Prev
+            </button>
+            <span style={{ fontSize: '12px' }}>Page {safePage} of {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}
+              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                cursor: safePage >= totalPages ? 'default' : 'pointer', fontSize: '12px', fontWeight: '500',
+                backgroundColor: 'white', color: safePage >= totalPages ? '#cbd5e1' : '#475569' }}>
+              Next
+            </button>
+          </div>
         </div>
       </main>
     </div>

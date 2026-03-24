@@ -72,6 +72,12 @@ export default function OpportunityDetail() {
     setLoading(false)
   }
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this opportunity? This action cannot be undone.')) return
+    const { error } = await supabase.from('opportunities').delete().eq('id', id)
+    if (!error) navigate('/opportunities')
+  }
+
   const updateStage = async (newStage) => {
     setSaving(true)
     const { error } = await supabase
@@ -321,6 +327,13 @@ return (
                     color: '#ef4444', border: '1px solid #fecaca', borderRadius: '8px',
                     cursor: 'pointer', fontWeight: '600', fontSize: '14px', textAlign: 'left' }}>
                   ✗ Close as Lost
+                </button>
+                <button
+                  onClick={handleDelete}
+                  style={{ width: '100%', padding: '12px', backgroundColor: '#fee2e2',
+                    color: '#dc2626', border: '1px solid #fecaca', borderRadius: '8px',
+                    cursor: 'pointer', fontWeight: '600', fontSize: '14px', textAlign: 'left', marginTop: '8px' }}>
+                  🗑 Delete Opportunity
                 </button>
               </div>
             </div>

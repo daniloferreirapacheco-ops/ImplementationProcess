@@ -31,12 +31,15 @@ const tdStyle = {
   textOverflow: 'ellipsis', maxWidth: '300px'
 }
 
+const PER_PAGE = 25
+
 export default function Projects() {
   const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("active")
   const [hoveredRow, setHoveredRow] = useState(null)
+  const [page, setPage] = useState(1)
 
   useEffect(() => { fetchProjects() }, [])
 
@@ -69,12 +72,28 @@ export default function Projects() {
             </h1>
             <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{filtered.length} of {projects.length} projects</p>
           </div>
-          <button onClick={() => navigate("/projects/new")}
-            style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
-              padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
-              fontWeight: "600", fontSize: "13px" }}>
-            + New Project
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => {
+              const headers = ['Name', 'Account', 'Status', 'Health', 'Go-Live Date', 'Created']
+              const rows = filtered.map(p => [p.name, p.accounts?.name, p.status?.replace(/_/g, ' '), p.health, p.golive_target || '', p.created_at ? new Date(p.created_at).toLocaleDateString() : ''].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+              const csv = [headers.join(','), ...rows].join('\n')
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = URL.createObjectURL(blob)
+              const link = document.createElement('a'); link.href = url; link.download = 'projects.csv'; link.click()
+              URL.revokeObjectURL(url)
+            }}
+              style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
+                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '500' }}>
+              Export CSV
+            </button>
+            <button onClick={() => navigate("/projects/new")}
+              style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
+                padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+                fontWeight: "600", fontSize: "13px" }}>
+              + New Project
+            </button>
+          </div>
         </div>
 
         <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
@@ -85,7 +104,7 @@ export default function Projects() {
             { key: "golive", label: "Go-Live" },
             { key: "closed", label: "Closed" },
           ].map(f => (
-            <button key={f.key} onClick={() => setFilter(f.key)}
+            <button key={f.key} onClick={() => { setFilter(f.key); setPage(1) }}
               style={{ padding: "4px 12px", borderRadius: "4px", border: '1px solid #d1d5db',
                 cursor: "pointer", fontSize: "12px", fontWeight: "500",
                 backgroundColor: filter === f.key ? "#1a1a2e" : "white",
@@ -115,7 +134,7 @@ export default function Projects() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(project => (
+                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(project => (
                   <tr key={project.id}
                     onClick={() => navigate(`/projects/${project.id}`)}
                     onMouseEnter={() => setHoveredRow(project.id)}
@@ -152,8 +171,19 @@ export default function Projects() {
             </table>
           </div>
         )}
-        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0' }}>
-          {filtered.length} record{filtered.length !== 1 ? 's' : ''} ({projects.length} total)
+        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{filtered.length} record{filtered.length !== 1 ? 's' : ''} ({projects.length} total)</span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: page <= 1 ? 'default' : 'pointer', backgroundColor: 'white', color: page <= 1 ? '#cbd5e1' : '#475569' }}>
+              Prev
+            </button>
+            <span>Page {page} of {Math.max(1, Math.ceil(filtered.length / PER_PAGE))}</span>
+            <button onClick={() => setPage(p => Math.min(Math.ceil(filtered.length / PER_PAGE), p + 1))} disabled={page >= Math.ceil(filtered.length / PER_PAGE)}
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: page >= Math.ceil(filtered.length / PER_PAGE) ? 'default' : 'pointer', backgroundColor: 'white', color: page >= Math.ceil(filtered.length / PER_PAGE) ? '#cbd5e1' : '#475569' }}>
+              Next
+            </button>
+          </div>
         </div>
       </main>
     </div>

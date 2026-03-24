@@ -21,11 +21,16 @@ const tdStyle = {
   textOverflow: 'ellipsis', maxWidth: '300px'
 }
 
+const PER_PAGE = 25
+
 export default function Testing() {
   const navigate = useNavigate()
   const [cycles, setCycles] = useState([])
   const [loading, setLoading] = useState(true)
   const [hoveredRow, setHoveredRow] = useState(null)
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
 
   useEffect(() => { fetchCycles() }, [])
 
@@ -38,6 +43,35 @@ export default function Testing() {
     setLoading(false)
   }
 
+  const filtered = cycles.filter(c => {
+    const matchesSearch = search === '' ||
+      (c.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (c.projects?.name || '').toLowerCase().includes(search.toLowerCase())
+    const matchesFilter = filter === 'all' || c.status === filter
+    return matchesSearch && matchesFilter
+  })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const paginated = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
+
+  const exportCSV = () => {
+    const headers = ['Cycle Name', 'Project', 'Status', 'Passed', 'Failed', 'Pass Rate']
+    const rows = filtered.map(c => {
+      const total = (c.pass_count || 0) + (c.fail_count || 0)
+      const rate = total > 0 ? Math.round((c.pass_count / total) * 100) + '%' : '—'
+      return [c.name, c.projects?.name || '', c.status || '', c.pass_count || 0, c.fail_count || 0, rate]
+    })
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'test_cycles.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Testing" />
@@ -48,14 +82,43 @@ export default function Testing() {
             <h1 style={{ fontSize: "20px", fontWeight: "700", color: "#1e293b", margin: "0 0 2px 0" }}>
               Testing Center
             </h1>
-            <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{cycles.length} test cycles</p>
+            <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{filtered.length} of {cycles.length} test cycles</p>
           </div>
-          <button onClick={() => navigate("/testing/new")}
-            style={{ backgroundColor: "#06b6d4", color: "white", border: "none",
-              padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
-              fontWeight: "600", fontSize: "13px" }}>
-            + New Test Cycle
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={exportCSV}
+              style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
+                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '500' }}>
+              Export CSV
+            </button>
+            <button onClick={() => navigate("/testing/new")}
+              style={{ backgroundColor: "#06b6d4", color: "white", border: "none",
+                padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+                fontWeight: "600", fontSize: "13px" }}>
+              + New Test Cycle
+            </button>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Search cycles or projects..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1) }}
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '240px' }}
+          />
+          {['all', 'not_started', 'in_progress', 'passed', 'failed', 'blocked'].map(s => (
+            <button key={s} onClick={() => { setFilter(s); setPage(1) }}
+              style={{
+                padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                cursor: 'pointer', fontSize: '12px', fontWeight: '500',
+                backgroundColor: filter === s ? '#1a1a2e' : 'white',
+                color: filter === s ? 'white' : '#475569'
+              }}>
+              {s === 'all' ? 'All' : s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+            </button>
+          ))}
         </div>
 
         {loading ? (
@@ -79,7 +142,7 @@ export default function Testing() {
                 </tr>
               </thead>
               <tbody>
-                {cycles.map(cycle => {
+                {paginated.map(cycle => {
                   const total = (cycle.pass_count || 0) + (cycle.fail_count || 0)
                   const passRate = total > 0 ? Math.round((cycle.pass_count / total) * 100) : 0
                   return (
@@ -119,8 +182,23 @@ export default function Testing() {
             </table>
           </div>
         )}
-        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0' }}>
-          {cycles.length} record{cycles.length !== 1 ? 's' : ''}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', fontSize: '12px', color: '#64748b', borderTop: '1px solid #e2e8f0' }}>
+          <span>{filtered.length} record{filtered.length !== 1 ? 's' : ''}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage <= 1}
+              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                backgroundColor: safePage <= 1 ? '#f1f5f9' : 'white', color: safePage <= 1 ? '#94a3b8' : '#475569',
+                cursor: safePage <= 1 ? 'default' : 'pointer', fontSize: '12px' }}>
+              Prev
+            </button>
+            <span style={{ fontSize: '12px' }}>Page {safePage} of {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}
+              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                backgroundColor: safePage >= totalPages ? '#f1f5f9' : 'white', color: safePage >= totalPages ? '#94a3b8' : '#475569',
+                cursor: safePage >= totalPages ? 'default' : 'pointer', fontSize: '12px' }}>
+              Next
+            </button>
+          </div>
         </div>
       </main>
     </div>

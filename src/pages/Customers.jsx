@@ -17,6 +17,8 @@ const tdStyle = {
   textOverflow: 'ellipsis', maxWidth: '300px'
 }
 
+const PER_PAGE = 25
+
 export default function Customers() {
   const { profile } = useAuth()
   const navigate = useNavigate()
@@ -25,6 +27,7 @@ export default function Customers() {
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     fetchAccounts()
@@ -64,22 +67,38 @@ export default function Customers() {
               {filtered.length} of {accounts.length} accounts | {totalActive} active
             </p>
           </div>
-          <button onClick={() => navigate('/customers/new')}
-            style={{ padding: '7px 16px', backgroundColor: '#6366f1', color: 'white',
-              border: 'none', borderRadius: '4px', cursor: 'pointer',
-              fontSize: '13px', fontWeight: '600' }}>
-            + New Customer
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => {
+              const headers = ['Name', 'Industry', 'City', 'State', 'Phone', 'Status', 'Website']
+              const rows = filtered.map(a => [a.name, a.industry, a.city, a.state, a.phone, a.status || 'active', a.website].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+              const csv = [headers.join(','), ...rows].join('\n')
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = URL.createObjectURL(blob)
+              const link = document.createElement('a'); link.href = url; link.download = 'customers.csv'; link.click()
+              URL.revokeObjectURL(url)
+            }}
+              style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
+                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '500' }}>
+              Export CSV
+            </button>
+            <button onClick={() => navigate('/customers/new')}
+              style={{ padding: '7px 16px', backgroundColor: '#6366f1', color: 'white',
+                border: 'none', borderRadius: '4px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '600' }}>
+              + New Customer
+            </button>
+          </div>
         </div>
 
         {/* Search & Filters */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', alignItems: 'center' }}>
-          <input value={search} onChange={e => setSearch(e.target.value)}
+          <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
             placeholder="Search customers..."
             style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
               fontSize: '13px', width: '240px' }} />
           {['all', 'active', 'inactive'].map(f => (
-            <button key={f} onClick={() => setFilter(f)}
+            <button key={f} onClick={() => { setFilter(f); setPage(1) }}
               style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
                 cursor: 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: filter === f ? '#1a1a2e' : 'white',
@@ -110,7 +129,7 @@ export default function Customers() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(account => (
+                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(account => (
                   <tr key={account.id}
                     onClick={() => navigate(`/customers/${account.id}`)}
                     onMouseEnter={() => setHoveredRow(account.id)}
@@ -143,8 +162,19 @@ export default function Customers() {
             </table>
           </div>
         )}
-        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0' }}>
-          {filtered.length} record{filtered.length !== 1 ? 's' : ''} ({accounts.length} total)
+        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{filtered.length} record{filtered.length !== 1 ? 's' : ''} ({accounts.length} total)</span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: page <= 1 ? 'default' : 'pointer', backgroundColor: 'white', color: page <= 1 ? '#cbd5e1' : '#475569' }}>
+              Prev
+            </button>
+            <span>Page {page} of {Math.max(1, Math.ceil(filtered.length / PER_PAGE))}</span>
+            <button onClick={() => setPage(p => Math.min(Math.ceil(filtered.length / PER_PAGE), p + 1))} disabled={page >= Math.ceil(filtered.length / PER_PAGE)}
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: page >= Math.ceil(filtered.length / PER_PAGE) ? 'default' : 'pointer', backgroundColor: 'white', color: page >= Math.ceil(filtered.length / PER_PAGE) ? '#cbd5e1' : '#475569' }}>
+              Next
+            </button>
+          </div>
         </div>
       </main>
     </div>

@@ -31,6 +31,14 @@ export default function TimeTracking() {
     notes: ''
   })
 
+  // Edit state
+  const [editingEntry, setEditingEntry] = useState(null)
+  const [editForm, setEditForm] = useState({ task_name: '', date: '', hours: '', rate: '', notes: '' })
+
+  // Pagination
+  const PER_PAGE = 25
+  const [page, setPage] = useState(1)
+
   useEffect(() => { loadProjects() }, [])
   useEffect(() => {
     if (selectedProject) {
@@ -140,6 +148,68 @@ export default function TimeTracking() {
     loadEntries()
   }
 
+  const startEditing = (entry) => {
+    setEditingEntry(entry.id)
+    setEditForm({
+      task_name: entry.task_name || '',
+      date: entry.date || '',
+      hours: entry.hours || '',
+      rate: entry.rate || '',
+      notes: entry.notes || ''
+    })
+  }
+
+  const cancelEditing = () => {
+    setEditingEntry(null)
+    setEditForm({ task_name: '', date: '', hours: '', rate: '', notes: '' })
+  }
+
+  const handleEditSave = async () => {
+    const hours = parseFloat(editForm.hours) || 0
+    const rate = parseFloat(editForm.rate) || 0
+    const { error: err } = await supabase
+      .from('time_entries')
+      .update({
+        task_name: editForm.task_name,
+        date: editForm.date,
+        hours,
+        rate,
+        cost: hours * rate,
+        notes: editForm.notes
+      })
+      .eq('id', editingEntry)
+    if (err) { setError(err.message); return }
+    setEditingEntry(null)
+    setEditForm({ task_name: '', date: '', hours: '', rate: '', notes: '' })
+    loadEntries()
+  }
+
+  const handleExportCSV = () => {
+    if (entries.length === 0) return
+    const headers = ['Date', 'Task', 'User', 'Hours', 'Rate', 'Cost', 'Notes']
+    const rows = entries.map(e => [
+      e.date,
+      `"${(e.task_name || '').replace(/"/g, '""')}"`,
+      `"${(e.user_name || '').replace(/"/g, '""')}"`,
+      e.hours,
+      e.rate,
+      e.cost || 0,
+      `"${(e.notes || '').replace(/"/g, '""')}"`
+    ])
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `time-entries-${selectedProject}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // Pagination helpers
+  const totalPages = Math.max(1, Math.ceil(entries.length / PER_PAGE))
+  const paginatedEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+
   const totalHours = entries.reduce((sum, e) => sum + (e.hours || 0), 0)
   const totalCost = entries.reduce((sum, e) => sum + (e.cost || 0), 0)
 
@@ -181,6 +251,12 @@ export default function TimeTracking() {
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
+            <button onClick={handleExportCSV}
+              style={{ padding: '10px 20px', backgroundColor: '#f1f5f9', color: '#475569',
+                border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer',
+                fontSize: '14px', fontWeight: '500' }}>
+              Export CSV
+            </button>
             <button onClick={() => setShowForm(true)}
               style={{ padding: '10px 20px', backgroundColor: '#f59e0b', color: 'white',
                 border: 'none', borderRadius: '8px', cursor: 'pointer',
@@ -417,31 +493,115 @@ export default function TimeTracking() {
                 </tr>
               </thead>
               <tbody>
-                {entries.map(entry => (
-                  <tr key={entry.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1e293b' }}>{entry.date}</td>
-                    <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1e293b', fontWeight: '500' }}>{entry.task_name}</td>
-                    <td style={{ padding: '12px 16px', fontSize: '13px', color: '#64748b' }}>{entry.user_name}</td>
-                    <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1e293b', fontWeight: '600' }}>{entry.hours}h</td>
-                    <td style={{ padding: '12px 16px', fontSize: '13px', color: '#64748b' }}>${entry.rate}/hr</td>
-                    <td style={{ padding: '12px 16px', fontSize: '13px', color: '#10b981', fontWeight: '600' }}>
-                      ${(entry.cost || 0).toLocaleString()}
-                    </td>
-                    <td style={{ padding: '12px 16px', fontSize: '12px', color: '#94a3b8', maxWidth: '200px',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {entry.notes}
-                    </td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <button onClick={() => handleDelete(entry.id)}
-                        style={{ background: 'none', border: 'none', color: '#dc2626',
-                          cursor: 'pointer', fontSize: '12px' }}>
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+                {paginatedEntries.map(entry => (
+                  entry.id === editingEntry ? (
+                    <tr key={entry.id} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: '#fffbeb' }}>
+                      <td style={{ padding: '8px 16px' }}>
+                        <input type="date" value={editForm.date} onChange={e => setEditForm(prev => ({ ...prev, date: e.target.value }))}
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                      </td>
+                      <td style={{ padding: '8px 16px' }}>
+                        <input value={editForm.task_name} onChange={e => setEditForm(prev => ({ ...prev, task_name: e.target.value }))}
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                      </td>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#64748b' }}>{entry.user_name}</td>
+                      <td style={{ padding: '8px 16px' }}>
+                        <input type="number" step="0.25" value={editForm.hours} onChange={e => setEditForm(prev => ({ ...prev, hours: e.target.value }))}
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                      </td>
+                      <td style={{ padding: '8px 16px' }}>
+                        <input type="number" value={editForm.rate} onChange={e => setEditForm(prev => ({ ...prev, rate: e.target.value }))}
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                      </td>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#10b981', fontWeight: '600' }}>
+                        ${((parseFloat(editForm.hours) || 0) * (parseFloat(editForm.rate) || 0)).toFixed(2)}
+                      </td>
+                      <td style={{ padding: '8px 16px' }}>
+                        <input value={editForm.notes} onChange={e => setEditForm(prev => ({ ...prev, notes: e.target.value }))}
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                      </td>
+                      <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
+                        <button onClick={handleEditSave}
+                          style={{ background: 'none', border: 'none', color: '#10b981',
+                            cursor: 'pointer', fontSize: '12px', fontWeight: '600', marginRight: '8px' }}>
+                          Save
+                        </button>
+                        <button onClick={cancelEditing}
+                          style={{ background: 'none', border: 'none', color: '#64748b',
+                            cursor: 'pointer', fontSize: '12px' }}>
+                          Cancel
+                        </button>
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={entry.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1e293b' }}>{entry.date}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1e293b', fontWeight: '500' }}>{entry.task_name}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#64748b' }}>{entry.user_name}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1e293b', fontWeight: '600' }}>{entry.hours}h</td>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#64748b' }}>${entry.rate}/hr</td>
+                      <td style={{ padding: '12px 16px', fontSize: '13px', color: '#10b981', fontWeight: '600' }}>
+                        ${(entry.cost || 0).toLocaleString()}
+                      </td>
+                      <td style={{ padding: '12px 16px', fontSize: '12px', color: '#94a3b8', maxWidth: '200px',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {entry.notes}
+                      </td>
+                      <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
+                        <button onClick={() => startEditing(entry)}
+                          style={{ background: 'none', border: 'none', color: '#3b82f6',
+                            cursor: 'pointer', fontSize: '12px', marginRight: '8px' }}>
+                          Edit
+                        </button>
+                        <button onClick={() => handleDelete(entry.id)}
+                          style={{ background: 'none', border: 'none', color: '#dc2626',
+                            cursor: 'pointer', fontSize: '12px' }}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  )
                 ))}
               </tbody>
             </table>
+          )}
+          {/* Pagination Controls */}
+          {entries.length > PER_PAGE && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '12px 20px', borderTop: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '13px', color: '#64748b' }}>
+                Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, entries.length)} of {entries.length}
+              </span>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <button onClick={() => setPage(1)} disabled={page === 1}
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                    backgroundColor: page === 1 ? '#f1f5f9' : 'white', color: page === 1 ? '#94a3b8' : '#475569',
+                    cursor: page === 1 ? 'default' : 'pointer', fontSize: '13px' }}>
+                  First
+                </button>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                    backgroundColor: page === 1 ? '#f1f5f9' : 'white', color: page === 1 ? '#94a3b8' : '#475569',
+                    cursor: page === 1 ? 'default' : 'pointer', fontSize: '13px' }}>
+                  Prev
+                </button>
+                <span style={{ padding: '6px 12px', fontSize: '13px', color: '#1e293b', fontWeight: '500' }}>
+                  {page} / {totalPages}
+                </span>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                    backgroundColor: page === totalPages ? '#f1f5f9' : 'white', color: page === totalPages ? '#94a3b8' : '#475569',
+                    cursor: page === totalPages ? 'default' : 'pointer', fontSize: '13px' }}>
+                  Next
+                </button>
+                <button onClick={() => setPage(totalPages)} disabled={page === totalPages}
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                    backgroundColor: page === totalPages ? '#f1f5f9' : 'white', color: page === totalPages ? '#94a3b8' : '#475569',
+                    cursor: page === totalPages ? 'default' : 'pointer', fontSize: '13px' }}>
+                  Last
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </main>

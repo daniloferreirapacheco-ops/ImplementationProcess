@@ -37,6 +37,8 @@ const tdStyle = {
   textOverflow: 'ellipsis', maxWidth: '300px'
 }
 
+const PER_PAGE = 25
+
 export default function Opportunities() {
   const { profile } = useAuth()
   const navigate = useNavigate()
@@ -44,6 +46,7 @@ export default function Opportunities() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [hoveredRow, setHoveredRow] = useState(null)
+  const [page, setPage] = useState(1)
 
   useEffect(() => { fetchOpportunities() }, [])
 
@@ -78,12 +81,28 @@ export default function Opportunities() {
               {filtered.length} of {opportunities.length} opportunities
             </p>
           </div>
-          <button onClick={() => navigate('/opportunities/new')}
-            style={{ backgroundColor: '#f59e0b', color: 'white', border: 'none',
-              padding: '7px 16px', borderRadius: '4px', cursor: 'pointer',
-              fontWeight: '600', fontSize: '13px' }}>
-            + New Opportunity
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => {
+              const headers = ['Name', 'Account', 'Stage', 'Urgency', 'Value', 'Go-Live Date', 'Risk']
+              const rows = filtered.map(o => [o.name, o.accounts?.name, stageLabels[o.stage] || o.stage, o.urgency, o.estimated_value ? `$${Number(o.estimated_value).toLocaleString()}` : '', o.target_golive_date || '', o.early_risk_indicators?.length > 0 ? 'Yes' : 'No'].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+              const csv = [headers.join(','), ...rows].join('\n')
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = URL.createObjectURL(blob)
+              const link = document.createElement('a'); link.href = url; link.download = 'opportunities.csv'; link.click()
+              URL.revokeObjectURL(url)
+            }}
+              style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
+                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '500' }}>
+              Export CSV
+            </button>
+            <button onClick={() => navigate('/opportunities/new')}
+              style={{ backgroundColor: '#f59e0b', color: 'white', border: 'none',
+                padding: '7px 16px', borderRadius: '4px', cursor: 'pointer',
+                fontWeight: '600', fontSize: '13px' }}>
+              + New Opportunity
+            </button>
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
@@ -95,7 +114,7 @@ export default function Opportunities() {
             { key: 'awaiting_approval', label: 'Awaiting Approval' },
             { key: 'approved', label: 'Approved' },
           ].map(f => (
-            <button key={f.key} onClick={() => setFilter(f.key)}
+            <button key={f.key} onClick={() => { setFilter(f.key); setPage(1) }}
               style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
                 cursor: 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: filter === f.key ? '#1a1a2e' : 'white',
@@ -126,7 +145,7 @@ export default function Opportunities() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(opp => (
+                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(opp => (
                   <tr key={opp.id}
                     onClick={() => navigate(`/opportunities/${opp.id}`)}
                     onMouseEnter={() => setHoveredRow(opp.id)}
@@ -169,8 +188,19 @@ export default function Opportunities() {
             </table>
           </div>
         )}
-        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0' }}>
-          {filtered.length} record{filtered.length !== 1 ? 's' : ''} ({opportunities.length} total)
+        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{filtered.length} record{filtered.length !== 1 ? 's' : ''} ({opportunities.length} total)</span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: page <= 1 ? 'default' : 'pointer', backgroundColor: 'white', color: page <= 1 ? '#cbd5e1' : '#475569' }}>
+              Prev
+            </button>
+            <span>Page {page} of {Math.max(1, Math.ceil(filtered.length / PER_PAGE))}</span>
+            <button onClick={() => setPage(p => Math.min(Math.ceil(filtered.length / PER_PAGE), p + 1))} disabled={page >= Math.ceil(filtered.length / PER_PAGE)}
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: page >= Math.ceil(filtered.length / PER_PAGE) ? 'default' : 'pointer', backgroundColor: 'white', color: page >= Math.ceil(filtered.length / PER_PAGE) ? '#cbd5e1' : '#475569' }}>
+              Next
+            </button>
+          </div>
         </div>
       </main>
     </div>
