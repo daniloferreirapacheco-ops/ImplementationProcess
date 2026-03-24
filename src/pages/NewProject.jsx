@@ -44,9 +44,11 @@ export default function NewProject() {
     setLoading(true)
     setError("")
     try {
+      const payload = { ...form, created_by: profile.id }
+      if (!payload.opportunity_id) payload.opportunity_id = null
       const { data, error: err } = await supabase
         .from("projects")
-        .insert({ ...form, created_by: profile.id })
+        .insert(payload)
         .select().single()
       if (err) throw err
       navigate(`/projects/${data.id}`)
