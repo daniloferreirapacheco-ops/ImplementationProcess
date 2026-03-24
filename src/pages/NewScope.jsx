@@ -89,16 +89,26 @@ export default function NewScope() {
     setLoading(true)
     setError("")
     try {
+      const payload = {
+        ...form,
+        workstream_hours: hours,
+        estimated_hours_min: totalMin,
+        estimated_hours_max: totalMax,
+        confidence_score: confidenceScore(),
+        created_by: profile.id
+      }
+      // Convert empty strings to null for UUID and optional fields
+      if (!payload.discovery_id) payload.discovery_id = null
+      if (!payload.included_modules) payload.included_modules = null
+      if (!payload.excluded_modules) payload.excluded_modules = null
+      if (!payload.assumptions) payload.assumptions = null
+      if (!payload.exclusions) payload.exclusions = null
+      if (!payload.risks) payload.risks = null
+      if (!payload.team_recommendation) payload.team_recommendation = null
+      if (!payload.phase_plan) payload.phase_plan = null
       const { data, error: err } = await supabase
         .from("scope_baselines")
-        .insert({
-          ...form,
-          workstream_hours: hours,
-          estimated_hours_min: totalMin,
-          estimated_hours_max: totalMax,
-          confidence_score: confidenceScore(),
-          created_by: profile.id
-        })
+        .insert(payload)
         .select().single()
       if (err) throw err
       navigate(`/scope/${data.id}`)

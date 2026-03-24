@@ -89,13 +89,19 @@ export default function NewDiscovery() {
     setLoading(true)
     setError("")
     try {
+      const payload = {
+        ...form,
+        complexity_score: calculateScore(),
+        created_by: profile.id
+      }
+      // Convert empty strings to null for optional text/array fields
+      const optionalFields = ['business_segment', 'key_pain_points', 'workflow_notes',
+        'current_systems', 'integration_needs', 'reporting_needs', 'decision_maker',
+        'sme_contacts', 'meeting_cadence', 'missing_information']
+      optionalFields.forEach(f => { if (!payload[f]) payload[f] = null })
       const { data, error: err } = await supabase
         .from("discovery_records")
-        .insert({
-          ...form,
-          complexity_score: calculateScore(),
-          created_by: profile.id
-        })
+        .insert(payload)
         .select().single()
       if (err) throw err
       navigate(`/discovery/${data.id}`)
