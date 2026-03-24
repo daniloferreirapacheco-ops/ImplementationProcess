@@ -1,4 +1,4 @@
-﻿import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext"
 
 export default function NavBar({ current }) {
@@ -19,6 +19,10 @@ export default function NavBar({ current }) {
     { label: "Testing", path: "/testing", icon: "🧪" },
     { label: "Handoff", path: "/handoff", icon: "🤝" },
     { label: "Analytics", path: "/intelligence", icon: "📊" },
+    { label: "Machines", path: "/machines", icon: "🖨️" },
+    { label: "Products", path: "/products", icon: "📦" },
+    { label: "Templates", path: "/templates", icon: "✅" },
+    { label: "Time", path: "/time", icon: "⏱️" },
   ]
 
   return (
