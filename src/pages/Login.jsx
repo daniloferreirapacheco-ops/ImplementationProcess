@@ -28,36 +28,55 @@ export default function Login() {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '100vh',
-      backgroundColor: '#f5f5f5'
+      minHeight: '100vh',
+      backgroundColor: '#1a1a2e',
     }}>
       <div style={{
-        backgroundColor: 'white',
-        padding: '40px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        width: '400px'
+        backgroundColor: '#ffffff',
+        padding: '48px 40px',
+        borderRadius: '12px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+        width: '400px',
+        maxWidth: '90vw',
       }}>
-        <h1 style={{ textAlign: 'center', color: '#1a1a2e', marginBottom: '8px' }}>
-          Ecalc Delivery OS
-        </h1>
-        <p style={{ textAlign: 'center', color: '#666', marginBottom: '32px' }}>
-          Sign in to your account
-        </p>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h1 style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#1a1a2e',
+            marginBottom: '8px',
+            marginTop: 0,
+          }}>
+            ⚡ Ecalc OS
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '15px', margin: 0 }}>
+            Sign in to your account
+          </p>
+        </div>
+
         {error && (
           <div style={{
-            backgroundColor: '#fee2e2',
+            backgroundColor: '#fef2f2',
             color: '#dc2626',
-            padding: '12px',
-            borderRadius: '4px',
-            marginBottom: '16px'
+            padding: '12px 16px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontSize: '14px',
+            border: '1px solid #fecaca',
           }}>
             {error}
           </div>
         )}
+
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '6px',
+              fontWeight: '500',
+              fontSize: '14px',
+              color: '#374151',
+            }}>
               Email
             </label>
             <input
@@ -65,18 +84,29 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              placeholder="you@company.com"
               style={{
                 width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
+                padding: '10px 14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '15px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                transition: 'border-color 0.2s',
               }}
+              onFocus={(e) => e.target.style.borderColor = '#6366f1'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             />
           </div>
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+          <div style={{ marginBottom: '28px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '6px',
+              fontWeight: '500',
+              fontSize: '14px',
+              color: '#374151',
+            }}>
               Password
             </label>
             <input
@@ -84,14 +114,19 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              placeholder="Enter your password"
               style={{
                 width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
+                padding: '10px 14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '15px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                transition: 'border-color 0.2s',
               }}
+              onFocus={(e) => e.target.style.borderColor = '#6366f1'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             />
           </div>
           <button
@@ -100,18 +135,36 @@ export default function Login() {
             style={{
               width: '100%',
               padding: '12px',
-              backgroundColor: '#1a1a2e',
-              color: 'white',
+              backgroundColor: '#6366f1',
+              color: '#ffffff',
               border: 'none',
-              borderRadius: '4px',
+              borderRadius: '8px',
               fontSize: '16px',
+              fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1
+              opacity: loading ? 0.7 : 1,
+              transition: 'opacity 0.2s',
             }}
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <a
+            href="#"
+            onClick={(e) => e.preventDefault()}
+            style={{
+              color: '#6366f1',
+              fontSize: '14px',
+              textDecoration: 'none',
+            }}
+            onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+            onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+          >
+            Forgot password?
+          </a>
+        </div>
       </div>
     </div>
   )

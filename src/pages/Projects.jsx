@@ -41,6 +41,7 @@ export default function Projects() {
   const [milestoneMap, setMilestoneMap] = useState({})
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("active")
+  const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)
 
@@ -96,6 +97,12 @@ export default function Projects() {
   }
 
   const filtered = projects.filter(p => {
+    if (search) {
+      const term = search.toLowerCase()
+      const name = (p.name || '').toLowerCase()
+      const accName = (p.accounts?.name || '').toLowerCase()
+      if (!name.includes(term) && !accName.includes(term)) return false
+    }
     if (filter === "all") return true
     if (filter === "active") return !["closed", "on_hold"].includes(p.status)
     if (filter === "at_risk") return ["at_risk", "blocked"].includes(p.status)
@@ -143,7 +150,11 @@ export default function Projects() {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap", alignItems: "center" }}>
+          <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
+            placeholder="Search projects..."
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+              fontSize: '13px', width: '240px' }} />
           {[
             { key: "all", label: "All" },
             { key: "active", label: "Active" },

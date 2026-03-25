@@ -135,17 +135,16 @@ export default function NewProject() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Projects" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
+        <button onClick={() => navigate("/projects")}
+          style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
+            fontSize: '14px', padding: 0, marginBottom: '8px' }}>
+          ← Back to Projects
+        </button>
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "center", marginBottom: "24px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: 0 }}>
             New Project
           </h1>
-          <button onClick={() => navigate("/projects")}
-            style={{ backgroundColor: "transparent", border: "1px solid #d1d5db",
-              color: "#64748b", padding: "8px 16px", borderRadius: "6px",
-              cursor: "pointer", fontSize: "14px" }}>
-            ← Back
-          </button>
         </div>
 
         {scopeData && (
