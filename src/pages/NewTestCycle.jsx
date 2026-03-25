@@ -45,7 +45,7 @@ export default function NewTestCycle() {
         .insert({ ...form, owner_id: profile.id })
         .select().single()
       if (err) throw err
-      navigate(`/testing/${data.id}`)
+      navigate(`/projects/${form.project_id}`)
     } catch (err) {
       setError(err.message)
       setLoading(false)
@@ -66,7 +66,7 @@ export default function NewTestCycle() {
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: 0 }}>
             New Test Cycle
           </h1>
-          <button onClick={() => navigate("/testing")}
+          <button onClick={() => navigate(-1)}
             style={{ backgroundColor: "transparent", border: "1px solid #d1d5db",
               color: "#64748b", padding: "8px 16px", borderRadius: "6px",
               cursor: "pointer", fontSize: "14px" }}>

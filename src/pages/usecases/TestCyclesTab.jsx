@@ -27,7 +27,7 @@ function SignoffDots({ signoffs }) {
   )
 }
 
-export default function TestCyclesTab({ useCases, cycles, signoffs, defects }) {
+export default function TestCyclesTab({ useCases, cycles, signoffs, defects, onUpdateCycle }) {
   // Aggregate stats
   const allTests = useCases.flatMap(u => u.tests || [])
   const totalTests = allTests.length
@@ -171,7 +171,7 @@ export default function TestCyclesTab({ useCases, cycles, signoffs, defects }) {
                     <span><b>{cPending}</b> pending</span>
                     <span><b>{ucSignedOff}</b>/{cycleUCs.length} signed off</span>
                   </div>
-                  <button style={btnOutline("#64748b")}>Close Cycle</button>
+                  <button style={btnOutline("#64748b")} onClick={() => onUpdateCycle(cycle.id, { status: "Closed" })}>Close Cycle</button>
                 </div>
               </>
             )}

@@ -1,6 +1,6 @@
 import { pill, metaLabel, card, btn, btnOutline, divider } from "./styles"
 
-export default function SignoffTab({ useCases, signoffs, cycles }) {
+export default function SignoffTab({ useCases, signoffs, cycles, onToggleSignoff }) {
   const allSignoffs = signoffs
   const totalRequired = allSignoffs.length
   const totalSigned = allSignoffs.filter(s => s.signed).length
@@ -110,9 +110,9 @@ export default function SignoffTab({ useCases, signoffs, cycles }) {
                   return (
                     <td key={signer.name} style={{ padding: "10px 12px", textAlign: "center" }}>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-                        <span style={{
+                        <span onClick={() => sig && onToggleSignoff && onToggleSignoff(sig.id, sig.signed)} style={{
                           width: "20px", height: "20px", borderRadius: "50%", display: "inline-flex",
-                          alignItems: "center", justifyContent: "center",
+                          alignItems: "center", justifyContent: "center", cursor: sig ? "pointer" : "default",
                           backgroundColor: sig?.signed ? "#10b981" : "white",
                           border: sig?.signed ? "none" : "1.5px solid #d1d5db"
                         }}>

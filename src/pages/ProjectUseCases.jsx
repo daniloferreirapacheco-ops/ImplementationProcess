@@ -276,6 +276,13 @@ export default function ProjectUseCases() {
     refreshCycles()
   }
 
+  const updateCycle = async (cycleId, updates) => {
+    const { error } = await supabase.from("uc_cycles").update(updates).eq("id", cycleId)
+    if (!error) {
+      setCycles(prev => prev.map(c => c.id === cycleId ? { ...c, ...updates } : c))
+    }
+  }
+
   const deleteCycle = async (cycleId) => {
     await supabase.from("uc_cycles").delete().eq("id", cycleId)
     setCycles(prev => prev.filter(c => c.id !== cycleId))
@@ -745,6 +752,7 @@ export default function ProjectUseCases() {
               setCycles={setCycles}
               onEditCycle={openEditCycle} onDeleteCycle={deleteCycle}
               onAddCycle={openNewCycle}
+              onUpdateCycle={updateCycle}
             />
           )}
           {activeTab === "defects" && (
