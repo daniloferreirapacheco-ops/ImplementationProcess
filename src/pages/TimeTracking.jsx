@@ -30,6 +30,8 @@ export default function TimeTracking() {
     user_name: '',
     notes: ''
   })
+  const [showCustomTask, setShowCustomTask] = useState(false)
+  const [customTaskName, setCustomTaskName] = useState('')
 
   // Edit state
   const [editingEntry, setEditingEntry] = useState(null)

@@ -68,7 +68,7 @@ export default function TestCycleDetail() {
 
   if (loading) return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      <NavBar current="Testing" />
+      <NavBar current="Projects" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center",
           height: "calc(100vh - 64px)", color: "#64748b" }}>Loading...</div>
@@ -101,7 +101,7 @@ export default function TestCycleDetail() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      <NavBar current="Testing" />
+      <NavBar current="Projects" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
 
         <div style={{ display: "flex", justifyContent: "space-between",

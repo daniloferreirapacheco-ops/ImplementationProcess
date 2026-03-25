@@ -11,7 +11,7 @@ function ActivityDot({ type }) {
   )
 }
 
-export default function DefectsTab({ defects }) {
+export default function DefectsTab({ defects, onUpdateDefect }) {
   const [filter, setFilter] = useState("All")
   const [selectedId, setSelectedId] = useState(() => {
     const firstCritOpen = defects.find(d => d.severity === "Critical" && d.status === "Open")
@@ -194,9 +194,9 @@ export default function DefectsTab({ defects }) {
             <div style={{ display: "flex", gap: "8px" }}>
               {selected.status !== "Resolved" && (
                 <>
-                  <button style={btn("#10b981")}>Mark Resolved</button>
-                  <button style={btn("#7c3aed")}>Send to Retest</button>
-                  <button style={btn("#dc2626")}>Escalate</button>
+                  <button style={btn("#10b981")} onClick={() => onUpdateDefect(selected.id, { status: "Resolved", resolved_at: new Date().toISOString() })}>Mark Resolved</button>
+                  <button style={btn("#7c3aed")} onClick={() => onUpdateDefect(selected.id, { status: "Ready to Retest" })}>Send to Retest</button>
+                  <button style={btn("#dc2626")} onClick={() => onUpdateDefect(selected.id, { severity: "Critical" })}>Escalate</button>
                 </>
               )}
               <button style={btnOutline("#64748b")}>Add Comment</button>
