@@ -16,63 +16,67 @@ const roleLabels = {
   sales: "Sales", support: "Support", product_specialist: "Product Specialist"
 }
 
-const widgets = {
-  admin: [
-    { title: "Pending Approvals", value: "0", icon: "✅", color: "#6366f1", link: "/scope" },
-    { title: "Active Projects", value: "0", icon: "📁", color: "#3b82f6", link: "/projects" },
-    { title: "Open Opportunities", value: "0", icon: "💼", color: "#f59e0b", link: "/opportunities" },
-    { title: "Pending Handoffs", value: "0", icon: "🤝", color: "#ef4444", link: "/handoff" },
-    { title: "Projects At Risk", value: "0", icon: "⚠️", color: "#dc2626", link: "/projects" },
-    { title: "Team Capacity", value: "0%", icon: "👥", color: "#10b981", link: "/time" },
-  ],
-  leadership: [
-    { title: "Portfolio Health", value: "Good", icon: "📊", color: "#8b5cf6", link: "/projects" },
-    { title: "Active Projects", value: "0", icon: "📁", color: "#3b82f6", link: "/projects" },
-    { title: "Projects At Risk", value: "0", icon: "⚠️", color: "#dc2626", link: "/projects" },
-    { title: "Pending Approvals", value: "0", icon: "✅", color: "#6366f1", link: "/scope" },
-    { title: "Estimate Accuracy", value: "0%", icon: "🎯", color: "#10b981", link: "/intelligence" },
-    { title: "Upcoming Go-Lives", value: "0", icon: "🚀", color: "#f59e0b", link: "/projects" },
-  ],
-  project_manager: [
-    { title: "My Active Projects", value: "0", icon: "📁", color: "#3b82f6", link: "/projects" },
-    { title: "Projects At Risk", value: "0", icon: "⚠️", color: "#dc2626", link: "/projects" },
-    { title: "Overdue Milestones", value: "0", icon: "📅", color: "#ef4444", link: "/projects" },
-    { title: "Open Blockers", value: "0", icon: "🚧", color: "#f59e0b", link: "/projects" },
-    { title: "Upcoming Go-Lives", value: "0", icon: "🚀", color: "#10b981", link: "/projects" },
-    { title: "Pending Handoffs", value: "0", icon: "🤝", color: "#6366f1", link: "/handoff" },
-  ],
-  consultant: [
-    { title: "My Assignments", value: "0", icon: "📋", color: "#10b981", link: "/projects" },
-    { title: "Discovery Tasks Due", value: "0", icon: "🔍", color: "#3b82f6", link: "/discovery" },
-    { title: "Data Gaps", value: "0", icon: "⚠️", color: "#f59e0b", link: "/discovery" },
-    { title: "Testing Items Due", value: "0", icon: "🧪", color: "#6366f1", link: "/testing" },
-    { title: "Open Questions", value: "0", icon: "❓", color: "#ef4444", link: "/discovery" },
-    { title: "Configurations Pending", value: "0", icon: "⚙️", color: "#06b6d4", link: "/projects" },
-  ],
-  sales: [
-    { title: "Open Opportunities", value: "0", icon: "💼", color: "#f59e0b", link: "/opportunities" },
-    { title: "Needs Discovery", value: "0", icon: "🔍", color: "#3b82f6", link: "/opportunities" },
-    { title: "Scopes Pending Approval", value: "0", icon: "✅", color: "#6366f1", link: "/scope" },
-    { title: "High Risk Deals", value: "0", icon: "⚠️", color: "#dc2626", link: "/opportunities" },
-    { title: "Ready to Convert", value: "0", icon: "🚀", color: "#10b981", link: "/opportunities" },
-    { title: "Closed This Month", value: "0", icon: "🏆", color: "#8b5cf6", link: "/opportunities" },
-  ],
-  support: [
-    { title: "Pending Handoffs", value: "0", icon: "🤝", color: "#ef4444", link: "/handoff" },
-    { title: "Customers in Hypercare", value: "0", icon: "💊", color: "#f59e0b", link: "/projects" },
-    { title: "Recently Live", value: "0", icon: "🚀", color: "#10b981", link: "/projects" },
-    { title: "Watchlist Accounts", value: "0", icon: "👁️", color: "#6366f1", link: "/projects" },
-    { title: "Known Issues", value: "0", icon: "🐛", color: "#dc2626", link: "/projects" },
-    { title: "Support Sensitive", value: "0", icon: "⚡", color: "#8b5cf6", link: "/projects" },
-  ],
-  product_specialist: [
-    { title: "Technical Reviews Due", value: "0", icon: "🔬", color: "#06b6d4", link: "/scope" },
-    { title: "Advanced Requests", value: "0", icon: "⚙️", color: "#6366f1", link: "/opportunities" },
-    { title: "Integration Reviews", value: "0", icon: "🔗", color: "#3b82f6", link: "/projects" },
-    { title: "Custom Logic Pending", value: "0", icon: "💡", color: "#f59e0b", link: "/scope" },
-    { title: "Open Technical Risks", value: "0", icon: "⚠️", color: "#dc2626", link: "/projects" },
-    { title: "Pending Sign-offs", value: "0", icon: "✅", color: "#10b981", link: "/testing" },
-  ]
+// Dynamic widget builder - values populated from stats
+const buildWidgets = (s) => {
+  if (!s) return []
+  return {
+    admin: [
+      { title: "Pending Approvals", value: s.pendingApprovals, icon: "✅", color: "#6366f1", link: "/scope" },
+      { title: "Active Projects", value: s.active, icon: "📁", color: "#3b82f6", link: "/projects" },
+      { title: "Open Opportunities", value: s.openOpps, icon: "💼", color: "#f59e0b", link: "/opportunities" },
+      { title: "Pending Handoffs", value: s.pendingHandoffs, icon: "🤝", color: "#ef4444", link: "/handoff" },
+      { title: "Projects At Risk", value: s.atRisk, icon: "⚠️", color: "#dc2626", link: "/projects" },
+      { title: "Open Blockers", value: s.openBlockers, icon: "🚧", color: "#f97316", link: "/projects" },
+    ],
+    leadership: [
+      { title: "Active Projects", value: s.active, icon: "📁", color: "#3b82f6", link: "/projects" },
+      { title: "Projects At Risk", value: s.atRisk, icon: "⚠️", color: "#dc2626", link: "/projects" },
+      { title: "Pending Approvals", value: s.pendingApprovals, icon: "✅", color: "#6366f1", link: "/scope" },
+      { title: "Open Opportunities", value: s.openOpps, icon: "💼", color: "#f59e0b", link: "/opportunities" },
+      { title: "Upcoming Go-Lives", value: s.upcomingGolive, icon: "🚀", color: "#10b981", link: "/projects" },
+      { title: "Overdue Milestones", value: s.overdueMilestones, icon: "📅", color: "#ef4444", link: "/projects" },
+    ],
+    project_manager: [
+      { title: "Active Projects", value: s.active, icon: "📁", color: "#3b82f6", link: "/projects" },
+      { title: "Projects At Risk", value: s.atRisk, icon: "⚠️", color: "#dc2626", link: "/projects" },
+      { title: "Overdue Milestones", value: s.overdueMilestones, icon: "📅", color: "#ef4444", link: "/projects" },
+      { title: "Open Blockers", value: s.openBlockers, icon: "🚧", color: "#f59e0b", link: "/projects" },
+      { title: "Upcoming Go-Lives", value: s.upcomingGolive, icon: "🚀", color: "#10b981", link: "/projects" },
+      { title: "Pending Handoffs", value: s.pendingHandoffs, icon: "🤝", color: "#6366f1", link: "/handoff" },
+    ],
+    consultant: [
+      { title: "Active Projects", value: s.active, icon: "📋", color: "#10b981", link: "/projects" },
+      { title: "Discoveries", value: s.discoveryCount, icon: "🔍", color: "#3b82f6", link: "/discovery" },
+      { title: "Open Blockers", value: s.openBlockers, icon: "🚧", color: "#f59e0b", link: "/projects" },
+      { title: "Overdue Milestones", value: s.overdueMilestones, icon: "📅", color: "#ef4444", link: "/projects" },
+      { title: "Pending Approvals", value: s.pendingApprovals, icon: "✅", color: "#6366f1", link: "/scope" },
+      { title: "Upcoming Go-Lives", value: s.upcomingGolive, icon: "🚀", color: "#06b6d4", link: "/projects" },
+    ],
+    sales: [
+      { title: "Open Opportunities", value: s.openOpps, icon: "💼", color: "#f59e0b", link: "/opportunities" },
+      { title: "Needs Discovery", value: s.needsDiscovery, icon: "🔍", color: "#3b82f6", link: "/opportunities" },
+      { title: "Pending Approvals", value: s.pendingApprovals, icon: "✅", color: "#6366f1", link: "/scope" },
+      { title: "Projects At Risk", value: s.atRisk, icon: "⚠️", color: "#dc2626", link: "/projects" },
+      { title: "Ready to Convert", value: s.readyToConvert, icon: "🚀", color: "#10b981", link: "/opportunities" },
+      { title: "Active Projects", value: s.active, icon: "📁", color: "#8b5cf6", link: "/projects" },
+    ],
+    support: [
+      { title: "Pending Handoffs", value: s.pendingHandoffs, icon: "🤝", color: "#ef4444", link: "/handoff" },
+      { title: "In Hypercare", value: s.hypercare, icon: "💊", color: "#f59e0b", link: "/projects" },
+      { title: "Upcoming Go-Lives", value: s.upcomingGolive, icon: "🚀", color: "#10b981", link: "/projects" },
+      { title: "Active Projects", value: s.active, icon: "📁", color: "#3b82f6", link: "/projects" },
+      { title: "Open Blockers", value: s.openBlockers, icon: "🐛", color: "#dc2626", link: "/projects" },
+      { title: "Projects At Risk", value: s.atRisk, icon: "⚠️", color: "#8b5cf6", link: "/projects" },
+    ],
+    product_specialist: [
+      { title: "Pending Approvals", value: s.pendingApprovals, icon: "🔬", color: "#06b6d4", link: "/scope" },
+      { title: "Active Projects", value: s.active, icon: "📁", color: "#3b82f6", link: "/projects" },
+      { title: "Discoveries", value: s.discoveryCount, icon: "🔍", color: "#8b5cf6", link: "/discovery" },
+      { title: "Open Blockers", value: s.openBlockers, icon: "🚧", color: "#f59e0b", link: "/projects" },
+      { title: "Projects At Risk", value: s.atRisk, icon: "⚠️", color: "#dc2626", link: "/projects" },
+      { title: "Upcoming Go-Lives", value: s.upcomingGolive, icon: "🚀", color: "#10b981", link: "/projects" },
+    ]
+  }
 }
 
 export default function Dashboard() {
@@ -82,6 +86,9 @@ export default function Dashboard() {
   const roleLabel = roleLabels[role] || "User"
   const [stats, setStats] = useState(null)
   const [topProjects, setTopProjects] = useState([])
+  const [upcomingMilestones, setUpcomingMilestones] = useState([])
+  const [healthDist, setHealthDist] = useState({ green: 0, yellow: 0, red: 0, grey: 0 })
+  const [recentActivity, setRecentActivity] = useState([])
 
   useEffect(() => { fetchStats() }, [])
 
@@ -93,15 +100,17 @@ export default function Dashboard() {
       { data: milestones },
       { data: scopes },
       { data: handoffs },
-      { data: timeEntries }
+      { data: timeEntries },
+      { data: discoveries }
     ] = await Promise.all([
-      supabase.from("projects").select("id, name, status, health, budget_cost, budget_hours, golive_target, accounts(name)"),
-      supabase.from("opportunities").select("id, stage"),
+      supabase.from("projects").select("id, name, status, health, budget_cost, budget_hours, golive_target, accounts(name), updated_at"),
+      supabase.from("opportunities").select("id, stage, name, accounts(name), updated_at"),
       supabase.from("blockers").select("project_id, severity, status").eq("status", "open"),
-      supabase.from("milestones").select("project_id, status, due_date"),
+      supabase.from("milestones").select("project_id, name, status, due_date, projects(name)"),
       supabase.from("scope_baselines").select("id, approval_status"),
       supabase.from("handoff_packages").select("id, approval_status"),
-      supabase.from("time_entries").select("project_id, hours, cost")
+      supabase.from("time_entries").select("project_id, hours, cost"),
+      supabase.from("discovery_records").select("id, status")
     ])
 
     const allProjects = projects || []
@@ -148,12 +157,38 @@ export default function Dashboard() {
     }).sort((a, b) => b.riskScore - a.riskScore)
 
     setTopProjects(scored.slice(0, 5))
+
+    // Health distribution
+    const hd = { green: 0, yellow: 0, red: 0, grey: 0 }
+    active.forEach(p => { hd[p.health || "grey"] = (hd[p.health || "grey"] || 0) + 1 })
+    setHealthDist(hd)
+
+    // Upcoming milestones (next 30 days, pending only)
+    const upcoming = allMilestones
+      .filter(m => m.status === "pending" && m.due_date && new Date(m.due_date) >= now && new Date(m.due_date) <= new Date(now.getTime() + 30 * 86400000))
+      .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+      .slice(0, 5)
+    setUpcomingMilestones(upcoming)
+
+    // Recent activity (mix of recent projects and opps by updated_at)
+    const activity = [
+      ...(projects || []).map(p => ({ type: "Project", name: p.name, account: p.accounts?.name, date: p.updated_at, link: `/projects/${p.id}` })),
+      ...(opps || []).map(o => ({ type: "Opportunity", name: o.name, account: o.accounts?.name, date: o.updated_at, link: `/opportunities/${o.id}` }))
+    ].filter(a => a.date).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8)
+    setRecentActivity(activity)
+
+    const discoveryCount = (discoveries || []).length
+
     setStats({
       active: active.length, atRisk: atRisk.length,
       openBlockers: allBlockers.length, overdueMilestones: overdue.length,
       pendingApprovals: pendingApprovals.length, pendingHandoffs: pendingHandoffs.length,
       openOpps: openOpps.length, upcomingGolive: upcomingGolive.length,
-      totalSpend, totalBudget
+      totalSpend, totalBudget, discoveryCount,
+      completedProjects: allProjects.filter(p => p.status === "closed").length,
+      hypercare: allProjects.filter(p => p.status === "hypercare").length,
+      needsDiscovery: (opps || []).filter(o => o.stage === "discovery_required").length,
+      readyToConvert: (opps || []).filter(o => o.stage === "approved").length,
     })
   }
 
@@ -330,6 +365,107 @@ export default function Dashboard() {
               )}
             </div>
 
+            {/* Health Distribution + Upcoming Milestones Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+              {/* Delivery Health */}
+              <div style={{ backgroundColor: "white", borderRadius: "12px", padding: "24px",
+                border: "1px solid #e2e8f0" }}>
+                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+                  Delivery Health
+                </h2>
+                {stats.active > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {[
+                      { label: "Healthy", count: healthDist.green, color: "#10b981" },
+                      { label: "Needs Attention", count: healthDist.yellow, color: "#f59e0b" },
+                      { label: "At Risk", count: healthDist.red, color: "#ef4444" },
+                      { label: "Not Set", count: healthDist.grey, color: "#94a3b8" },
+                    ].map(h => (
+                      <div key={h.label}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "4px" }}>
+                          <span style={{ color: "#64748b" }}>{h.label}</span>
+                          <span style={{ fontWeight: "600", color: h.color }}>{h.count}</span>
+                        </div>
+                        <div style={{ height: "8px", backgroundColor: "#f1f5f9", borderRadius: "4px", overflow: "hidden" }}>
+                          <div style={{ width: `${stats.active > 0 ? (h.count / stats.active) * 100 : 0}%`, height: "100%", backgroundColor: h.color, borderRadius: "4px" }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{ color: "#94a3b8", fontSize: "14px", textAlign: "center", padding: "20px" }}>No active projects</p>
+                )}
+              </div>
+
+              {/* Upcoming Milestones */}
+              <div style={{ backgroundColor: "white", borderRadius: "12px", padding: "24px",
+                border: "1px solid #e2e8f0" }}>
+                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+                  Upcoming Milestones
+                </h2>
+                {upcomingMilestones.length === 0 ? (
+                  <p style={{ color: "#94a3b8", fontSize: "14px", textAlign: "center", padding: "20px" }}>No upcoming milestones</p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {upcomingMilestones.map((m, i) => {
+                      const daysLeft = Math.ceil((new Date(m.due_date) - new Date()) / 86400000)
+                      return (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+                          padding: "10px 12px", backgroundColor: "#f8fafc", borderRadius: "8px",
+                          borderLeft: `3px solid ${daysLeft <= 3 ? "#ef4444" : daysLeft <= 7 ? "#f59e0b" : "#3b82f6"}` }}>
+                          <div>
+                            <p style={{ margin: 0, fontSize: "13px", fontWeight: "500", color: "#1e293b" }}>{m.name}</p>
+                            <p style={{ margin: 0, fontSize: "11px", color: "#94a3b8" }}>{m.projects?.name}</p>
+                          </div>
+                          <div style={{ textAlign: "right" }}>
+                            <p style={{ margin: 0, fontSize: "12px", fontWeight: "600",
+                              color: daysLeft <= 3 ? "#ef4444" : daysLeft <= 7 ? "#f59e0b" : "#3b82f6" }}>
+                              {daysLeft <= 0 ? "Today" : `${daysLeft}d`}
+                            </p>
+                            <p style={{ margin: 0, fontSize: "11px", color: "#94a3b8" }}>
+                              {new Date(m.due_date).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            {recentActivity.length > 0 && (
+              <div style={{ backgroundColor: "white", borderRadius: "12px", padding: "24px",
+                border: "1px solid #e2e8f0", marginBottom: "24px" }}>
+                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+                  Recent Activity
+                </h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {recentActivity.map((a, i) => (
+                    <div key={i} onClick={() => navigate(a.link)}
+                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+                        padding: "8px 12px", borderRadius: "6px", cursor: "pointer" }}
+                      onMouseEnter={e => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                      onMouseLeave={e => e.currentTarget.style.backgroundColor = "white"}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "4px",
+                          backgroundColor: a.type === "Project" ? "#dbeafe" : "#fef3c7",
+                          color: a.type === "Project" ? "#1e40af" : "#92400e", fontWeight: "600" }}>
+                          {a.type}
+                        </span>
+                        <span style={{ fontSize: "13px", fontWeight: "500", color: "#1e293b" }}>{a.name}</span>
+                        {a.account && <span style={{ fontSize: "12px", color: "#94a3b8" }}>— {a.account}</span>}
+                      </div>
+                      <span style={{ fontSize: "11px", color: "#94a3b8" }}>
+                        {new Date(a.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Quick Actions */}
             <div style={{ backgroundColor: "white", borderRadius: "12px", padding: "24px",
               boxShadow: "0 1px 3px rgba(0,0,0,0.1)", border: "1px solid #e2e8f0" }}>
@@ -337,30 +473,21 @@ export default function Dashboard() {
                 Quick Actions
               </h2>
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                <button onClick={() => navigate("/opportunities/new")}
-                  style={{ backgroundColor: "#f59e0b", color: "white", border: "none",
-                    padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-                    fontWeight: "600", fontSize: "14px" }}>
-                  + New Opportunity
-                </button>
-                <button onClick={() => navigate("/projects/new")}
-                  style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
-                    padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-                    fontWeight: "600", fontSize: "14px" }}>
-                  + New Project
-                </button>
-                <button onClick={() => navigate("/discovery/new")}
-                  style={{ backgroundColor: "#10b981", color: "white", border: "none",
-                    padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-                    fontWeight: "600", fontSize: "14px" }}>
-                  + New Discovery
-                </button>
-                <button onClick={() => navigate("/time")}
-                  style={{ backgroundColor: "#6366f1", color: "white", border: "none",
-                    padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-                    fontWeight: "600", fontSize: "14px" }}>
-                  Log Time
-                </button>
+                {[
+                  { label: "+ New Opportunity", color: "#f59e0b", link: "/opportunities/new" },
+                  { label: "+ New Project", color: "#3b82f6", link: "/projects/new" },
+                  { label: "+ New Discovery", color: "#10b981", link: "/discovery/new" },
+                  { label: "+ New Customer", color: "#8b5cf6", link: "/customers/new" },
+                  { label: "Log Time", color: "#6366f1", link: "/time" },
+                  { label: "Analytics", color: "#06b6d4", link: "/intelligence" },
+                ].map(a => (
+                  <button key={a.label} onClick={() => navigate(a.link)}
+                    style={{ backgroundColor: a.color, color: "white", border: "none",
+                      padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
+                      fontWeight: "600", fontSize: "14px" }}>
+                    {a.label}
+                  </button>
+                ))}
               </div>
             </div>
           </>
