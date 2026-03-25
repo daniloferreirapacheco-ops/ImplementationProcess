@@ -28,12 +28,26 @@ export default function ScopeDetail() {
   useEffect(() => { fetchScope() }, [id])
 
   const fetchScope = async () => {
-    const { data } = await supabase
-      .from("scope_baselines")
-      .select("*, opportunities(name, accounts(name))")
-      .eq("id", id).single()
-    setScope(data)
-    setLoading(false)
+    try {
+      // Try with nested join first
+      let { data, error } = await supabase
+        .from("scope_baselines")
+        .select("*, opportunities(name, accounts(name))")
+        .eq("id", id).single()
+      // If nested join fails, fall back to simple query
+      if (error || !data) {
+        const res = await supabase
+          .from("scope_baselines")
+          .select("*, opportunities(name)")
+          .eq("id", id).single()
+        data = res.data
+      }
+      setScope(data)
+    } catch (err) {
+      console.error("Error fetching scope:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const updateStatus = async (status) => {
