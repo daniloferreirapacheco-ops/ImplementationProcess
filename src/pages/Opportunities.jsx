@@ -45,6 +45,7 @@ export default function Opportunities() {
   const [opportunities, setOpportunities] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)
 
@@ -61,6 +62,12 @@ export default function Opportunities() {
   }
 
   const filtered = opportunities.filter(o => {
+    if (search) {
+      const term = search.toLowerCase()
+      const name = (o.name || '').toLowerCase()
+      const accName = (o.accounts?.name || '').toLowerCase()
+      if (!name.includes(term) && !accName.includes(term)) return false
+    }
     if (filter === 'all') return true
     if (filter === 'active') return !['closed_lost', 'converted', 'rejected'].includes(o.stage)
     if (filter === 'at_risk') return o.early_risk_indicators?.length > 0
@@ -105,7 +112,11 @@ export default function Opportunities() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
+            placeholder="Search opportunities..."
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+              fontSize: '13px', width: '240px' }} />
           {[
             { key: 'all', label: 'All' },
             { key: 'active', label: 'Active' },
