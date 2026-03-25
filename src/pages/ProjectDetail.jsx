@@ -43,6 +43,10 @@ export default function ProjectDetail() {
   const [newMilestone, setNewMilestone] = useState({ name: "", due_date: "" })
   const [newBlocker, setNewBlocker] = useState({ title: "", severity: "medium" })
   const [saving, setSaving] = useState(false)
+  const [team, setTeam] = useState([])
+  const [newMember, setNewMember] = useState({ member_name: "", role: "consultant" })
+  const [notes, setNotes] = useState([])
+  const [newNote, setNewNote] = useState("")
 
   useEffect(() => { fetchAll() }, [id])
 
@@ -57,7 +61,49 @@ export default function ProjectDetail() {
     setMilestones(miles || [])
     setBlockers(blocks || [])
     setTimeEntries(times || [])
+
+    // Load team and notes (may not exist yet - handle gracefully)
+    try {
+      const { data: tm } = await supabase.from("project_team").select("*").eq("project_id", id).order("created_at")
+      setTeam(tm || [])
+    } catch { setTeam([]) }
+    try {
+      const { data: nt } = await supabase.from("project_notes").select("*").eq("project_id", id).order("created_at", { ascending: false })
+      setNotes(nt || [])
+    } catch { setNotes([]) }
+
     setLoading(false)
+  }
+
+  const addTeamMember = async () => {
+    if (!newMember.member_name) return
+    setSaving(true)
+    try {
+      const { data } = await supabase.from("project_team")
+        .insert({ ...newMember, project_id: id }).select().single()
+      if (data) setTeam(prev => [...prev, data])
+    } catch { /* table may not exist */ }
+    setNewMember({ member_name: "", role: "consultant" })
+    setSaving(false)
+  }
+
+  const removeTeamMember = async (memberId) => {
+    try {
+      await supabase.from("project_team").delete().eq("id", memberId)
+      setTeam(prev => prev.filter(m => m.id !== memberId))
+    } catch { /* table may not exist */ }
+  }
+
+  const addNote = async () => {
+    if (!newNote.trim()) return
+    setSaving(true)
+    try {
+      const { data } = await supabase.from("project_notes")
+        .insert({ project_id: id, note: newNote, author_name: "System" }).select().single()
+      if (data) setNotes(prev => [data, ...prev])
+    } catch { /* table may not exist */ }
+    setNewNote("")
+    setSaving(false)
   }
 
   const updateProject = async (field, value) => {
@@ -118,7 +164,9 @@ export default function ProjectDetail() {
     { id: "overview", label: "Overview" },
     { id: "milestones", label: `Milestones (${milestones.length})` },
     { id: "blockers", label: `Blockers (${blockers.filter(b => b.status === "open").length})` },
+    { id: "team", label: `Team (${team.length})` },
     { id: "usecases", label: "Use Cases & Testing" },
+    { id: "notes", label: `Notes (${notes.length})` },
     { id: "handoff", label: "Handoff" }
   ]
 
@@ -586,6 +634,120 @@ export default function ProjectDetail() {
                 fontSize: "15px" }}>
               Open Use Cases & Testing
             </button>
+          </div>
+        )}
+
+        {activeTab === "team" && (
+          <div style={cardStyle}>
+            <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+              Project Team
+            </h2>
+            {/* Add member form */}
+            <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+              <input value={newMember.member_name}
+                onChange={e => setNewMember(prev => ({ ...prev, member_name: e.target.value }))}
+                placeholder="Team member name"
+                style={{ ...inputStyle, flex: 1 }} />
+              <select value={newMember.role}
+                onChange={e => setNewMember(prev => ({ ...prev, role: e.target.value }))}
+                style={{ ...inputStyle, width: "180px" }}>
+                <option value="pm">Project Manager</option>
+                <option value="consultant">Consultant</option>
+                <option value="developer">Developer</option>
+                <option value="specialist">Specialist</option>
+                <option value="sales">Sales</option>
+                <option value="support">Support</option>
+              </select>
+              <button onClick={addTeamMember} disabled={saving || !newMember.member_name}
+                style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
+                  padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
+                  fontWeight: "600", fontSize: "14px", opacity: !newMember.member_name ? 0.5 : 1 }}>
+                + Add
+              </button>
+            </div>
+            {/* Team list */}
+            {team.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8" }}>
+                <p style={{ margin: 0 }}>No team members assigned yet</p>
+                <p style={{ fontSize: "13px", margin: "4px 0 0 0" }}>Add team members above</p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {team.map(m => {
+                  const roleColors = { pm: "#3b82f6", consultant: "#10b981", developer: "#8b5cf6", specialist: "#06b6d4", sales: "#f59e0b", support: "#ef4444" }
+                  const roleLabels = { pm: "Project Manager", consultant: "Consultant", developer: "Developer", specialist: "Specialist", sales: "Sales", support: "Support" }
+                  return (
+                    <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "12px 16px", backgroundColor: "#f8fafc", borderRadius: "8px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <div style={{ width: "36px", height: "36px", borderRadius: "50%",
+                          backgroundColor: (roleColors[m.role] || "#94a3b8") + "18",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          color: roleColors[m.role] || "#94a3b8", fontSize: "14px", fontWeight: "700" }}>
+                          {m.member_name?.charAt(0)?.toUpperCase() || "?"}
+                        </div>
+                        <div>
+                          <p style={{ margin: 0, fontSize: "14px", fontWeight: "600", color: "#1e293b" }}>{m.member_name}</p>
+                          <span style={{ fontSize: "11px", padding: "1px 8px", borderRadius: "10px",
+                            backgroundColor: (roleColors[m.role] || "#94a3b8") + "18",
+                            color: roleColors[m.role] || "#94a3b8", fontWeight: "600" }}>
+                            {roleLabels[m.role] || m.role}
+                          </span>
+                        </div>
+                      </div>
+                      <button onClick={() => removeTeamMember(m.id)}
+                        style={{ backgroundColor: "#fee2e2", color: "#dc2626", border: "none",
+                          padding: "4px 12px", borderRadius: "6px", cursor: "pointer",
+                          fontSize: "12px", fontWeight: "600" }}>
+                        Remove
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "notes" && (
+          <div style={cardStyle}>
+            <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+              Notes & Activity
+            </h2>
+            {/* Add note form */}
+            <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+              <input value={newNote}
+                onChange={e => setNewNote(e.target.value)}
+                placeholder="Add a note or update..."
+                onKeyDown={e => e.key === "Enter" && addNote()}
+                style={{ ...inputStyle, flex: 1 }} />
+              <button onClick={addNote} disabled={saving || !newNote.trim()}
+                style={{ backgroundColor: "#8b5cf6", color: "white", border: "none",
+                  padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
+                  fontWeight: "600", fontSize: "14px", opacity: !newNote.trim() ? 0.5 : 1 }}>
+                + Add Note
+              </button>
+            </div>
+            {/* Notes list */}
+            {notes.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8" }}>
+                <p style={{ margin: 0 }}>No notes yet</p>
+                <p style={{ fontSize: "13px", margin: "4px 0 0 0" }}>Add project updates, meeting notes, or action items above</p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {notes.map(n => (
+                  <div key={n.id} style={{ padding: "12px 16px", backgroundColor: "#f8fafc",
+                    borderRadius: "8px", borderLeft: "3px solid #8b5cf6" }}>
+                    <p style={{ margin: "0 0 6px 0", fontSize: "14px", color: "#1e293b", lineHeight: "1.5" }}>{n.note}</p>
+                    <div style={{ display: "flex", gap: "12px", fontSize: "11px", color: "#94a3b8" }}>
+                      <span>{n.author_name || "System"}</span>
+                      <span>{n.created_at ? new Date(n.created_at).toLocaleString() : ""}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
