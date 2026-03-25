@@ -336,6 +336,13 @@ export default function ProjectUseCases() {
     refreshDefects()
   }
 
+  const updateDefect = async (defectId, updates) => {
+    const { error } = await supabase.from("defects").update(updates).eq("id", defectId)
+    if (!error) {
+      setDefects(prev => prev.map(d => d.id === defectId ? { ...d, ...updates } : d))
+    }
+  }
+
   const deleteDefect = async (defectId) => {
     await supabase.from("defects").delete().eq("id", defectId)
     setDefects(prev => prev.filter(d => d.id !== defectId))
@@ -746,6 +753,7 @@ export default function ProjectUseCases() {
               setDefects={setDefects}
               onEditDefect={openEditDefect} onDeleteDefect={deleteDefect}
               onAddDefect={openNewDefect}
+              onUpdateDefect={updateDefect}
             />
           )}
           {activeTab === "signoff" && (

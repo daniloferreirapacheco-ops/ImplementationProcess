@@ -141,6 +141,8 @@ export default function TimeTracking() {
     if (err) { setError(err.message); return }
     setShowForm(false)
     setForm(prev => ({ ...prev, task_name: '', hours: '', notes: '' }))
+    setShowCustomTask(false)
+    setCustomTaskName('')
     setTimerSeconds(0)
     loadEntries()
   }
@@ -354,7 +356,17 @@ export default function TimeTracking() {
                   Task *
                 </label>
                 {tasks.length > 0 ? (
-                  <select value={form.task_name} onChange={e => updateForm('task_name', e.target.value)}
+                  <select value={showCustomTask ? '__other__' : form.task_name} onChange={e => {
+                    if (e.target.value === '__other__') {
+                      setShowCustomTask(true)
+                      setCustomTaskName('')
+                      updateForm('task_name', '')
+                    } else {
+                      setShowCustomTask(false)
+                      setCustomTaskName('')
+                      updateForm('task_name', e.target.value)
+                    }
+                  }}
                     style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db',
                       borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}>
                     <option value="">Select task...</option>
@@ -369,8 +381,11 @@ export default function TimeTracking() {
                     style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db',
                       borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
                 )}
-                {form.task_name === '__other__' && (
-                  <input value="" onChange={e => updateForm('task_name', e.target.value)}
+                {showCustomTask && (
+                  <input value={customTaskName} onChange={e => {
+                    setCustomTaskName(e.target.value)
+                    updateForm('task_name', e.target.value)
+                  }}
                     placeholder="Enter task name"
                     style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db',
                       borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box', marginTop: '8px' }} />
