@@ -119,8 +119,6 @@ export default function ProjectDetail() {
     { id: "milestones", label: `Milestones (${milestones.length})` },
     { id: "blockers", label: `Blockers (${blockers.filter(b => b.status === "open").length})` },
     { id: "usecases", label: "Use Cases & Testing" },
-    { id: "roi", label: "ROI Discovery" },
-    { id: "testing", label: "Testing (Legacy)" },
     { id: "handoff", label: "Handoff" }
   ]
 
@@ -587,40 +585,6 @@ export default function ProjectDetail() {
                 padding: "12px 28px", borderRadius: "8px", cursor: "pointer", fontWeight: "600",
                 fontSize: "15px" }}>
               Open Use Cases & Testing
-            </button>
-          </div>
-        )}
-
-        {activeTab === "roi" && (
-          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
-            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>&#128200;</p>
-            <p style={{ color: "#1e293b", fontSize: "18px", fontWeight: "600", margin: "0 0 8px 0" }}>
-              ROI Discovery & Calculator
-            </p>
-            <p style={{ color: "#64748b", fontSize: "14px", margin: "0 0 24px 0" }}>
-              Capture business metrics, quantify savings, and build the ROI case for this implementation
-            </p>
-            <button onClick={() => navigate(`/projects/${id}/roi`)}
-              style={{ backgroundColor: "#10b981", color: "white", border: "none",
-                padding: "12px 28px", borderRadius: "8px", cursor: "pointer", fontWeight: "600",
-                fontSize: "15px" }}>
-              Open ROI Discovery
-            </button>
-          </div>
-        )}
-
-        {activeTab === "testing" && (
-          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
-            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>&#129514;</p>
-            <p style={{ color: "#64748b", fontSize: "18px", margin: "0 0 24px 0" }}>
-              Legacy Testing Center
-            </p>
-            <button onClick={() => navigate("/testing")}
-              style={{ backgroundColor: "#06b6d4", color: "white", border: "none",
-                padding: "12px 24px", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>
-              Go to Testing Center
             </button>
           </div>
         )}

@@ -29,7 +29,8 @@ export default function ROIDiscovery() {
   const { id } = useParams()
   const { profile } = useAuth()
   const navigate = useNavigate()
-  const [project, setProject] = useState(null)
+  const [parentRecord, setParentRecord] = useState(null)
+  const [parentType, setParentType] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState("volume")
@@ -39,22 +40,62 @@ export default function ROIDiscovery() {
   useEffect(() => { fetchData() }, [id])
 
   const fetchData = async () => {
-    const { data: proj } = await supabase.from("projects").select("*, accounts(name)").eq("id", id).single()
-    setProject(proj)
+    // Try loading as discovery first, then fall back to project
+    const { data: disc } = await supabase.from("discovery_records")
+      .select("*, opportunities(id, name, account_id, accounts(name))")
+      .eq("id", id).single()
 
-    const { data: rois } = await supabase.from("roi_discoveries").select("*").eq("project_id", id).limit(1)
-    if (rois && rois.length > 0) {
-      setData(rois[0])
-      setRoiId(rois[0].id)
+    if (disc) {
+      setParentRecord({
+        name: disc.opportunities?.name || "Discovery Record",
+        accountName: disc.opportunities?.accounts?.name,
+        opportunityId: disc.opportunities?.id,
+        accountId: disc.opportunities?.account_id
+      })
+      setParentType("discovery")
+      // Load ROI by opportunity_id
+      const { data: rois } = await supabase.from("roi_discoveries")
+        .select("*").eq("opportunity_id", disc.opportunities?.id).limit(1)
+      if (rois && rois.length > 0) {
+        setData(rois[0])
+        setRoiId(rois[0].id)
+      }
+    } else {
+      // Fallback: load as project (backward compatibility)
+      const { data: proj } = await supabase.from("projects")
+        .select("*, accounts(name)").eq("id", id).single()
+      if (proj) {
+        setParentRecord({
+          name: proj.name,
+          accountName: proj.accounts?.name,
+          opportunityId: proj.opportunity_id,
+          accountId: proj.account_id
+        })
+        setParentType("project")
+        const { data: rois } = await supabase.from("roi_discoveries")
+          .select("*").eq("project_id", id).limit(1)
+        if (rois && rois.length > 0) {
+          setData(rois[0])
+          setRoiId(rois[0].id)
+        }
+      }
     }
     setLoading(false)
   }
 
   const update = (field, value) => setData(prev => ({ ...prev, [field]: value }))
 
+  const backPath = parentType === "discovery" ? `/discovery/${id}` : `/projects/${id}`
+
   const save = async () => {
     setSaving(true)
-    const payload = { ...data, project_id: id, account_id: project?.account_id, updated_at: new Date() }
+    const payload = {
+      ...data,
+      opportunity_id: parentRecord?.opportunityId,
+      account_id: parentRecord?.accountId,
+      updated_at: new Date()
+    }
+    if (parentType === "project") payload.project_id = id
     delete payload.id; delete payload.created_at
     if (!payload.created_by) payload.created_by = profile?.id
 
@@ -69,7 +110,7 @@ export default function ROIDiscovery() {
 
   if (loading) return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      <NavBar current="Projects" />
+      <NavBar current="Discovery" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 64px)", color: "#64748b" }}>Loading...</div>
       </main>
@@ -117,18 +158,23 @@ export default function ROIDiscovery() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      <NavBar current="Projects" />
+      <NavBar current="Discovery" />
       <main style={{ marginLeft: "220px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {/* Header */}
         <div style={{ padding: "16px 24px", backgroundColor: "white", borderBottom: "0.5px solid #e2e8f0" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                <span onClick={() => navigate(`/projects/${id}`)} style={{ fontSize: "13px", color: "#3b82f6", cursor: "pointer", fontWeight: "500" }}>{project?.name}</span>
+                <span onClick={() => navigate(backPath)} style={{ fontSize: "13px", color: "#3b82f6", cursor: "pointer", fontWeight: "500" }}>{parentRecord?.name}</span>
                 <span style={{ fontSize: "12px", color: "#cbd5e1" }}>/</span>
                 <span style={{ fontSize: "13px", color: "#1e293b", fontWeight: "600" }}>ROI Discovery</span>
               </div>
               <h1 style={{ fontSize: "22px", fontWeight: "700", color: "#1e293b", margin: 0 }}>ROI Discovery & Calculator</h1>
+              {parentRecord?.accountName && (
+                <p style={{ fontSize: "13px", color: "#64748b", margin: "4px 0 0 0" }}>
+                  {parentRecord.accountName}
+                </p>
+              )}
             </div>
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               <span style={pill(data.status || "draft")}>{(data.status || "draft").replace("_", " ")}</span>
@@ -137,7 +183,7 @@ export default function ROIDiscovery() {
                   backgroundColor: "#3b82f6", color: "white", border: "none", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving..." : "Save"}
               </button>
-              <button onClick={() => navigate(`/projects/${id}`)}
+              <button onClick={() => navigate(backPath)}
                 style={{ padding: "8px 16px", fontSize: "13px", fontWeight: "500", borderRadius: "6px", cursor: "pointer",
                   backgroundColor: "white", color: "#64748b", border: "0.5px solid #d1d5db" }}>
                 Back

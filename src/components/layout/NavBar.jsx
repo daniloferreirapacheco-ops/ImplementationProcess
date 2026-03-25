@@ -22,7 +22,6 @@ const sections = [
       { label: "Discovery", path: "/discovery", icon: "🔍" },
       { label: "Scope", path: "/scope", icon: "📋" },
       { label: "Projects", path: "/projects", icon: "📁" },
-      { label: "Testing", path: "/testing", icon: "🧪" },
       { label: "Handoff", path: "/handoff", icon: "🤝" },
     ]
   },

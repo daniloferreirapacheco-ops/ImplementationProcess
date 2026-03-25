@@ -75,6 +75,7 @@ export default function DiscoveryDetail() {
     { id: "products", label: "Products & Data" },
     { id: "workflow", label: "Workflow" },
     { id: "technical", label: "Technical" },
+    { id: "roi", label: "ROI Analysis" },
     { id: "questions", label: `Questions (${questions.filter(q => q.status === "open").length})` }
   ]
 
@@ -114,11 +115,17 @@ export default function DiscoveryDetail() {
               <option value="completed">Completed</option>
               <option value="blocked">Blocked</option>
             </select>
+            <button onClick={() => navigate(`/discovery/${id}/roi`)}
+              style={{ backgroundColor: "#10b981", color: "white", border: "none",
+                padding: "10px 20px", borderRadius: "8px", cursor: "pointer",
+                fontWeight: "600", fontSize: "14px" }}>
+              ROI Analysis
+            </button>
             <button onClick={() => navigate(`/scope/new?discovery=${id}`)}
               style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
                 padding: "10px 20px", borderRadius: "8px", cursor: "pointer",
                 fontWeight: "600", fontSize: "14px" }}>
-              📋 Build Scope
+              Build Scope
             </button>
           </div>
         </div>
@@ -234,6 +241,25 @@ export default function DiscoveryDetail() {
                 </p>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === "roi" && (
+          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
+            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>&#128200;</p>
+            <p style={{ color: "#1e293b", fontSize: "18px", fontWeight: "600", margin: "0 0 8px 0" }}>
+              ROI Discovery & Calculator
+            </p>
+            <p style={{ color: "#64748b", fontSize: "14px", margin: "0 0 24px 0" }}>
+              Capture business metrics, quantify savings, and build the ROI case for this opportunity
+            </p>
+            <button onClick={() => navigate(`/discovery/${id}/roi`)}
+              style={{ backgroundColor: "#10b981", color: "white", border: "none",
+                padding: "12px 28px", borderRadius: "8px", cursor: "pointer", fontWeight: "600",
+                fontSize: "15px" }}>
+              Open ROI Analysis
+            </button>
           </div>
         )}
 

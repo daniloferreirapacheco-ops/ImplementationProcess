@@ -20,6 +20,9 @@ export default function CustomerDetail() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const [tab, setTab] = useState('overview')
+  const [discoveries, setDiscoveries] = useState([])
+  const [scopes, setScopes] = useState([])
+  const [handoffs, setHandoffs] = useState([])
 
   useEffect(() => {
     loadData()
@@ -29,7 +32,7 @@ export default function CustomerDetail() {
     const [accountRes, contactsRes, oppsRes, projRes, amRes, apRes, machinesRes, productsRes] = await Promise.all([
       supabase.from('accounts').select('*').eq('id', id).single(),
       supabase.from('contacts').select('*').eq('account_id', id).order('name'),
-      supabase.from('opportunities').select('*').eq('account_id', id).order('created_at', { ascending: false }),
+      supabase.from('opportunities').select('id, name, stage, created_at, account_id').eq('account_id', id).order('created_at', { ascending: false }),
       supabase.from('projects').select('*').eq('account_id', id).order('created_at', { ascending: false }),
       supabase.from('account_machines').select('*, machines(*)').eq('account_id', id),
       supabase.from('account_products').select('*, products(*)').eq('account_id', id),
@@ -47,6 +50,20 @@ export default function CustomerDetail() {
     setCustomerProducts((apRes.data || []).map(ap => ap.products).filter(Boolean))
     setAllMachines(machinesRes.data || [])
     setAllProducts(productsRes.data || [])
+
+    // Load discoveries, scopes, and handoffs via opportunity IDs
+    const oppIds = (oppsRes.data || []).map(o => o.id)
+    if (oppIds.length > 0) {
+      const [discRes, scopeRes, handoffRes] = await Promise.all([
+        supabase.from('discovery_records').select('*, opportunities(name)').in('opportunity_id', oppIds).order('created_at', { ascending: false }),
+        supabase.from('scope_baselines').select('*, opportunities(name)').in('opportunity_id', oppIds).order('created_at', { ascending: false }),
+        supabase.from('handoff_packages').select('*').in('project_id', (projRes.data || []).map(p => p.id)).order('created_at', { ascending: false })
+      ])
+      setDiscoveries(discRes.data || [])
+      setScopes(scopeRes.data || [])
+      setHandoffs(handoffRes.data || [])
+    }
+
     setLoading(false)
   }
 
@@ -174,11 +191,13 @@ export default function CustomerDetail() {
         <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', borderBottom: '1px solid #e2e8f0' }}>
           {[
             { key: 'overview', label: 'Overview', count: null },
+            { key: 'pipeline', label: 'Delivery Pipeline', count: null },
             { key: 'contacts', label: 'Contacts', count: contacts.length },
-            { key: 'machines', label: 'Machines', count: customerMachines.length },
-            { key: 'products', label: 'Products', count: customerProducts.length },
             { key: 'opportunities', label: 'Opportunities', count: opportunities.length },
-            { key: 'projects', label: 'Projects', count: projects.length }
+            { key: 'discoveries', label: 'Discoveries', count: discoveries.length },
+            { key: 'projects', label: 'Projects', count: projects.length },
+            { key: 'machines', label: 'Machines', count: customerMachines.length },
+            { key: 'products', label: 'Products', count: customerProducts.length }
           ].map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               style={{ padding: '10px 20px', border: 'none', cursor: 'pointer', fontSize: '14px',
@@ -275,6 +294,180 @@ export default function CustomerDetail() {
           </div>
         )}
 
+        {/* Pipeline Tab */}
+        {tab === 'pipeline' && (
+          <div>
+            {/* Pipeline Progress Steps */}
+            <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px',
+              border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 20px 0' }}>
+                Delivery Overview
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+                {[
+                  { label: 'Opportunities', count: opportunities.length, color: '#3b82f6', icon: '1' },
+                  { label: 'Discoveries', count: discoveries.length, color: '#8b5cf6', icon: '2' },
+                  { label: 'Scopes', count: scopes.length, color: '#06b6d4', icon: '3' },
+                  { label: 'Projects', count: projects.length, color: '#f59e0b', icon: '4' },
+                  { label: 'Handoffs', count: handoffs.length, color: '#10b981', icon: '5' },
+                ].map((step, i) => (
+                  <div key={step.label} style={{ textAlign: 'center', padding: '16px 8px',
+                    backgroundColor: step.count > 0 ? step.color + '10' : '#f8fafc',
+                    borderRadius: '10px', border: `1px solid ${step.count > 0 ? step.color + '30' : '#e2e8f0'}` }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%',
+                      backgroundColor: step.count > 0 ? step.color : '#e2e8f0',
+                      color: step.count > 0 ? 'white' : '#94a3b8',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      margin: '0 auto 8px', fontSize: '14px', fontWeight: '700' }}>
+                      {step.icon}
+                    </div>
+                    <p style={{ margin: '0 0 2px 0', fontSize: '22px', fontWeight: '700',
+                      color: step.count > 0 ? step.color : '#94a3b8' }}>
+                      {step.count}
+                    </p>
+                    <p style={{ margin: 0, fontSize: '12px', color: '#64748b', fontWeight: '500' }}>
+                      {step.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Active Opportunities with their pipeline */}
+            {opportunities.map(opp => {
+              const oppDiscs = discoveries.filter(d => d.opportunity_id === opp.id)
+              const oppScopes = scopes.filter(s => s.opportunity_id === opp.id)
+              const oppProjects = projects.filter(p => p.opportunity_id === opp.id)
+              const stageColor = {
+                new: '#94a3b8', qualified: '#3b82f6', discovery_required: '#f59e0b',
+                discovery_in_progress: '#8b5cf6', ready_for_scope: '#06b6d4',
+                scope_under_review: '#f97316', awaiting_approval: '#ec4899',
+                approved: '#10b981', converted: '#1d4ed8', closed_lost: '#6b7280'
+              }
+              return (
+                <div key={opp.id} style={{ backgroundColor: 'white', borderRadius: '12px',
+                  padding: '20px', border: '1px solid #e2e8f0', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <h3 onClick={() => navigate(`/opportunities/${opp.id}`)}
+                        style={{ margin: 0, fontSize: '15px', fontWeight: '600', color: '#1e293b',
+                          cursor: 'pointer' }}>
+                        {opp.name}
+                      </h3>
+                      <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: '600',
+                        backgroundColor: (stageColor[opp.stage] || '#94a3b8') + '18',
+                        color: stageColor[opp.stage] || '#94a3b8', textTransform: 'capitalize' }}>
+                        {opp.stage?.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                      {new Date(opp.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {oppDiscs.map(d => (
+                      <div key={d.id} onClick={() => navigate(`/discovery/${d.id}`)}
+                        style={{ padding: '6px 12px', borderRadius: '6px', backgroundColor: '#f5f3ff',
+                          border: '1px solid #ddd6fe', cursor: 'pointer', fontSize: '12px' }}>
+                        <span style={{ color: '#7c3aed', fontWeight: '600' }}>Discovery</span>
+                        <span style={{ color: '#a78bfa', marginLeft: '6px', textTransform: 'capitalize' }}>
+                          {d.status?.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    ))}
+                    {oppScopes.map(s => (
+                      <div key={s.id} onClick={() => navigate(`/scope/${s.id}`)}
+                        style={{ padding: '6px 12px', borderRadius: '6px', backgroundColor: '#ecfeff',
+                          border: '1px solid #a5f3fc', cursor: 'pointer', fontSize: '12px' }}>
+                        <span style={{ color: '#0891b2', fontWeight: '600' }}>Scope:</span>
+                        <span style={{ color: '#06b6d4', marginLeft: '4px' }}>{s.name}</span>
+                        <span style={{ color: '#67e8f9', marginLeft: '6px', textTransform: 'capitalize' }}>
+                          {s.approval_status?.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    ))}
+                    {oppProjects.map(p => {
+                      const hc = { green: '#10b981', yellow: '#f59e0b', red: '#ef4444', grey: '#94a3b8' }
+                      return (
+                        <div key={p.id} onClick={() => navigate(`/projects/${p.id}`)}
+                          style={{ padding: '6px 12px', borderRadius: '6px', backgroundColor: '#eff6ff',
+                            border: '1px solid #bfdbfe', cursor: 'pointer', fontSize: '12px',
+                            display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%',
+                            backgroundColor: hc[p.health] || '#94a3b8' }} />
+                          <span style={{ color: '#1d4ed8', fontWeight: '600' }}>Project:</span>
+                          <span style={{ color: '#3b82f6' }}>{p.name}</span>
+                        </div>
+                      )
+                    })}
+                    {oppDiscs.length === 0 && oppScopes.length === 0 && oppProjects.length === 0 && (
+                      <span style={{ fontSize: '12px', color: '#94a3b8', padding: '6px 0' }}>
+                        No delivery records yet
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+            {opportunities.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
+                backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '14px', margin: 0 }}>No opportunities yet — create one to start the delivery pipeline</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Discoveries Tab */}
+        {tab === 'discoveries' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+              <button onClick={() => navigate(`/discovery/new?account_id=${id}`)}
+                style={{ padding: '10px 20px', backgroundColor: '#8b5cf6', color: 'white',
+                  border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                + New Discovery
+              </button>
+            </div>
+            {discoveries.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
+                backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <p style={{ margin: '0 0 8px 0' }}>No discoveries for this customer</p>
+                <p style={{ fontSize: '13px', margin: 0 }}>Start a discovery from an opportunity</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {discoveries.map(d => {
+                  const sc = { in_progress: '#f59e0b', completed: '#10b981', blocked: '#ef4444', not_started: '#94a3b8' }
+                  return (
+                    <div key={d.id} onClick={() => navigate(`/discovery/${d.id}`)}
+                      style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px 20px',
+                        border: '1px solid #e2e8f0', cursor: 'pointer', display: 'flex',
+                        justifyContent: 'space-between', alignItems: 'center' }}
+                      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'}
+                      onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
+                      <div>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600', color: '#1e293b' }}>
+                          {d.opportunities?.name || 'Discovery Record'}
+                        </h3>
+                        <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: '#64748b' }}>
+                          {d.complexity_score > 0 && <span>Complexity: {d.complexity_score}</span>}
+                          <span>Created: {new Date(d.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '11px', padding: '2px 10px', borderRadius: '10px', fontWeight: '600',
+                        backgroundColor: (sc[d.status] || '#94a3b8') + '18',
+                        color: sc[d.status] || '#94a3b8', textTransform: 'capitalize' }}>
+                        {d.status?.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Contacts Tab */}
         {tab === 'contacts' && (
           <div>
@@ -319,56 +512,94 @@ export default function CustomerDetail() {
         )}
 
         {/* Opportunities Tab */}
-        {tab === 'opportunities' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {opportunities.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
-                backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <p style={{ fontSize: '36px', margin: '0 0 8px 0' }}>💼</p>
-                <p>No opportunities for this customer</p>
+        {tab === 'opportunities' && (() => {
+          const stageColor = {
+            new: '#94a3b8', qualified: '#3b82f6', discovery_required: '#f59e0b',
+            discovery_in_progress: '#8b5cf6', ready_for_scope: '#06b6d4',
+            scope_under_review: '#f97316', awaiting_approval: '#ec4899',
+            approved: '#10b981', converted: '#1d4ed8', closed_lost: '#6b7280'
+          }
+          return (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                <button onClick={() => navigate(`/opportunities/new?account_id=${id}`)}
+                  style={{ padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white',
+                    border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                  + New Opportunity
+                </button>
               </div>
-            ) : opportunities.map(o => (
-              <div key={o.id} onClick={() => navigate(`/opportunities/${o.id}`)}
-                style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px 20px',
-                  border: '1px solid #e2e8f0', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600', color: '#1e293b' }}>
-                  {o.name}
-                </h3>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
-                  Stage: {o.stage} | Created: {new Date(o.created_at).toLocaleDateString()}
-                </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {opportunities.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
+                    backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <p>No opportunities for this customer</p>
+                  </div>
+                ) : opportunities.map(o => (
+                  <div key={o.id} onClick={() => navigate(`/opportunities/${o.id}`)}
+                    style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px 20px',
+                      border: '1px solid #e2e8f0', cursor: 'pointer', display: 'flex',
+                      justifyContent: 'space-between', alignItems: 'center' }}
+                    onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'}
+                    onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
+                    <div>
+                      <h3 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600', color: '#1e293b' }}>
+                        {o.name}
+                      </h3>
+                      <span style={{ fontSize: '12px', color: '#64748b' }}>
+                        Created: {new Date(o.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', padding: '2px 10px', borderRadius: '10px', fontWeight: '600',
+                      backgroundColor: (stageColor[o.stage] || '#94a3b8') + '18',
+                      color: stageColor[o.stage] || '#94a3b8', textTransform: 'capitalize' }}>
+                      {o.stage?.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          )
+        })()}
 
         {/* Projects Tab */}
-        {tab === 'projects' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {projects.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
-                backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <p style={{ fontSize: '36px', margin: '0 0 8px 0' }}>📁</p>
-                <p>No projects for this customer</p>
-              </div>
-            ) : projects.map(p => (
-              <div key={p.id} onClick={() => navigate(`/projects/${p.id}`)}
-                style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px 20px',
-                  border: '1px solid #e2e8f0', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600', color: '#1e293b' }}>
-                  {p.name}
-                </h3>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
-                  Status: {p.status} | Created: {new Date(p.created_at).toLocaleDateString()}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+        {tab === 'projects' && (() => {
+          const hc = { green: '#10b981', yellow: '#f59e0b', red: '#ef4444', grey: '#94a3b8' }
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {projects.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8',
+                  backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <p>No projects for this customer</p>
+                </div>
+              ) : projects.map(p => (
+                <div key={p.id} onClick={() => navigate(`/projects/${p.id}`)}
+                  style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px 20px',
+                    border: '1px solid #e2e8f0', cursor: 'pointer', display: 'flex',
+                    justifyContent: 'space-between', alignItems: 'center' }}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%',
+                      backgroundColor: hc[p.health] || '#94a3b8' }} />
+                    <div>
+                      <h3 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600', color: '#1e293b' }}>
+                        {p.name}
+                      </h3>
+                      <span style={{ fontSize: '12px', color: '#64748b' }}>
+                        Created: {new Date(p.created_at).toLocaleDateString()}
+                        {p.golive_date && ` | Go-Live: ${new Date(p.golive_date).toLocaleDateString()}`}
+                      </span>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '11px', padding: '2px 10px', borderRadius: '10px', fontWeight: '600',
+                    color: '#64748b', backgroundColor: '#f1f5f9', textTransform: 'capitalize' }}>
+                    {p.status?.replace(/_/g, ' ')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
 
         {/* Machines Tab */}
         {tab === 'machines' && (() => {

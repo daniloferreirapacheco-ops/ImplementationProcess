@@ -51,6 +51,7 @@ function AppRoutes() {
       <Route path="/discovery" element={<ProtectedRoute><Discovery /></ProtectedRoute>} />
       <Route path="/discovery/new" element={<ProtectedRoute><NewDiscovery /></ProtectedRoute>} />
       <Route path="/discovery/:id" element={<ProtectedRoute><DiscoveryDetail /></ProtectedRoute>} />
+      <Route path="/discovery/:id/roi" element={<ProtectedRoute><ROIDiscovery /></ProtectedRoute>} />
       <Route path="/scope" element={<ProtectedRoute><Scope /></ProtectedRoute>} />
       <Route path="/scope/new" element={<ProtectedRoute><NewScope /></ProtectedRoute>} />
       <Route path="/scope/:id" element={<ProtectedRoute><ScopeDetail /></ProtectedRoute>} />
