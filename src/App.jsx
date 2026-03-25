@@ -33,6 +33,7 @@ import CustomerDetail from "./pages/CustomerDetail"
 import Contacts from "./pages/Contacts"
 import NewContact from "./pages/NewContact"
 import ContactDetail from "./pages/ContactDetail"
+import Users from "./pages/Users"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -73,6 +74,7 @@ function AppRoutes() {
       <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
       <Route path="/contacts/new" element={<ProtectedRoute><NewContact /></ProtectedRoute>} />
       <Route path="/contacts/:id" element={<ProtectedRoute><ContactDetail /></ProtectedRoute>} />
+      <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
       <Route path="/machines" element={<ProtectedRoute><MachineList /></ProtectedRoute>} />
       <Route path="/products" element={<ProtectedRoute><ProductList /></ProtectedRoute>} />
       <Route path="/templates" element={<ProtectedRoute><TaskTemplates /></ProtectedRoute>} />

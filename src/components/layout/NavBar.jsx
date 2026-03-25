@@ -39,6 +39,12 @@ const sections = [
     items: [
       { label: "Analytics", path: "/intelligence", icon: "📊" },
     ]
+  },
+  {
+    title: "Admin",
+    items: [
+      { label: "Users", path: "/users", icon: "👥" },
+    ]
   }
 ]
 
