@@ -197,6 +197,7 @@ CREATE TABLE IF NOT EXISTS projects (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
   opportunity_id UUID REFERENCES opportunities(id) ON DELETE SET NULL,
+  scope_id UUID,
   name TEXT NOT NULL,
   start_date DATE,
   planned_end_date DATE,
@@ -219,6 +220,7 @@ CREATE TABLE IF NOT EXISTS projects (
 DO $$ BEGIN
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS account_id UUID;
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS opportunity_id UUID;
+  ALTER TABLE projects ADD COLUMN IF NOT EXISTS scope_id UUID;
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS name TEXT;
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS start_date DATE;
   ALTER TABLE projects ADD COLUMN IF NOT EXISTS planned_end_date DATE;
@@ -407,7 +409,9 @@ CREATE TABLE IF NOT EXISTS task_templates (
   project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
   name TEXT,
   phase TEXT,
+  estimated_hours NUMERIC,
   enabled BOOLEAN DEFAULT true,
+  is_custom BOOLEAN DEFAULT false,
   sort_order INTEGER,
   created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -418,7 +422,9 @@ DO $$ BEGIN
   ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS project_id UUID;
   ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS name TEXT;
   ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS phase TEXT;
+  ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS estimated_hours NUMERIC;
   ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS enabled BOOLEAN DEFAULT true;
+  ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS is_custom BOOLEAN DEFAULT false;
   ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS sort_order INTEGER;
   ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS created_by UUID;
   ALTER TABLE task_templates ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();

@@ -93,11 +93,11 @@ export default function ScopeDetail() {
               {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
             {scope?.approval_status === "approved" && (
-              <button onClick={() => navigate("/projects/new")}
+              <button onClick={() => navigate(`/projects/new?scope=${id}&opportunity=${scope?.opportunity_id || ""}`)}
                 style={{ backgroundColor: "#10b981", color: "white", border: "none",
                   padding: "10px 20px", borderRadius: "8px", cursor: "pointer",
                   fontWeight: "600", fontSize: "14px" }}>
-                📁 Create Project
+                Create Project from Scope
               </button>
             )}
           </div>

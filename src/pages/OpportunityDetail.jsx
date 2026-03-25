@@ -54,22 +54,29 @@ export default function OpportunityDetail() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [stage, setStage] = useState('')
+  const [discoveries, setDiscoveries] = useState([])
+  const [scopes, setScopes] = useState([])
+  const [projects, setProjects] = useState([])
 
   useEffect(() => {
     fetchOpportunity()
   }, [id])
 
   const fetchOpportunity = async () => {
-    const { data, error } = await supabase
-      .from('opportunities')
-      .select('*, accounts(name)')
-      .eq('id', id)
-      .single()
+    const [{ data, error }, { data: discs }, { data: scs }, { data: projs }] = await Promise.all([
+      supabase.from('opportunities').select('*, accounts(name)').eq('id', id).single(),
+      supabase.from('discovery_records').select('id, status, complexity_score, created_at').eq('opportunity_id', id),
+      supabase.from('scope_baselines').select('id, name, approval_status, estimated_hours_min, estimated_hours_max, workstream_hours').eq('opportunity_id', id),
+      supabase.from('projects').select('id, name, status, health').eq('opportunity_id', id)
+    ])
     if (error) console.error(error)
     else {
       setOpp(data)
       setStage(data.stage)
     }
+    setDiscoveries(discs || [])
+    setScopes(scs || [])
+    setProjects(projs || [])
     setLoading(false)
   }
 
@@ -244,6 +251,87 @@ return (
                 </p>
               </div>
             )}
+            {/* Linked Records */}
+            <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
+              <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 16px 0' }}>
+                Delivery Pipeline
+              </h2>
+
+              {/* Discoveries */}
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Discoveries ({discoveries.length})
+                  </span>
+                  <button onClick={() => navigate(`/discovery/new?opportunity=${id}`)}
+                    style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>+ New</button>
+                </div>
+                {discoveries.length > 0 ? discoveries.map(d => (
+                  <div key={d.id} onClick={() => navigate(`/discovery/${d.id}`)}
+                    style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: '#f8fafc',
+                      marginBottom: '4px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '13px', color: '#1e293b' }}>Discovery Record</span>
+                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: '600',
+                      backgroundColor: d.status === 'completed' ? '#dcfce7' : '#dbeafe',
+                      color: d.status === 'completed' ? '#166534' : '#1e40af', textTransform: 'capitalize' }}>
+                      {d.status?.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                )) : <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0 }}>No discoveries yet</p>}
+              </div>
+
+              {/* Scopes */}
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Scopes ({scopes.length})
+                  </span>
+                  <button onClick={() => navigate(`/scope/new?opportunity=${id}`)}
+                    style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>+ New</button>
+                </div>
+                {scopes.length > 0 ? scopes.map(s => {
+                  const ws = s.workstream_hours || {}
+                  const totalH = Object.values(ws).reduce((a, b) => a + (Number(b) || 0), 0)
+                  const sc = { draft: '#94a3b8', submitted: '#3b82f6', in_review: '#f59e0b', approved: '#10b981', rejected: '#ef4444', changes_required: '#f97316' }
+                  return (
+                    <div key={s.id} onClick={() => navigate(`/scope/${s.id}`)}
+                      style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: '#f8fafc',
+                        marginBottom: '4px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span style={{ fontSize: '13px', color: '#1e293b', fontWeight: '500' }}>{s.name}</span>
+                        {totalH > 0 && <span style={{ fontSize: '11px', color: '#94a3b8', marginLeft: '8px' }}>{totalH}h</span>}
+                      </div>
+                      <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: '600',
+                        backgroundColor: (sc[s.approval_status] || '#94a3b8') + '18',
+                        color: sc[s.approval_status] || '#94a3b8', textTransform: 'capitalize' }}>
+                        {s.approval_status?.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  )
+                }) : <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0 }}>No scopes yet</p>}
+              </div>
+
+              {/* Projects */}
+              <div>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Projects ({projects.length})
+                </span>
+                {projects.length > 0 ? projects.map(p => {
+                  const hc = { green: '#10b981', yellow: '#f59e0b', red: '#ef4444', grey: '#94a3b8' }
+                  return (
+                    <div key={p.id} onClick={() => navigate(`/projects/${p.id}`)}
+                      style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: '#f8fafc',
+                        marginTop: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: hc[p.health] || '#94a3b8' }} />
+                        <span style={{ fontSize: '13px', color: '#1e293b', fontWeight: '500' }}>{p.name}</span>
+                      </div>
+                      <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'capitalize' }}>{p.status?.replace(/_/g, ' ')}</span>
+                    </div>
+                  )
+                }) : <p style={{ fontSize: '12px', color: '#94a3b8', margin: '8px 0 0 0' }}>No projects yet</p>}
+              </div>
+            </div>
           </div>
 
           {/* Right Column */}

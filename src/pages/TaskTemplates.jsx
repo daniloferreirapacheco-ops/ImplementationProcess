@@ -41,6 +41,7 @@ export default function TaskTemplates() {
   const [showCustomForm, setShowCustomForm] = useState(false)
   const [customTask, setCustomTask] = useState({ phase: 'Discovery', name: '', hours: 2 })
   const [hourlyRate, setHourlyRate] = useState(150)
+  const [scopeWorkstreams, setScopeWorkstreams] = useState(null)
 
   useEffect(() => { loadProjects() }, [])
 
@@ -75,9 +76,41 @@ export default function TaskTemplates() {
     }
   }
 
-  const handleProjectChange = (projectId) => {
+  const handleProjectChange = async (projectId) => {
     setSelectedProject(projectId)
     loadTasks(projectId)
+    // Check if project has a linked scope
+    const { data: proj } = await supabase.from('projects').select('scope_id, opportunity_id').eq('id', projectId).single()
+    if (proj?.scope_id) {
+      const { data: scope } = await supabase.from('scope_baselines').select('workstream_hours').eq('id', proj.scope_id).single()
+      setScopeWorkstreams(scope?.workstream_hours || null)
+    } else if (proj?.opportunity_id) {
+      const { data: scopes } = await supabase.from('scope_baselines').select('workstream_hours').eq('opportunity_id', proj.opportunity_id).eq('approval_status', 'approved').limit(1)
+      setScopeWorkstreams(scopes?.[0]?.workstream_hours || null)
+    } else {
+      setScopeWorkstreams(null)
+    }
+  }
+
+  const importFromScope = () => {
+    if (!scopeWorkstreams) return
+    const phaseMap = {
+      discovery_design: 'Discovery', configuration: 'Configuration',
+      integration: 'Configuration', testing: 'Testing', training: 'Handoff',
+      data_migration: 'Configuration', go_live: 'Handoff',
+      project_management: 'Discovery', customization: 'Configuration',
+      reporting: 'Configuration'
+    }
+    const newTasks = Object.entries(scopeWorkstreams).map(([key, hours], i) => ({
+      id: `scope_${Date.now()}_${i}`,
+      phase: phaseMap[key] || 'Configuration',
+      name: key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      estimated_hours: Number(hours) || 0,
+      enabled: true,
+      sort_order: tasks.length + i,
+      is_custom: false
+    }))
+    setTasks(newTasks)
   }
 
   const toggleTask = (taskId) => {
@@ -221,6 +254,13 @@ export default function TaskTemplates() {
                   border: '1px solid #ddd6fe', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
                 + Custom Task
               </button>
+              {scopeWorkstreams && (
+                <button onClick={importFromScope}
+                  style={{ padding: '8px 16px', backgroundColor: '#f0fdf4', color: '#10b981',
+                    border: '1px solid #bbf7d0', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+                  Import from Scope ({Object.keys(scopeWorkstreams).length} workstreams)
+                </button>
+              )}
             </div>
 
             {/* Add from Library */}

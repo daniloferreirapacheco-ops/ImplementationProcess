@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
@@ -7,13 +7,17 @@ import NavBar from "../components/layout/NavBar"
 export default function NewProject() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const scopeId = searchParams.get("scope")
+  const oppId = searchParams.get("opportunity")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [opportunities, setOpportunities] = useState([])
   const [accounts, setAccounts] = useState([])
+  const [scopeData, setScopeData] = useState(null)
   const [form, setForm] = useState({
     name: "",
-    opportunity_id: "",
+    opportunity_id: oppId || "",
     account_id: "",
     start_date: "",
     planned_end_date: "",
@@ -22,18 +26,48 @@ export default function NewProject() {
     status: "not_started",
     health: "green",
     budget_hours: "",
-    budget_cost: ""
+    budget_cost: "",
+    scope_id: scopeId || ""
   })
 
   useEffect(() => { fetchData() }, [])
 
   const fetchData = async () => {
     const [{ data: opps }, { data: accs }] = await Promise.all([
-      supabase.from("opportunities").select("id, name, accounts(name)").eq("stage", "approved"),
+      supabase.from("opportunities").select("id, name, account_id, accounts(name)").eq("stage", "approved"),
       supabase.from("accounts").select("id, name").order("name")
     ])
     setOpportunities(opps || [])
     setAccounts(accs || [])
+
+    // Auto-populate from scope if linked
+    if (scopeId) {
+      const { data: scope } = await supabase.from("scope_baselines")
+        .select("*, opportunities(name, account_id, accounts(name))")
+        .eq("id", scopeId).single()
+      if (scope) {
+        setScopeData(scope)
+        const ws = scope.workstream_hours || {}
+        const totalHours = Object.values(ws).reduce((a, b) => a + (Number(b) || 0), 0)
+        const avgRate = 150 // default rate
+        setForm(prev => ({
+          ...prev,
+          name: scope.name ? `${scope.opportunities?.accounts?.name || ""} — ${scope.name}`.trim() : prev.name,
+          opportunity_id: scope.opportunity_id || prev.opportunity_id,
+          account_id: scope.opportunities?.account_id || prev.account_id,
+          budget_hours: totalHours || prev.budget_hours,
+          budget_cost: totalHours * avgRate || prev.budget_cost,
+          notes: scope.team_recommendation ? `Scope: ${scope.name}\n${scope.team_recommendation}` : prev.notes,
+          scope_id: scopeId
+        }))
+      }
+    } else if (oppId) {
+      // Auto-fill account from opportunity
+      const opp = (opps || []).find(o => o.id === oppId)
+      if (opp) {
+        setForm(prev => ({ ...prev, account_id: opp.account_id || prev.account_id }))
+      }
+    }
   }
 
   const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
@@ -52,6 +86,7 @@ export default function NewProject() {
       if (!payload.planned_end_date) payload.planned_end_date = null
       if (!payload.golive_target) payload.golive_target = null
       if (!payload.notes) payload.notes = null
+      if (!payload.scope_id) payload.scope_id = null
       payload.budget_hours = payload.budget_hours ? Number(payload.budget_hours) : null
       payload.budget_cost = payload.budget_cost ? Number(payload.budget_cost) : null
       const { data, error: err } = await supabase
@@ -59,6 +94,31 @@ export default function NewProject() {
         .insert(payload)
         .select().single()
       if (err) throw err
+
+      // Auto-generate task templates from scope workstreams
+      if (scopeData && scopeData.workstream_hours) {
+        const ws = scopeData.workstream_hours
+        const phaseMap = {
+          discovery_design: "Discovery", configuration: "Configuration",
+          integration: "Integration", testing: "Testing", training: "Handoff",
+          data_migration: "Configuration", go_live: "Handoff",
+          project_management: "Discovery", customization: "Configuration",
+          reporting: "Configuration"
+        }
+        const taskPayload = Object.entries(ws).map(([key, hours], i) => ({
+          project_id: data.id,
+          phase: phaseMap[key] || "Configuration",
+          name: key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+          estimated_hours: Number(hours) || 0,
+          enabled: true,
+          sort_order: i,
+          created_by: profile.id
+        }))
+        if (taskPayload.length > 0) {
+          await supabase.from("task_templates").insert(taskPayload)
+        }
+      }
+
       navigate(`/projects/${data.id}`)
     } catch (err) {
       setError(err.message)
@@ -87,6 +147,24 @@ export default function NewProject() {
             ← Back
           </button>
         </div>
+
+        {scopeData && (
+          <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0",
+            padding: "14px 18px", borderRadius: "8px", marginBottom: "16px",
+            display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <p style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "600", color: "#166534" }}>
+                Creating from approved scope: {scopeData.name}
+              </p>
+              <p style={{ margin: 0, fontSize: "12px", color: "#15803d" }}>
+                Budget hours and cost auto-populated from scope workstreams ({Object.keys(scopeData.workstream_hours || {}).length} workstreams, {Object.values(scopeData.workstream_hours || {}).reduce((a, b) => a + (Number(b) || 0), 0)}h total).
+                Task templates will be auto-generated.
+              </p>
+            </div>
+            <span style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "12px",
+              backgroundColor: "#dcfce7", color: "#166534", fontWeight: "600" }}>Scope Linked</span>
+          </div>
+        )}
 
         {error && <div style={{ backgroundColor: "#fee2e2", color: "#dc2626",
           padding: "12px", borderRadius: "8px", marginBottom: "16px" }}>{error}</div>}
