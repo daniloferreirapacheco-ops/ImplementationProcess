@@ -34,7 +34,7 @@ export default function NewCustomer() {
       zip: form.zip || null,
       notes: form.notes || null,
       status: form.status,
-      created_by: profile.id
+      created_by: profile?.id
     }).select().single()
     if (err) {
       setError(err.message)

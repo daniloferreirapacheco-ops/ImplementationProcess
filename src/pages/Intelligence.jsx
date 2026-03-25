@@ -31,7 +31,7 @@ export default function Intelligence() {
       supabase.from("blockers").select("project_id, severity, status"),
       supabase.from("milestones").select("project_id, name, status, due_date"),
       supabase.from("defects").select("id, severity, status, project_id")
-    ])
+    ]).catch(() => Array(9).fill({ data: null }))
 
     const p = projects || [], o = opps || [], d = discoveries || [], s = scopes || [],
       h = handoffs || [], t = timeEntries || [], b = blockers || [], m = milestones || [],
@@ -98,8 +98,11 @@ export default function Intelligence() {
 
     // Defect summary
     const defectsBySeverity = { Critical: 0, High: 0, Medium: 0, Low: 0 }
-    df.forEach(x => { if (defectsBySeverity[x.severity] !== undefined) defectsBySeverity[x.severity]++ })
-    const openDefects = df.filter(x => x.status === "Open").length
+    df.forEach(x => {
+      const sev = x.severity ? x.severity.charAt(0).toUpperCase() + x.severity.slice(1).toLowerCase() : null
+      if (sev && defectsBySeverity[sev] !== undefined) defectsBySeverity[sev]++
+    })
+    const openDefects = df.filter(x => x.status && x.status.toLowerCase() === "open").length
 
     // Milestone stats
     const totalMilestones = m.length

@@ -122,9 +122,13 @@ export default function Handoff() {
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
-        ) : filtered.length === 0 ? (
+        ) : handoffs.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
             <p style={{ fontSize: '14px', margin: 0 }}>No handoff packages found</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
+            <p style={{ fontSize: '14px', margin: 0 }}>No matching handoff packages</p>
           </div>
         ) : (
           <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>

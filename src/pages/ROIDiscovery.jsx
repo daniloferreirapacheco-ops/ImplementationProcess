@@ -148,7 +148,7 @@ export default function ROIDiscovery() {
           placeholder={placeholder} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
       ) : (
         <input type={type === "number" ? "number" : "text"} value={data[field] ?? ""}
-          onChange={e => update(field, type === "number" ? e.target.value : e.target.value)}
+          onChange={e => update(field, type === "number" ? (e.target.value === '' ? null : Number(e.target.value)) : e.target.value)}
           placeholder={placeholder} style={inputStyle}
           min={type === "number" ? "0" : undefined} step={type === "number" ? "any" : undefined} />
       )}

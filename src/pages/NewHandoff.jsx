@@ -60,7 +60,7 @@ export default function NewHandoff() {
     try {
       const { data, error: err } = await supabase
         .from("handoff_packages")
-        .insert({ ...form, created_by: profile.id })
+        .insert({ ...form, created_by: profile?.id })
         .select().single()
       if (err) throw err
       navigate(`/handoff/${data.id}`)

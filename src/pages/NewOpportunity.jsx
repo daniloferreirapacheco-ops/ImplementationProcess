@@ -132,8 +132,8 @@ export default function NewOpportunity() {
           qualification_score: score,
           complexity_level: getComplexity(score),
           discovery_depth: getDiscoveryDepth(score),
-          sales_owner_id: profile.id,
-          created_by: profile.id
+          sales_owner_id: profile?.id,
+          created_by: profile?.id
         })
         .select()
         .single()
@@ -156,6 +156,11 @@ return (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '24px' }}>
 
           <div>
+            <button onClick={() => navigate('/opportunities')}
+              style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
+                fontSize: '14px', padding: 0, marginBottom: '16px' }}>
+              ← Back to Opportunities
+            </button>
             <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', margin: '0 0 24px 0' }}>
               New Opportunity
             </h1>

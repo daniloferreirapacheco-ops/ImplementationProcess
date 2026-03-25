@@ -95,7 +95,7 @@ export default function NewScope() {
         estimated_hours_min: totalMin,
         estimated_hours_max: totalMax,
         confidence_score: confidenceScore(),
-        created_by: profile.id
+        created_by: profile?.id
       }
       // Convert empty strings to null for UUID and optional fields
       if (!payload.discovery_id) payload.discovery_id = null

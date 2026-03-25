@@ -44,12 +44,12 @@ export default function ScopeDetail() {
     setSaving(false)
   }
 
-  if (loading) return (
+  if (loading || !scope) return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Scope" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center",
-          height: "calc(100vh - 64px)", color: "#64748b" }}>Loading...</div>
+          height: "calc(100vh - 64px)", color: "#64748b" }}>{loading ? "Loading..." : "Scope record not found."}</div>
       </main>
     </div>
   )
@@ -71,6 +71,12 @@ export default function ScopeDetail() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Scope" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
+
+        <button onClick={() => navigate('/scope')}
+          style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer",
+            fontSize: "14px", padding: 0, marginBottom: "16px" }}>
+          ← Back to Scope
+        </button>
 
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "flex-start", marginBottom: "24px" }}>

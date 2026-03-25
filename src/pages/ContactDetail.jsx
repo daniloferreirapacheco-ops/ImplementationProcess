@@ -49,7 +49,8 @@ export default function ContactDetail() {
 
   const handleDelete = async () => {
     if (!window.confirm('Delete this contact?')) return
-    await supabase.from('contacts').delete().eq('id', id)
+    const { error } = await supabase.from('contacts').delete().eq('id', id)
+    if (error) { alert(error.message); return }
     navigate('/contacts')
   }
 

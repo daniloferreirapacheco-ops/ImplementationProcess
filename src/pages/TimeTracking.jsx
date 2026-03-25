@@ -101,8 +101,7 @@ export default function TimeTracking() {
   const stopTimer = () => {
     setTimerRunning(false)
     if (timerRef.current) clearInterval(timerRef.current)
-    const hours = (timerSeconds / 3600).toFixed(2)
-    setForm(prev => ({ ...prev, hours }))
+    setForm(prev => ({ ...prev, hours: (timerSeconds / 3600).toFixed(2) }))
     setShowForm(true)
   }
 
@@ -134,8 +133,8 @@ export default function TimeTracking() {
       cost: parseFloat(form.hours) * (parseFloat(form.rate) || 0),
       user_name: form.user_name,
       notes: form.notes,
-      user_id: profile.id,
-      created_by: profile.id
+      user_id: profile?.id,
+      created_by: profile?.id
     }
     const { error: err } = await supabase.from('time_entries').insert(payload)
     if (err) { setError(err.message); return }
@@ -298,7 +297,7 @@ export default function TimeTracking() {
                 style={{ padding: '10px 24px', backgroundColor: '#ef4444', color: 'white',
                   border: 'none', borderRadius: '8px', cursor: 'pointer',
                   fontSize: '14px', fontWeight: '600' }}>
-                Stop &amp; Log
+                Stop & Log
               </button>
             )}
             {timerSeconds > 0 && !timerRunning && (
@@ -500,7 +499,7 @@ export default function TimeTracking() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ backgroundColor: '#f8fafc' }}>
-                  {['Date', 'Task', 'User', 'Hours', 'Rate', 'Cost', 'Notes', ''].map(h => (
+                  {['Date', 'Task', 'User', 'Hours', 'Rate', 'Cost', 'Notes', 'Actions'].map(h => (
                     <th key={h} style={{ padding: '10px 16px', textAlign: 'left',
                       fontSize: '12px', fontWeight: '600', color: '#64748b',
                       borderBottom: '1px solid #e2e8f0' }}>

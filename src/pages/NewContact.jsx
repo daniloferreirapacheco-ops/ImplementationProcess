@@ -43,7 +43,7 @@ export default function NewContact() {
       account_id: form.account_id || null,
       role: form.role || null,
       notes: form.notes || null,
-      created_by: profile.id
+      created_by: profile?.id
     }).select().single()
     if (err) {
       setError(err.message)

@@ -92,7 +92,7 @@ export default function NewDiscovery() {
       const payload = {
         ...form,
         complexity_score: calculateScore(),
-        created_by: profile.id
+        created_by: profile?.id
       }
       // Convert empty strings to null for optional text/array fields
       const optionalFields = ['business_segment', 'key_pain_points', 'workflow_notes',
@@ -186,13 +186,13 @@ export default function NewDiscovery() {
               <div>
                 <label style={labelStyle}>Number of Locations</label>
                 <input type="number" value={form.number_of_locations}
-                  onChange={e => update("number_of_locations", parseInt(e.target.value))}
+                  onChange={e => update("number_of_locations", parseInt(e.target.value, 10) || 0)}
                   style={inputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>Number of Estimators</label>
                 <input type="number" value={form.number_of_estimators}
-                  onChange={e => update("number_of_estimators", parseInt(e.target.value))}
+                  onChange={e => update("number_of_estimators", parseInt(e.target.value, 10) || 0)}
                   style={inputStyle} />
               </div>
               <div>

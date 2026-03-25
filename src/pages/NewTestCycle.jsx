@@ -42,10 +42,10 @@ export default function NewTestCycle() {
     try {
       const { data, error: err } = await supabase
         .from("test_cycles")
-        .insert({ ...form, owner_id: profile.id })
+        .insert({ ...form, owner_id: profile?.id })
         .select().single()
       if (err) throw err
-      navigate(`/projects/${form.project_id}`)
+      navigate(`/testing/${data.id}`)
     } catch (err) {
       setError(err.message)
       setLoading(false)
@@ -59,7 +59,7 @@ export default function NewTestCycle() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      <NavBar current="Projects" />
+      <NavBar current="Testing" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "center", marginBottom: "24px" }}>

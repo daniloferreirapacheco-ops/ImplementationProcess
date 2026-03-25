@@ -47,7 +47,7 @@ export default function TestCycleDetail() {
     const { data } = await supabase.from("test_cases")
       .insert({ ...newCase, cycle_id: id, project_id: cycle.project_id })
       .select().single()
-    setCases(prev => [...prev, data])
+    if (data) setCases(prev => [...prev, data])
     setNewCase({ name: "", scenario: "", expected_result: "", severity: "medium" })
     setShowAddCase(false)
     setSaving(false)
@@ -55,8 +55,8 @@ export default function TestCycleDetail() {
 
   const updateCaseStatus = async (caseId, status) => {
     await supabase.from("test_cases").update({ status, updated_at: new Date() }).eq("id", caseId)
-    setCases(prev => prev.map(c => c.id === caseId ? { ...c, status } : c))
     const updated = cases.map(c => c.id === caseId ? { ...c, status } : c)
+    setCases(updated)
     const passed = updated.filter(c => c.status === "passed").length
     const failed = updated.filter(c => c.status === "failed").length
     await supabase.from("test_cycles").update({
@@ -68,7 +68,7 @@ export default function TestCycleDetail() {
 
   if (loading) return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      <NavBar current="Projects" />
+      <NavBar current="Testing" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center",
           height: "calc(100vh - 64px)", color: "#64748b" }}>Loading...</div>
@@ -101,7 +101,7 @@ export default function TestCycleDetail() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      <NavBar current="Projects" />
+      <NavBar current="Testing" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
 
         <div style={{ display: "flex", justifyContent: "space-between",

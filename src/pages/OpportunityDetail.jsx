@@ -128,6 +128,12 @@ return (
 
       <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
 
+        <button onClick={() => navigate('/opportunities')}
+          style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
+            fontSize: '14px', padding: 0, marginBottom: '16px' }}>
+          ← Back to Opportunities
+        </button>
+
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between',
           alignItems: 'flex-start', marginBottom: '24px' }}>
