@@ -23,7 +23,7 @@ function CircleProgress({ passed, failed, pending, size = 90 }) {
   )
 }
 
-export default function UseCasesTab({ useCases, defects, signoffs, cycles }) {
+export default function UseCasesTab({ useCases, defects, signoffs, cycles, onEditUseCase, onDeleteUseCase, onAddUseCase }) {
   const [selectedId, setSelectedId] = useState(useCases[0]?.id || null)
   const selected = useCases.find(u => u.id === selectedId) || useCases[0]
   const selTests = selected?.tests || []
@@ -53,7 +53,7 @@ export default function UseCasesTab({ useCases, defects, signoffs, cycles }) {
         <div style={{ padding: "12px 14px", borderBottom: "0.5px solid #e2e8f0",
           display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontSize: "13px", fontWeight: "600", color: "#1e293b" }}>Use Cases</span>
-          <button style={{ width: "26px", height: "26px", borderRadius: "6px", border: "0.5px solid #d1d5db",
+          <button onClick={onAddUseCase} style={{ width: "26px", height: "26px", borderRadius: "6px", border: "0.5px solid #d1d5db",
             backgroundColor: "white", cursor: "pointer", fontSize: "14px", color: "#3b82f6",
             display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700" }}>+</button>
         </div>
@@ -88,7 +88,7 @@ export default function UseCasesTab({ useCases, defects, signoffs, cycles }) {
                   <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1e293b", margin: 0 }}>{selected.name}</h3>
                   <span style={pill(selected.status)}>{selected.status}</span>
                 </div>
-                <button style={btnOutline("#64748b")}>Edit</button>
+                <button style={btnOutline("#64748b")} onClick={() => onEditUseCase && onEditUseCase(selected)}>Edit</button>
               </div>
 
               <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
@@ -126,7 +126,7 @@ export default function UseCasesTab({ useCases, defects, signoffs, cycles }) {
                 <h3 style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", margin: 0 }}>
                   Test Cases ({selTests.length})
                 </h3>
-                <button style={btn("#3b82f6")}>+ Add Test</button>
+                <button style={btn("#3b82f6")} onClick={onAddUseCase}>+ Add Test</button>
               </div>
 
               <table style={{ width: "100%", borderCollapse: "collapse" }}>

@@ -118,7 +118,7 @@ export default function ProjectDetail() {
     setSaving(true)
     const { data } = await supabase.from("milestones")
       .insert({ ...newMilestone, project_id: id }).select().single()
-    setMilestones(prev => [...prev, data])
+    if (data) setMilestones(prev => [...prev, data])
     setNewMilestone({ name: "", due_date: "" })
     setSaving(false)
   }
@@ -134,7 +134,7 @@ export default function ProjectDetail() {
     setSaving(true)
     const { data } = await supabase.from("blockers")
       .insert({ ...newBlocker, project_id: id }).select().single()
-    setBlockers(prev => [data, ...prev])
+    if (data) setBlockers(prev => [data, ...prev])
     setNewBlocker({ title: "", severity: "medium" })
     setSaving(false)
   }
@@ -150,12 +150,12 @@ export default function ProjectDetail() {
     setBlockers(prev => prev.map(b => b.id === bId ? { ...b, status: "resolved" } : b))
   }
 
-  if (loading) return (
+  if (loading || !project) return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Projects" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center",
-          height: "calc(100vh - 64px)", color: "#64748b" }}>Loading...</div>
+          height: "calc(100vh - 64px)", color: "#64748b" }}>{loading ? "Loading..." : "Project not found."}</div>
       </main>
     </div>
   )

@@ -128,9 +128,9 @@ export default function ProjectUseCases() {
         testsMap[t.use_case_id].push(t)
       })
       setUseCases(ucs.map(uc => ({ ...uc, tests: testsMap[uc.id] || [] })))
-      if (defs && defs.length > 0) setDefects(defs)
-      if (cycs && cycs.length > 0) setCycles(cycs)
-      if (sigs && sigs.length > 0) setSignoffs(sigs)
+      setDefects(defs || [])
+      setCycles(cycs || [])
+      setSignoffs(sigs || [])
     }
     // else keep sample data
 

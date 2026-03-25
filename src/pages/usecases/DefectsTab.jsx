@@ -11,7 +11,7 @@ function ActivityDot({ type }) {
   )
 }
 
-export default function DefectsTab({ defects, onUpdateDefect }) {
+export default function DefectsTab({ defects, onUpdateDefect, onEditDefect, onDeleteDefect, onAddDefect }) {
   const [filter, setFilter] = useState("All")
   const [selectedId, setSelectedId] = useState(() => {
     const firstCritOpen = defects.find(d => d.severity === "Critical" && d.status === "Open")

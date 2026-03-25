@@ -27,7 +27,7 @@ function SignoffDots({ signoffs }) {
   )
 }
 
-export default function TestCyclesTab({ useCases, cycles, signoffs, defects, onUpdateCycle }) {
+export default function TestCyclesTab({ useCases, cycles, signoffs, defects, onUpdateCycle, onEditCycle, onDeleteCycle, onAddCycle }) {
   // Aggregate stats
   const allTests = useCases.flatMap(u => u.tests || [])
   const totalTests = allTests.length
@@ -101,7 +101,8 @@ export default function TestCyclesTab({ useCases, cycles, signoffs, defects, onU
                     </div>
                   )}
                   <span style={pill(cycle.status)}>{cycle.status}</span>
-                  <button style={isPlanned ? btnOutline("#64748b") : btn("#3b82f6")}>
+                  <button style={isPlanned ? btnOutline("#64748b") : btn("#3b82f6")}
+                    onClick={() => onEditCycle && onEditCycle(cycle)}>
                     {isPlanned ? "Configure" : "View"}
                   </button>
                 </div>

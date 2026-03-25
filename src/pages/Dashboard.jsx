@@ -18,7 +18,7 @@ const roleLabels = {
 
 // Dynamic widget builder - values populated from stats
 const buildWidgets = (s) => {
-  if (!s) return []
+  if (!s) return {}
   return {
     admin: [
       { title: "Pending Approvals", value: s.pendingApprovals, icon: "✅", color: "#6366f1", link: "/scope" },

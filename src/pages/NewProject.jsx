@@ -80,7 +80,7 @@ export default function NewProject() {
     setLoading(true)
     setError("")
     try {
-      const payload = { ...form, created_by: profile.id }
+      const payload = { ...form, created_by: profile?.id }
       if (!payload.opportunity_id) payload.opportunity_id = null
       if (!payload.start_date) payload.start_date = null
       if (!payload.planned_end_date) payload.planned_end_date = null
@@ -112,7 +112,7 @@ export default function NewProject() {
           estimated_hours: Number(hours) || 0,
           enabled: true,
           sort_order: i,
-          created_by: profile.id
+          created_by: profile?.id
         }))
         if (taskPayload.length > 0) {
           await supabase.from("task_templates").insert(taskPayload)

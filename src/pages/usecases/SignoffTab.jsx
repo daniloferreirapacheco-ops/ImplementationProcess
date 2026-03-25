@@ -1,6 +1,6 @@
 import { pill, metaLabel, card, btn, btnOutline, divider } from "./styles"
 
-export default function SignoffTab({ useCases, signoffs, cycles, onToggleSignoff }) {
+export default function SignoffTab({ useCases, signoffs, onToggleSignoff, onDeleteSignoff, onAddSignoff }) {
   const allSignoffs = signoffs
   const totalRequired = allSignoffs.length
   const totalSigned = allSignoffs.filter(s => s.signed).length
