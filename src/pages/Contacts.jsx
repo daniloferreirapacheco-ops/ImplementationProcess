@@ -82,8 +82,14 @@ export default function Contacts() {
         {loading ? (
           <p style={{ textAlign: 'center', color: '#64748b', padding: '48px' }}>Loading...</p>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>No contacts found</p>
+          <div style={{ textAlign: 'center', padding: '60px 40px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px' }}>👤</div>
+            <p style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px' }}>No contacts found</p>
+            <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 20px' }}>Add contacts to track stakeholders across your accounts.</p>
+            <button onClick={() => navigate('/contacts/new')}
+              style={{ padding: '10px 24px', backgroundColor: '#8b5cf6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+              + Add Contact
+            </button>
           </div>
         ) : (
           <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>

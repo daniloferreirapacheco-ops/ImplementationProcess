@@ -14,6 +14,8 @@ export default function DiscoveryDetail() {
   const [newQuestion, setNewQuestion] = useState("")
   const [addingQuestion, setAddingQuestion] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({})
 
   useEffect(() => { fetchRecord(); fetchQuestions() }, [id])
 
@@ -23,6 +25,14 @@ export default function DiscoveryDetail() {
       .select("*, opportunities(name, accounts(name))")
       .eq("id", id).single()
     setRecord(data)
+    if (data) setForm({
+      business_segment: data.business_segment || '', number_of_locations: data.number_of_locations || 0,
+      number_of_estimators: data.number_of_estimators || 0, process_maturity: data.process_maturity || '',
+      data_readiness: data.data_readiness || '', complexity_score: data.complexity_score || 0,
+      key_pain_points: data.key_pain_points || '', missing_information: data.missing_information || '',
+      workflow_notes: data.workflow_notes || '', current_systems: data.current_systems || '',
+      notes: data.notes || '',
+    })
     setLoading(false)
   }
 
@@ -66,6 +76,22 @@ export default function DiscoveryDetail() {
     fetchQuestions()
   }
 
+  const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
+  const saveRecord = async () => {
+    const payload = { ...form, complexity_score: parseInt(form.complexity_score) || 0,
+      number_of_locations: parseInt(form.number_of_locations) || 0,
+      number_of_estimators: parseInt(form.number_of_estimators) || 0,
+      updated_at: new Date().toISOString() }
+    for (const k of ['business_segment','process_maturity','data_readiness','key_pain_points','missing_information','workflow_notes','current_systems','notes']) {
+      if (!payload[k]) payload[k] = null
+    }
+    await supabase.from("discovery_records").update(payload).eq("id", id)
+    setRecord(prev => ({ ...prev, ...payload }))
+    setEditing(false)
+  }
+
+  const inputSm = { width: '100%', padding: '8px 10px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }
+
   if (loading || !record) return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Discovery" />
@@ -98,15 +124,15 @@ export default function DiscoveryDetail() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Discovery" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/discovery")} style={{ color: "#94a3b8", cursor: "pointer" }}>Discovery</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>{record?.opportunities?.name || "Record"}</span>
+        </div>
 
-        <button onClick={() => navigate('/discovery')}
-          style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer",
-            fontSize: "14px", padding: 0, marginBottom: "16px" }}>
-          ← Back to Discovery
-        </button>
-
-        <div style={{ display: "flex", justifyContent: "space-between",
-          alignItems: "flex-start", marginBottom: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px" }}>
           <div>
             <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
               {record?.opportunities?.name || "Discovery Record"}
@@ -115,28 +141,37 @@ export default function DiscoveryDetail() {
               🏢 {record?.opportunities?.accounts?.name}
             </p>
           </div>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <select value={record?.status || "in_progress"}
-              onChange={e => updateStatus(e.target.value)}
-              style={{ padding: "8px 14px", borderRadius: "8px", fontSize: "14px",
-                fontWeight: "600", border: `2px solid ${statusColors[record?.status] || "#94a3b8"}`,
-                color: statusColors[record?.status] || "#94a3b8",
-                backgroundColor: "white", cursor: "pointer" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            {!editing ? (
+              <button onClick={() => setEditing(true)}
+                style={{ padding: "8px 16px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #d1d5db", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+                Edit
+              </button>
+            ) : (
+              <>
+                <button onClick={saveRecord}
+                  style={{ padding: "8px 16px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+                  Save
+                </button>
+                <button onClick={() => setEditing(false)}
+                  style={{ padding: "8px 16px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #d1d5db", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+                  Cancel
+                </button>
+              </>
+            )}
+            <select value={record?.status || "in_progress"} onChange={e => updateStatus(e.target.value)}
+              style={{ padding: "8px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: "600", border: `2px solid ${statusColors[record?.status] || "#94a3b8"}`, color: statusColors[record?.status] || "#94a3b8", backgroundColor: "white", cursor: "pointer" }}>
               <option value="not_started">Not Started</option>
               <option value="in_progress">In Progress</option>
               <option value="completed">Completed</option>
               <option value="blocked">Blocked</option>
             </select>
             <button onClick={() => navigate(`/discovery/${id}/roi`)}
-              style={{ backgroundColor: "#10b981", color: "white", border: "none",
-                padding: "10px 20px", borderRadius: "8px", cursor: "pointer",
-                fontWeight: "600", fontSize: "14px" }}>
+              style={{ backgroundColor: "#10b981", color: "white", border: "none", padding: "8px 16px", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "13px" }}>
               ROI Analysis
             </button>
             <button onClick={() => navigate(`/scope/new?discovery=${id}`)}
-              style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
-                padding: "10px 20px", borderRadius: "8px", cursor: "pointer",
-                fontWeight: "600", fontSize: "14px" }}>
+              style={{ backgroundColor: "#3b82f6", color: "white", border: "none", padding: "8px 16px", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "13px" }}>
               Build Scope
             </button>
           </div>
@@ -157,41 +192,56 @@ export default function DiscoveryDetail() {
         {activeTab === "overview" && (
           <div>
             <div style={cardStyle}>
-              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 20px 0" }}>
-                Business Profile
-              </h2>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
-                {[
-                  { label: "Business Segment", value: record?.business_segment || "Not set" },
-                  { label: "Locations", value: record?.number_of_locations || 0 },
-                  { label: "Estimators", value: record?.number_of_estimators || 0 },
-                  { label: "Process Maturity", value: record?.process_maturity || "Unknown" },
-                  { label: "Data Readiness", value: record?.data_readiness || "Unknown" },
-                  { label: "Complexity Score", value: record?.complexity_score || 0 },
-                ].map(item => (
-                  <div key={item.label} style={{ padding: "12px", backgroundColor: "#f8fafc", borderRadius: "8px" }}>
-                    <p style={labelStyle}>{item.label}</p>
-                    <p style={{ ...valueStyle, textTransform: "capitalize" }}>{item.value}</p>
-                  </div>
-                ))}
-              </div>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 20px 0" }}>Business Profile</h2>
+              {editing ? (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }}>
+                  <div><label style={labelStyle}>Business Segment</label><input value={form.business_segment} onChange={e => updateForm('business_segment', e.target.value)} style={inputSm} /></div>
+                  <div><label style={labelStyle}>Locations</label><input type="number" value={form.number_of_locations} onChange={e => updateForm('number_of_locations', e.target.value)} style={inputSm} /></div>
+                  <div><label style={labelStyle}>Estimators</label><input type="number" value={form.number_of_estimators} onChange={e => updateForm('number_of_estimators', e.target.value)} style={inputSm} /></div>
+                  <div><label style={labelStyle}>Process Maturity</label>
+                    <select value={form.process_maturity} onChange={e => updateForm('process_maturity', e.target.value)} style={inputSm}>
+                      <option value="">Select...</option><option value="basic">Basic</option><option value="developing">Developing</option><option value="mature">Mature</option><option value="advanced">Advanced</option>
+                    </select></div>
+                  <div><label style={labelStyle}>Data Readiness</label>
+                    <select value={form.data_readiness} onChange={e => updateForm('data_readiness', e.target.value)} style={inputSm}>
+                      <option value="">Select...</option><option value="not_ready">Not Ready</option><option value="partial">Partial</option><option value="ready">Ready</option><option value="excellent">Excellent</option>
+                    </select></div>
+                  <div><label style={labelStyle}>Complexity Score (0-100)</label><input type="number" value={form.complexity_score} onChange={e => updateForm('complexity_score', e.target.value)} style={inputSm} /></div>
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+                  {[
+                    { label: "Business Segment", value: record?.business_segment || "Not set" },
+                    { label: "Locations", value: record?.number_of_locations || 0 },
+                    { label: "Estimators", value: record?.number_of_estimators || 0 },
+                    { label: "Process Maturity", value: record?.process_maturity || "Unknown" },
+                    { label: "Data Readiness", value: record?.data_readiness || "Unknown" },
+                    { label: "Complexity Score", value: record?.complexity_score || 0 },
+                  ].map(item => (
+                    <div key={item.label} style={{ padding: "12px", backgroundColor: "#f8fafc", borderRadius: "8px" }}>
+                      <p style={labelStyle}>{item.label}</p>
+                      <p style={{ ...valueStyle, textTransform: "capitalize" }}>{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            {record?.key_pain_points && (
-              <div style={cardStyle}>
-                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>
-                  Key Pain Points
-                </h2>
-                <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{record.key_pain_points}</p>
-              </div>
-            )}
-            {record?.missing_information && (
-              <div style={{ ...cardStyle, borderColor: "#fde68a", backgroundColor: "#fffbeb" }}>
-                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#92400e", margin: "0 0 12px 0" }}>
-                  ⚠️ Missing Information
-                </h2>
-                <p style={{ color: "#92400e", lineHeight: "1.6", margin: 0 }}>{record.missing_information}</p>
-              </div>
-            )}
+            <div style={cardStyle}>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>Key Pain Points</h2>
+              {editing ? (
+                <textarea value={form.key_pain_points} onChange={e => updateForm('key_pain_points', e.target.value)} rows={3} placeholder="What are the customer's main pain points?" style={{ ...inputSm, resize: 'vertical' }} />
+              ) : (
+                <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{record?.key_pain_points || <span style={{ color: '#cbd5e1', fontStyle: 'italic' }}>No pain points documented yet</span>}</p>
+              )}
+            </div>
+            <div style={{ ...cardStyle, borderColor: editing || record?.missing_information ? "#fde68a" : "#e2e8f0", backgroundColor: editing || record?.missing_information ? "#fffbeb" : "white" }}>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#92400e", margin: "0 0 12px 0" }}>Missing Information</h2>
+              {editing ? (
+                <textarea value={form.missing_information} onChange={e => updateForm('missing_information', e.target.value)} rows={3} placeholder="What information is still needed?" style={{ ...inputSm, resize: 'vertical' }} />
+              ) : (
+                <p style={{ color: "#92400e", lineHeight: "1.6", margin: 0 }}>{record?.missing_information || <span style={{ color: '#cbd5e1', fontStyle: 'italic' }}>None identified</span>}</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -220,16 +270,25 @@ export default function DiscoveryDetail() {
         {activeTab === "workflow" && (
           <div>
             {[
-              { label: "Workflow Notes", value: record?.workflow_notes },
-              { label: "Current Systems", value: record?.current_systems },
-            ].map(item => item.value && (
+              { label: "Workflow Notes", field: "workflow_notes", placeholder: "Document the customer's current workflows..." },
+              { label: "Current Systems", field: "current_systems", placeholder: "What systems are currently in use?" },
+              { label: "Notes", field: "notes", placeholder: "Additional discovery notes..." },
+            ].map(item => (editing || record?.[item.field]) ? (
               <div key={item.label} style={cardStyle}>
-                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>
-                  {item.label}
-                </h2>
-                <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{item.value}</p>
+                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>{item.label}</h2>
+                {editing ? (
+                  <textarea value={form[item.field]} onChange={e => updateForm(item.field, e.target.value)} rows={3} placeholder={item.placeholder} style={{ ...inputSm, resize: 'vertical' }} />
+                ) : (
+                  <p style={{ color: "#475569", lineHeight: "1.6", margin: 0, whiteSpace: "pre-wrap" }}>{record[item.field]}</p>
+                )}
               </div>
-            ))}
+            ) : null)}
+            {!editing && !record?.workflow_notes && !record?.current_systems && !record?.notes && (
+              <div style={{ textAlign: "center", padding: "48px", color: "#94a3b8", backgroundColor: "white", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                <p style={{ margin: "0 0 8px", fontSize: "15px" }}>No workflow details documented yet</p>
+                <button onClick={() => setEditing(true)} style={{ padding: "8px 20px", backgroundColor: "#8b5cf6", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>Add Details</button>
+              </div>
+            )}
           </div>
         )}
 
