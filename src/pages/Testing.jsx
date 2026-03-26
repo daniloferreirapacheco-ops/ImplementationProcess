@@ -100,6 +100,30 @@ export default function Testing() {
           </div>
         </div>
 
+        {/* Summary Stats */}
+        {cycles.length > 0 && (() => {
+          const totalPassed = cycles.reduce((s, c) => s + (c.pass_count || 0), 0)
+          const totalFailed = cycles.reduce((s, c) => s + (c.fail_count || 0), 0)
+          const totalTests = totalPassed + totalFailed
+          const passRate = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginBottom: '16px' }}>
+              {[
+                { label: 'Test Cycles', value: cycles.length, color: '#1e293b' },
+                { label: 'Total Tests', value: totalTests, color: '#3b82f6' },
+                { label: 'Passed', value: totalPassed, color: '#10b981' },
+                { label: 'Failed', value: totalFailed, color: totalFailed > 0 ? '#ef4444' : '#10b981' },
+                { label: 'Pass Rate', value: `${passRate}%`, color: passRate >= 80 ? '#10b981' : passRate >= 60 ? '#f59e0b' : '#ef4444' },
+              ].map(s => (
+                <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '12px 14px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                  <p style={{ fontSize: '20px', fontWeight: '700', color: s.color, margin: '0 0 2px' }}>{s.value}</p>
+                  <p style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
           <input
             type="text"

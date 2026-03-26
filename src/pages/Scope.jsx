@@ -100,6 +100,24 @@ export default function Scope() {
           </button>
         </div>
 
+        {/* Summary Stats */}
+        {scopes.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginBottom: '16px' }}>
+            {[
+              { label: 'Total', value: scopes.length, color: '#1e293b' },
+              { label: 'Draft', value: scopes.filter(s => s.approval_status === 'draft').length, color: '#94a3b8' },
+              { label: 'Submitted', value: scopes.filter(s => ['submitted', 'in_review'].includes(s.approval_status)).length, color: '#3b82f6' },
+              { label: 'Approved', value: scopes.filter(s => s.approval_status === 'approved').length, color: '#10b981' },
+              { label: 'Avg Confidence', value: `${scopes.length > 0 ? Math.round(scopes.reduce((a, s) => a + (s.confidence_score || 0), 0) / scopes.length) : 0}%`, color: '#6366f1' },
+            ].map(s => (
+              <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '12px 14px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                <p style={{ fontSize: '20px', fontWeight: '700', color: s.color, margin: '0 0 2px' }}>{s.value}</p>
+                <p style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Search & Filters */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', alignItems: 'center' }}>
           <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}

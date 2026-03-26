@@ -112,6 +112,28 @@ export default function Opportunities() {
           </div>
         </div>
 
+        {/* Summary Stats */}
+        {opps.length > 0 && (() => {
+          const totalValue = opps.reduce((s, o) => s + (Number(o.estimated_value) || 0), 0)
+          const openOpps = opps.filter(o => !['closed_lost', 'converted'].includes(o.stage))
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginBottom: '16px' }}>
+              {[
+                { label: 'Total Pipeline', value: opps.length, color: '#1e293b' },
+                { label: 'Open', value: openOpps.length, color: '#3b82f6' },
+                { label: 'Pipeline Value', value: `$${Math.round(totalValue / 1000)}K`, color: '#10b981' },
+                { label: 'Converted', value: opps.filter(o => o.stage === 'converted').length, color: '#6366f1' },
+                { label: 'Lost', value: opps.filter(o => o.stage === 'closed_lost').length, color: '#ef4444' },
+              ].map(s => (
+                <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '12px 14px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                  <p style={{ fontSize: '20px', fontWeight: '700', color: s.color, margin: '0 0 2px' }}>{s.value}</p>
+                  <p style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
+
         <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
           <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
             placeholder="Search opportunities..."
