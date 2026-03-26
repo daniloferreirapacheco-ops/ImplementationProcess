@@ -52,12 +52,15 @@ export default function Opportunities() {
   useEffect(() => { fetchOpportunities() }, [])
 
   const fetchOpportunities = async () => {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('opportunities')
       .select('*, accounts(name)')
       .order('created_at', { ascending: false })
-    if (error) console.error(error)
-    else setOpportunities(data || [])
+    if (error || !data) {
+      const res = await supabase.from('opportunities').select('*').order('created_at', { ascending: false })
+      data = res.data
+    }
+    setOpportunities(data || [])
     setLoading(false)
   }
 
@@ -113,9 +116,9 @@ export default function Opportunities() {
         </div>
 
         {/* Summary Stats */}
-        {opps.length > 0 && (() => {
-          const totalValue = opps.reduce((s, o) => s + (Number(o.estimated_value) || 0), 0)
-          const openOpps = opps.filter(o => !['closed_lost', 'converted'].includes(o.stage))
+        {opportunities.length > 0 && (() => {
+          const totalValue = opportunities.reduce((s, o) => s + (Number(o.estimated_value) || 0), 0)
+          const openOpps = opportunities.filter(o => !['closed_lost', 'converted'].includes(o.stage))
           return (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginBottom: '16px' }}>
               {[
