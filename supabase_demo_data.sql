@@ -84,16 +84,16 @@ SELECT '00000001-0000-0000-0000-000000000006', 'a0000001-0000-0000-0000-00000000
 WHERE NOT EXISTS (SELECT 1 FROM opportunities WHERE id = '00000001-0000-0000-0000-000000000006');
 
 -- DISCOVERY RECORDS
-INSERT INTO discovery_records (id, opportunity_id, status, complexity_score, notes)
-SELECT 'dd000001-0000-0000-0000-000000000001', '00000001-0000-0000-0000-000000000001', 'completed', 78, 'Full discovery completed. Complex BOM with 5 levels. 3 work centers.'
+INSERT INTO discovery_records (id, opportunity_id, status, complexity_score)
+SELECT 'dd000001-0000-0000-0000-000000000001', '00000001-0000-0000-0000-000000000001', 'completed', 78
 WHERE NOT EXISTS (SELECT 1 FROM discovery_records WHERE id = 'dd000001-0000-0000-0000-000000000001');
 
-INSERT INTO discovery_records (id, opportunity_id, status, complexity_score, notes)
-SELECT 'dd000001-0000-0000-0000-000000000002', '00000001-0000-0000-0000-000000000002', 'completed', 45, 'Standard upgrade path. Data migration from legacy system is main concern.'
+INSERT INTO discovery_records (id, opportunity_id, status, complexity_score)
+SELECT 'dd000001-0000-0000-0000-000000000002', '00000001-0000-0000-0000-000000000002', 'completed', 45
 WHERE NOT EXISTS (SELECT 1 FROM discovery_records WHERE id = 'dd000001-0000-0000-0000-000000000002');
 
-INSERT INTO discovery_records (id, opportunity_id, status, complexity_score, notes)
-SELECT 'dd000001-0000-0000-0000-000000000003', '00000001-0000-0000-0000-000000000003', 'in_progress', 85, 'Aerospace compliance adds complexity. AS9100 requirements.'
+INSERT INTO discovery_records (id, opportunity_id, status, complexity_score)
+SELECT 'dd000001-0000-0000-0000-000000000003', '00000001-0000-0000-0000-000000000003', 'in_progress', 85
 WHERE NOT EXISTS (SELECT 1 FROM discovery_records WHERE id = 'dd000001-0000-0000-0000-000000000003');
 
 -- SCOPES
