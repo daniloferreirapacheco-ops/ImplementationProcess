@@ -70,6 +70,23 @@ export default function Contacts() {
           </button>
         </div>
 
+        {/* Summary Stats */}
+        {contacts.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '16px' }}>
+            {[
+              { label: 'Total Contacts', value: contacts.length, color: '#1e293b' },
+              { label: 'Companies', value: [...new Set(contacts.map(c => c.account_id).filter(Boolean))].length, color: '#3b82f6' },
+              { label: 'With Email', value: contacts.filter(c => c.email).length, color: '#10b981' },
+              { label: 'With Title', value: contacts.filter(c => c.title).length, color: '#8b5cf6' },
+            ].map(s => (
+              <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '12px 14px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                <p style={{ fontSize: '20px', fontWeight: '700', color: s.color, margin: '0 0 2px' }}>{s.value}</p>
+                <p style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Search */}
         <div style={{ marginBottom: '12px' }}>
           <input value={search} onChange={e => setSearch(e.target.value)}

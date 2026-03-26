@@ -143,9 +143,21 @@ export default function Scope() {
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
-        ) : scopes.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>No scopes yet</p>
+        ) : scopes.length === 0 || paginated.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 40px", backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, #06b6d4, #3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "28px" }}>📋</div>
+            <p style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px' }}>
+              {scopes.length === 0 ? 'No scopes yet' : 'No matching scopes'}
+            </p>
+            <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 20px' }}>
+              {scopes.length === 0 ? 'Create a scope from a discovery to define implementation hours and costs.' : 'Try adjusting your search or filters.'}
+            </p>
+            {scopes.length === 0 && (
+              <button onClick={() => navigate('/scope/new')}
+                style={{ padding: '10px 24px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                + New Scope
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>

@@ -222,7 +222,16 @@ export default function Opportunities() {
                       {opp.target_golive_date ? new Date(opp.target_golive_date).toLocaleDateString() : '—'}
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      {opp.early_risk_indicators?.length > 0 ? '⚠' : '—'}
+                      {(() => {
+                        const flags = []
+                        if (opp.early_risk_indicators?.length > 0) flags.push({ icon: '⚠️', color: '#ef4444', title: `${opp.early_risk_indicators.length} risk flag${opp.early_risk_indicators.length > 1 ? 's' : ''}` })
+                        if (opp.target_close_date) {
+                          const days = Math.ceil((new Date(opp.target_close_date) - new Date()) / 86400000)
+                          if (days < 0) flags.push({ icon: '🔴', color: '#ef4444', title: 'Past close date' })
+                          else if (days <= 14) flags.push({ icon: '🟡', color: '#f59e0b', title: `${days}d to close` })
+                        }
+                        return flags.length > 0 ? flags.map((f, i) => <span key={i} title={f.title} style={{ cursor: 'help' }}>{f.icon}</span>) : '—'
+                      })()}
                     </td>
                   </tr>
                 ))}

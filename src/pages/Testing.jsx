@@ -147,9 +147,21 @@ export default function Testing() {
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
-        ) : cycles.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>No test cycles yet</p>
+        ) : cycles.length === 0 || paginated.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 40px", backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, #06b6d4, #10b981)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "28px" }}>🧪</div>
+            <p style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px' }}>
+              {cycles.length === 0 ? 'No test cycles yet' : 'No matching test cycles'}
+            </p>
+            <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 20px' }}>
+              {cycles.length === 0 ? 'Create a test cycle to start tracking testing progress.' : 'Try adjusting your search or filters.'}
+            </p>
+            {cycles.length === 0 && (
+              <button onClick={() => navigate('/testing/new')}
+                style={{ padding: '10px 24px', backgroundColor: '#06b6d4', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                + New Test Cycle
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
