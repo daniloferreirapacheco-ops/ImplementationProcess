@@ -28,7 +28,8 @@ export default function TimeTracking() {
     hours: '',
     rate: '150',
     user_name: '',
-    notes: ''
+    notes: '',
+    billable: true
   })
   const [showCustomTask, setShowCustomTask] = useState(false)
   const [customTaskName, setCustomTaskName] = useState('')
@@ -130,7 +131,7 @@ export default function TimeTracking() {
       date: form.date,
       hours: parseFloat(form.hours),
       rate: parseFloat(form.rate) || 0,
-      cost: parseFloat(form.hours) * (parseFloat(form.rate) || 0),
+      cost: form.billable ? parseFloat(form.hours) * (parseFloat(form.rate) || 0) : 0,
       user_name: form.user_name,
       notes: form.notes,
       user_id: profile?.id,
@@ -215,6 +216,9 @@ export default function TimeTracking() {
 
   const totalHours = entries.reduce((sum, e) => sum + (e.hours || 0), 0)
   const totalCost = entries.reduce((sum, e) => sum + (e.cost || 0), 0)
+  const billableHours = entries.filter(e => e.cost > 0).reduce((sum, e) => sum + (e.hours || 0), 0)
+  const nonBillableHours = totalHours - billableHours
+  const utilizationRate = totalHours > 0 ? Math.round((billableHours / totalHours) * 100) : 0
 
   const byUser = entries.reduce((acc, e) => {
     const user = e.user_name || 'Unknown'
@@ -311,12 +315,13 @@ export default function TimeTracking() {
         </div>
 
         {/* Summary Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {[
             { label: 'Total Entries', value: entries.length, color: '#3b82f6' },
             { label: 'Total Hours', value: `${totalHours.toFixed(1)}h`, color: '#f59e0b' },
-            { label: 'Total Cost', value: `$${totalCost.toLocaleString()}`, color: '#10b981' },
-            { label: 'Team Members', value: Object.keys(byUser).length, color: '#8b5cf6' }
+            { label: 'Billable', value: `${billableHours.toFixed(1)}h`, color: '#10b981' },
+            { label: 'Total Cost', value: `$${totalCost.toLocaleString()}`, color: '#6366f1' },
+            { label: 'Utilization', value: `${utilizationRate}%`, color: utilizationRate >= 70 ? '#10b981' : utilizationRate >= 40 ? '#f59e0b' : '#ef4444' }
           ].map(card => (
             <div key={card.label} style={{ backgroundColor: 'white', borderRadius: '12px',
               padding: '20px', border: '1px solid #e2e8f0' }}>
@@ -440,7 +445,19 @@ export default function TimeTracking() {
                     borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }} />
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+                <input type="checkbox" checked={form.billable} onChange={e => updateForm('billable', e.target.checked)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  Billable
+                  <span style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '4px', fontWeight: '600',
+                    backgroundColor: form.billable ? '#dcfce7' : '#f1f5f9', color: form.billable ? '#166534' : '#94a3b8' }}>
+                    {form.billable ? `$${(parseFloat(form.hours || 0) * parseFloat(form.rate || 0)).toFixed(0)}` : 'N/A'}
+                  </span>
+                </span>
+              </label>
+              <div style={{ flex: 1 }} />
               <button onClick={() => { setShowForm(false); setError('') }}
                 style={{ padding: '10px 20px', backgroundColor: '#f1f5f9', color: '#475569',
                   border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>
