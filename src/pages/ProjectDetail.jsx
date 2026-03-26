@@ -54,20 +54,27 @@ export default function ProjectDetail() {
   useEffect(() => { fetchAll() }, [id])
 
   const fetchAll = async () => {
-    const [{ data: proj }, { data: miles }, { data: blocks }, { data: times }] = await Promise.all([
-      supabase.from("projects").select("*, accounts(name)").eq("id", id).single(),
-      supabase.from("milestones").select("*").eq("project_id", id).order("due_date"),
-      supabase.from("blockers").select("*").eq("project_id", id).order("created_at", { ascending: false }),
-      supabase.from("time_entries").select("*").eq("project_id", id)
-    ])
+    let proj = null, miles = [], blocks = [], times = []
+    try {
+      const [r1, r2, r3] = await Promise.all([
+        supabase.from("projects").select("*, accounts(name)").eq("id", id).single(),
+        supabase.from("milestones").select("*").eq("project_id", id).order("due_date"),
+        supabase.from("blockers").select("*").eq("project_id", id).order("created_at", { ascending: false }),
+      ])
+      proj = r1.data; miles = r2.data || []; blocks = r3.data || []
+    } catch (err) { console.error("Error loading project:", err) }
+    try {
+      const { data } = await supabase.from("time_entries").select("*").eq("project_id", id)
+      times = data || []
+    } catch { /* time_entries may not be accessible */ }
     setProject(proj)
-    setMilestones(miles || [])
-    setBlockers(blocks || [])
-    setTimeEntries(times || [])
+    setMilestones(miles)
+    setBlockers(blocks)
+    setTimeEntries(times)
 
     // Load team and notes (may not exist yet - handle gracefully)
     try {
-      const { data: tm } = await supabase.from("project_team").select("*").eq("project_id", id).order("created_at")
+      const { data: tm } = await supabase.from("project_team_members").select("*").eq("project_id", id).order("created_at")
       setTeam(tm || [])
     } catch { setTeam([]) }
     try {
@@ -94,7 +101,7 @@ export default function ProjectDetail() {
     if (!newMember.member_name) return
     setSaving(true)
     try {
-      const { data } = await supabase.from("project_team")
+      const { data } = await supabase.from("project_team_members")
         .insert({ ...newMember, project_id: id }).select().single()
       if (data) setTeam(prev => [...prev, data])
     } catch { /* table may not exist */ }
@@ -104,7 +111,7 @@ export default function ProjectDetail() {
 
   const removeTeamMember = async (memberId) => {
     try {
-      await supabase.from("project_team").delete().eq("id", memberId)
+      await supabase.from("project_team_members").delete().eq("id", memberId)
       setTeam(prev => prev.filter(m => m.id !== memberId))
     } catch { /* table may not exist */ }
   }

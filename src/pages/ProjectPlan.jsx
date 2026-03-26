@@ -98,7 +98,7 @@ export default function ProjectPlan() {
         supabase.from("projects").select("*, accounts(name)").eq("id", id).single(),
         supabase.from("project_plan_tasks").select("*").eq("project_id", id).order("sort_order").order("planned_start"),
         supabase.from("profiles").select("id, full_name"),
-        supabase.from("project_team").select("*").eq("project_id", id),
+        supabase.from("project_team_members").select("*").eq("project_id", id),
       ])
       setProject(proj)
       setTasks(planTasks || [])
