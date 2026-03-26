@@ -212,86 +212,113 @@ export default function CustomerDetail() {
 
         {/* Overview Tab */}
         {tab === 'overview' && (
-          <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px',
-            border: '1px solid #e2e8f0' }}>
+          <>
             {editing ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={labelStyle}>Company Name *</label>
-                  <input value={form.name || ''} onChange={e => updateForm('name', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Industry</label>
-                  <input value={form.industry || ''} onChange={e => updateForm('industry', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Website</label>
-                  <input value={form.website || ''} onChange={e => updateForm('website', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Phone</label>
-                  <input value={form.phone || ''} onChange={e => updateForm('phone', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Address</label>
-                  <input value={form.address || ''} onChange={e => updateForm('address', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>City</label>
-                  <input value={form.city || ''} onChange={e => updateForm('city', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>State</label>
-                  <input value={form.state || ''} onChange={e => updateForm('state', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>ZIP</label>
-                  <input value={form.zip || ''} onChange={e => updateForm('zip', e.target.value)}
-                    style={fieldStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Status</label>
-                  <select value={form.status || 'active'} onChange={e => updateForm('status', e.target.value)}
-                    style={fieldStyle}>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Notes</label>
-                  <textarea value={form.notes || ''} onChange={e => updateForm('notes', e.target.value)}
-                    rows={3} style={{ ...fieldStyle, resize: 'vertical' }} />
+              <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 20px' }}>Edit Customer Details</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div><label style={labelStyle}>Company Name *</label><input value={form.name || ''} onChange={e => updateForm('name', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>Industry</label><input value={form.industry || ''} onChange={e => updateForm('industry', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>Website</label><input value={form.website || ''} onChange={e => updateForm('website', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>Phone</label><input value={form.phone || ''} onChange={e => updateForm('phone', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>Address</label><input value={form.address || ''} onChange={e => updateForm('address', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>City</label><input value={form.city || ''} onChange={e => updateForm('city', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>State</label><input value={form.state || ''} onChange={e => updateForm('state', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>ZIP</label><input value={form.zip || ''} onChange={e => updateForm('zip', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={labelStyle}>Status</label><select value={form.status || 'active'} onChange={e => updateForm('status', e.target.value)} style={fieldStyle}><option value="prospect">Prospect</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                  <div style={{ gridColumn: '1 / -1' }}><label style={labelStyle}>Notes</label><textarea value={form.notes || ''} onChange={e => updateForm('notes', e.target.value)} rows={3} style={{ ...fieldStyle, resize: 'vertical' }} /></div>
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                {[
-                  { label: 'Industry', value: account.industry },
-                  { label: 'Website', value: account.website },
-                  { label: 'Phone', value: account.phone },
-                  { label: 'Address', value: [account.address, account.city, account.state, account.zip].filter(Boolean).join(', ') },
-                  { label: 'Status', value: account.status || 'active' },
-                  { label: 'Notes', value: account.notes }
-                ].map(field => (
-                  <div key={field.label}>
-                    <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#64748b', fontWeight: '500' }}>
-                      {field.label.toUpperCase()}
-                    </p>
-                    <p style={{ margin: 0, fontSize: '14px', color: '#1e293b' }}>
-                      {field.value || '—'}
-                    </p>
+              <>
+                {/* Stats Row */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px', marginBottom: '20px' }}>
+                  {[
+                    { label: 'Contacts', value: contacts.length, color: '#8b5cf6', icon: '👤' },
+                    { label: 'Opportunities', value: opportunities.length, color: '#3b82f6', icon: '💼' },
+                    { label: 'Projects', value: projects.length, color: '#f59e0b', icon: '📁' },
+                    { label: 'Machines', value: customerMachines.length, color: '#06b6d4', icon: '🖨️' },
+                    { label: 'Products', value: customerProducts.length, color: '#10b981', icon: '📦' },
+                  ].map(s => (
+                    <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <span style={{ fontSize: '20px' }}>{s.icon}</span>
+                      <p style={{ fontSize: '24px', fontWeight: '700', color: s.color, margin: '4px 0 2px' }}>{s.value}</p>
+                      <p style={{ fontSize: '11px', color: '#64748b', margin: 0, fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  {/* Company Info Card */}
+                  <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
+                    <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#1e293b', margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      Company Information
+                    </h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {[
+                        { label: 'Industry', value: account.industry, icon: '🏭' },
+                        { label: 'Phone', value: account.phone, icon: '📞' },
+                        { label: 'Website', value: account.website, icon: '🌐' },
+                        { label: 'Address', value: [account.address, account.city, account.state, account.zip].filter(Boolean).join(', '), icon: '📍' },
+                      ].map(f => (
+                        <div key={f.label} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                          <span style={{ fontSize: '14px', marginTop: '1px' }}>{f.icon}</span>
+                          <div>
+                            <p style={{ margin: 0, fontSize: '11px', color: '#94a3b8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{f.label}</p>
+                            <p style={{ margin: '2px 0 0', fontSize: '14px', color: f.value ? '#1e293b' : '#cbd5e1', fontWeight: '500' }}>
+                              {f.label === 'Website' && f.value ? <span style={{ color: '#3b82f6', cursor: 'pointer' }}>{f.value}</span> : (f.value || 'Not set')}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+
+                  {/* Status & Activity Card */}
+                  <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
+                    <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#1e293b', margin: '0 0 16px' }}>Status & Activity</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: (account.status === 'active' ? '#f0fdf4' : account.status === 'prospect' ? '#eff6ff' : '#f8fafc'), borderRadius: '8px' }}>
+                        <span style={{ fontSize: '13px', color: '#64748b' }}>Status</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: account.status === 'active' ? '#10b981' : account.status === 'prospect' ? '#3b82f6' : '#94a3b8', textTransform: 'capitalize' }}>{account.status || 'prospect'}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                        <span style={{ fontSize: '13px', color: '#64748b' }}>Customer Since</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>{account.created_at ? new Date(account.created_at).toLocaleDateString() : '—'}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                        <span style={{ fontSize: '13px', color: '#64748b' }}>Active Projects</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: projects.filter(p => p.status !== 'closed').length > 0 ? '#3b82f6' : '#94a3b8' }}>{projects.filter(p => p.status !== 'closed').length}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                        <span style={{ fontSize: '13px', color: '#64748b' }}>Open Opportunities</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: opportunities.filter(o => o.stage !== 'closed_lost' && o.stage !== 'converted').length > 0 ? '#f59e0b' : '#94a3b8' }}>{opportunities.filter(o => o.stage !== 'closed_lost' && o.stage !== 'converted').length}</span>
+                      </div>
+                    </div>
+
+                    {account.notes && (
+                      <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#fffbeb', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+                        <p style={{ margin: 0, fontSize: '11px', color: '#92400e', fontWeight: '600', marginBottom: '4px' }}>NOTES</p>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#78350f', lineHeight: '1.5' }}>{account.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                  <button onClick={() => navigate(`/opportunities/new?account_id=${id}`)}
+                    style={{ padding: '10px 18px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+                    + New Opportunity
+                  </button>
+                  <button onClick={() => navigate(`/contacts/new?account_id=${id}`)}
+                    style={{ padding: '10px 18px', backgroundColor: '#8b5cf6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+                    + Add Contact
+                  </button>
+                </div>
+              </>
             )}
-          </div>
+          </>
         )}
 
         {/* Pipeline Tab */}
