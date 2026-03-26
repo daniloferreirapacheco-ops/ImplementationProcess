@@ -96,6 +96,23 @@ export default function Handoff() {
           </button>
         </div>
 
+        {/* Summary Stats */}
+        {handoffs.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '16px' }}>
+            {[
+              { label: 'Total', value: handoffs.length, color: '#1e293b' },
+              { label: 'In Preparation', value: handoffs.filter(h => ['not_started', 'in_preparation'].includes(h.approval_status)).length, color: '#f59e0b' },
+              { label: 'Awaiting Review', value: handoffs.filter(h => h.approval_status === 'awaiting_review').length, color: '#3b82f6' },
+              { label: 'Completed', value: handoffs.filter(h => ['approved', 'completed'].includes(h.approval_status)).length, color: '#10b981' },
+            ].map(s => (
+              <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '12px 14px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                <p style={{ fontSize: '20px', fontWeight: '700', color: s.color, margin: '0 0 2px' }}>{s.value}</p>
+                <p style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
           <input
             type="text"

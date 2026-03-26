@@ -236,7 +236,7 @@ export default function ProductList() {
                     padding: '20px', border: '1px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                       <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px 0' }}>{product.name}</h3>
-                      <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                      <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '8px',
                         backgroundColor: complexityColor(product.complexity) + '20',
                         color: complexityColor(product.complexity), fontWeight: '600' }}>
                         {product.complexity?.toUpperCase()}</span>

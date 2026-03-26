@@ -256,7 +256,7 @@ export default function MachineList() {
                     padding: '20px', border: '1px solid #e2e8f0', opacity: machine.active ? 1 : 0.5, position: 'relative' }}>
                     {!machine.active && (
                       <span style={{ position: 'absolute', top: '12px', right: '12px',
-                        fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                        fontSize: '11px', padding: '2px 8px', borderRadius: '8px',
                         backgroundColor: '#f1f5f9', color: '#94a3b8', fontWeight: '600' }}>INACTIVE</span>
                     )}
                     <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px 0' }}>{machine.name}</h3>

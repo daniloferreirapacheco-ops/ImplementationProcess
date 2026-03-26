@@ -662,7 +662,7 @@ export default function CustomerDetail() {
                           </p>
                         </div>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '8px',
                             backgroundColor: complexityBg(m.complexity_signal), color: complexityColor(m.complexity_signal),
                             fontWeight: '600' }}>
                             {(m.complexity_signal || 'low').toUpperCase()}
@@ -743,7 +743,7 @@ export default function CustomerDetail() {
                           <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>{p.category}</p>
                         </div>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '8px',
                             backgroundColor: complexityBg(p.complexity), color: complexityColor(p.complexity),
                             fontWeight: '600' }}>
                             {(p.complexity || 'low').toUpperCase()}

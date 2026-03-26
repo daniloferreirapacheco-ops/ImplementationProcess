@@ -358,7 +358,7 @@ export default function TaskTemplates() {
                           {task.name}
                           {task.is_custom && (
                             <span style={{ marginLeft: '8px', fontSize: '10px', padding: '1px 6px',
-                              borderRadius: '4px', backgroundColor: '#faf5ff', color: '#8b5cf6' }}>
+                              borderRadius: '8px', backgroundColor: '#faf5ff', color: '#8b5cf6' }}>
                               CUSTOM
                             </span>
                           )}
@@ -367,7 +367,7 @@ export default function TaskTemplates() {
                           <input type="number" value={task.estimated_hours}
                             onChange={e => updateHours(task.id, e.target.value)}
                             style={{ width: '60px', padding: '4px 8px', border: '1px solid #d1d5db',
-                              borderRadius: '4px', fontSize: '13px', textAlign: 'center' }} />
+                              borderRadius: '8px', fontSize: '13px', textAlign: 'center' }} />
                           <span style={{ fontSize: '12px', color: '#94a3b8' }}>hrs</span>
                         </div>
                         <button onClick={() => removeTask(task.id)}
@@ -400,8 +400,8 @@ export default function TaskTemplates() {
                         {hours}h ({totalHours > 0 ? Math.round(hours / totalHours * 100) : 0}%)
                       </span>
                     </div>
-                    <div style={{ height: '8px', borderRadius: '4px', backgroundColor: '#f1f5f9', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: '4px',
+                    <div style={{ height: '8px', borderRadius: '8px', backgroundColor: '#f1f5f9', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: '8px',
                         backgroundColor: phaseColors[phase],
                         width: totalHours > 0 ? `${(hours / totalHours) * 100}%` : '0%',
                         transition: 'width 0.3s' }} />

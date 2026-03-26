@@ -451,7 +451,7 @@ export default function TimeTracking() {
                   style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   Billable
-                  <span style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '4px', fontWeight: '600',
+                  <span style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '8px', fontWeight: '600',
                     backgroundColor: form.billable ? '#dcfce7' : '#f1f5f9', color: form.billable ? '#166534' : '#94a3b8' }}>
                     {form.billable ? `$${(parseFloat(form.hours || 0) * parseFloat(form.rate || 0)).toFixed(0)}` : 'N/A'}
                   </span>
@@ -531,27 +531,27 @@ export default function TimeTracking() {
                     <tr key={entry.id} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: '#fffbeb' }}>
                       <td style={{ padding: '8px 16px' }}>
                         <input type="date" value={editForm.date} onChange={e => setEditForm(prev => ({ ...prev, date: e.target.value }))}
-                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
                       </td>
                       <td style={{ padding: '8px 16px' }}>
                         <input value={editForm.task_name} onChange={e => setEditForm(prev => ({ ...prev, task_name: e.target.value }))}
-                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: '13px', color: '#64748b' }}>{entry.user_name}</td>
                       <td style={{ padding: '8px 16px' }}>
                         <input type="number" step="0.25" value={editForm.hours} onChange={e => setEditForm(prev => ({ ...prev, hours: e.target.value }))}
-                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
                       </td>
                       <td style={{ padding: '8px 16px' }}>
                         <input type="number" value={editForm.rate} onChange={e => setEditForm(prev => ({ ...prev, rate: e.target.value }))}
-                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: '13px', color: '#10b981', fontWeight: '600' }}>
                         ${((parseFloat(editForm.hours) || 0) * (parseFloat(editForm.rate) || 0)).toFixed(2)}
                       </td>
                       <td style={{ padding: '8px 16px' }}>
                         <input value={editForm.notes} onChange={e => setEditForm(prev => ({ ...prev, notes: e.target.value }))}
-                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
+                          style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} />
                       </td>
                       <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
                         <button onClick={handleEditSave}
@@ -607,13 +607,13 @@ export default function TimeTracking() {
               </span>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <button onClick={() => setPage(1)} disabled={page === 1}
-                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
                     backgroundColor: page === 1 ? '#f1f5f9' : 'white', color: page === 1 ? '#94a3b8' : '#475569',
                     cursor: page === 1 ? 'default' : 'pointer', fontSize: '13px' }}>
                   First
                 </button>
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
                     backgroundColor: page === 1 ? '#f1f5f9' : 'white', color: page === 1 ? '#94a3b8' : '#475569',
                     cursor: page === 1 ? 'default' : 'pointer', fontSize: '13px' }}>
                   Prev
@@ -622,13 +622,13 @@ export default function TimeTracking() {
                   {page} / {totalPages}
                 </span>
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
                     backgroundColor: page === totalPages ? '#f1f5f9' : 'white', color: page === totalPages ? '#94a3b8' : '#475569',
                     cursor: page === totalPages ? 'default' : 'pointer', fontSize: '13px' }}>
                   Next
                 </button>
                 <button onClick={() => setPage(totalPages)} disabled={page === totalPages}
-                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+                  style={{ padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
                     backgroundColor: page === totalPages ? '#f1f5f9' : 'white', color: page === totalPages ? '#94a3b8' : '#475569',
                     cursor: page === totalPages ? 'default' : 'pointer', fontSize: '13px' }}>
                   Last

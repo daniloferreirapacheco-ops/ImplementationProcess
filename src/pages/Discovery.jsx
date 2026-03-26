@@ -104,12 +104,34 @@ export default function Discovery() {
             </button>
             <button onClick={() => navigate("/discovery/new")}
               style={{ backgroundColor: "#8b5cf6", color: "white", border: "none",
-                padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+                padding: "7px 16px", borderRadius: "8px", cursor: "pointer",
                 fontWeight: "600", fontSize: "13px" }}>
               + New Discovery
             </button>
           </div>
         </div>
+
+        {/* Summary Stats */}
+        {records.length > 0 && (() => {
+          const completed = records.filter(r => r.status === 'completed').length
+          const inProgress = records.filter(r => r.status === 'in_progress').length
+          const avgComplexity = records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.complexity_score || 0), 0) / records.length) : 0
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '16px' }}>
+              {[
+                { label: 'Total', value: records.length, color: '#1e293b' },
+                { label: 'In Progress', value: inProgress, color: '#f59e0b' },
+                { label: 'Completed', value: completed, color: '#10b981' },
+                { label: 'Avg Complexity', value: avgComplexity, color: avgComplexity >= 70 ? '#ef4444' : avgComplexity >= 40 ? '#f59e0b' : '#3b82f6' },
+              ].map(s => (
+                <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '12px 14px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                  <p style={{ fontSize: '20px', fontWeight: '700', color: s.color, margin: '0 0 2px' }}>{s.value}</p>
+                  <p style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
           <input
