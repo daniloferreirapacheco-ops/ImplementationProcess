@@ -102,13 +102,13 @@ export default function Handoff() {
             placeholder="Search project or account..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
-            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '240px' }}
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '240px' }}
           />
           <div style={{ display: 'flex', gap: '4px' }}>
             {statusFilters.map(s => (
               <button key={s} onClick={() => { setFilter(s); setPage(1) }}
                 style={{
-                  padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                  padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                   cursor: 'pointer', fontSize: '12px', fontWeight: '500',
                   backgroundColor: filter === s ? '#1a1a2e' : 'white',
                   color: filter === s ? 'white' : '#475569',
@@ -137,7 +137,7 @@ export default function Handoff() {
             <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>No matching handoff packages. Try adjusting your filters.</p>
           </div>
         ) : (
-          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
@@ -185,21 +185,21 @@ export default function Handoff() {
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', fontSize: '12px', color: '#64748b', borderTop: '1px solid #e2e8f0' }}>
           <button onClick={exportCSV}
-            style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+            style={{ padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
               cursor: 'pointer', fontSize: '12px', fontWeight: '500',
               backgroundColor: 'white', color: '#475569' }}>
             Export CSV
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage <= 1}
-              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+              style={{ padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                 cursor: safePage <= 1 ? 'default' : 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: 'white', color: safePage <= 1 ? '#cbd5e1' : '#475569' }}>
               Prev
             </button>
             <span style={{ fontSize: '12px' }}>Page {safePage} of {totalPages}</span>
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}
-              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+              style={{ padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                 cursor: safePage >= totalPages ? 'default' : 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: 'white', color: safePage >= totalPages ? '#cbd5e1' : '#475569' }}>
               Next

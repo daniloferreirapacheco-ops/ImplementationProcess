@@ -99,13 +99,13 @@ export default function Opportunities() {
               URL.revokeObjectURL(url)
             }}
               style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
-                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '500' }}>
               Export CSV
             </button>
             <button onClick={() => navigate('/opportunities/new')}
               style={{ backgroundColor: '#f59e0b', color: 'white', border: 'none',
-                padding: '7px 16px', borderRadius: '4px', cursor: 'pointer',
+                padding: '7px 16px', borderRadius: '8px', cursor: 'pointer',
                 fontWeight: '600', fontSize: '13px' }}>
               + New Opportunity
             </button>
@@ -137,7 +137,7 @@ export default function Opportunities() {
         <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
           <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
             placeholder="Search opportunities..."
-            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
               fontSize: '13px', width: '240px' }} />
           {[
             { key: 'all', label: 'All' },
@@ -148,7 +148,7 @@ export default function Opportunities() {
             { key: 'approved', label: 'Approved' },
           ].map(f => (
             <button key={f.key} onClick={() => { setFilter(f.key); setPage(1) }}
-              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+              style={{ padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                 cursor: 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: filter === f.key ? '#1a1a2e' : 'white',
                 color: filter === f.key ? 'white' : '#475569' }}>
@@ -170,7 +170,7 @@ export default function Opportunities() {
             </button>
           </div>
         ) : (
-          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>

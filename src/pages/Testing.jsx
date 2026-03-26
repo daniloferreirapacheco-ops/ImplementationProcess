@@ -87,7 +87,7 @@ export default function Testing() {
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={exportCSV}
               style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
-                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '500' }}>
               Export CSV
             </button>
@@ -130,12 +130,12 @@ export default function Testing() {
             placeholder="Search cycles or projects..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
-            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '240px' }}
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '240px' }}
           />
           {['all', 'not_started', 'in_progress', 'passed', 'failed', 'blocked'].map(s => (
             <button key={s} onClick={() => { setFilter(s); setPage(1) }}
               style={{
-                padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                 cursor: 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: filter === s ? '#1a1a2e' : 'white',
                 color: filter === s ? 'white' : '#475569'
@@ -152,7 +152,7 @@ export default function Testing() {
             <p style={{ fontSize: '14px', margin: 0 }}>No test cycles yet</p>
           </div>
         ) : (
-          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
@@ -210,14 +210,14 @@ export default function Testing() {
           <span>{filtered.length} record{filtered.length !== 1 ? 's' : ''}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage <= 1}
-              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
                 backgroundColor: safePage <= 1 ? '#f1f5f9' : 'white', color: safePage <= 1 ? '#94a3b8' : '#475569',
                 cursor: safePage <= 1 ? 'default' : 'pointer', fontSize: '12px' }}>
               Prev
             </button>
             <span style={{ fontSize: '12px' }}>Page {safePage} of {totalPages}</span>
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}
-              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
                 backgroundColor: safePage >= totalPages ? '#f1f5f9' : 'white', color: safePage >= totalPages ? '#94a3b8' : '#475569',
                 cursor: safePage >= totalPages ? 'default' : 'pointer', fontSize: '12px' }}>
               Next

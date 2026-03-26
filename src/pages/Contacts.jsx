@@ -64,7 +64,7 @@ export default function Contacts() {
           </div>
           <button onClick={() => navigate('/contacts/new')}
             style={{ padding: '7px 16px', backgroundColor: '#8b5cf6', color: 'white',
-              border: 'none', borderRadius: '4px', cursor: 'pointer',
+              border: 'none', borderRadius: '8px', cursor: 'pointer',
               fontSize: '13px', fontWeight: '600' }}>
             + New Contact
           </button>
@@ -74,7 +74,7 @@ export default function Contacts() {
         <div style={{ marginBottom: '12px' }}>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by name, email, title, or company..."
-            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
               fontSize: '13px', width: '320px' }} />
         </div>
 
@@ -92,7 +92,7 @@ export default function Contacts() {
             </button>
           </div>
         ) : (
-          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>

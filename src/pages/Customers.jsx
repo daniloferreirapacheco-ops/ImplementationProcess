@@ -78,13 +78,13 @@ export default function Customers() {
               URL.revokeObjectURL(url)
             }}
               style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
-                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '500' }}>
               Export CSV
             </button>
             <button onClick={() => navigate('/customers/new')}
               style={{ padding: '7px 16px', backgroundColor: '#6366f1', color: 'white',
-                border: 'none', borderRadius: '4px', cursor: 'pointer',
+                border: 'none', borderRadius: '8px', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '600' }}>
               + New Customer
             </button>
@@ -112,11 +112,11 @@ export default function Customers() {
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', alignItems: 'center' }}>
           <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
             placeholder="Search customers..."
-            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
               fontSize: '13px', width: '240px' }} />
           {['all', 'active', 'inactive'].map(f => (
             <button key={f} onClick={() => { setFilter(f); setPage(1) }}
-              style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+              style={{ padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                 cursor: 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: filter === f ? '#1a1a2e' : 'white',
                 color: filter === f ? 'white' : '#475569', textTransform: 'capitalize' }}>
@@ -133,7 +133,7 @@ export default function Customers() {
             <p style={{ fontSize: '14px', margin: 0 }}>No customers found</p>
           </div>
         ) : (
-          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>

@@ -98,7 +98,7 @@ export default function Discovery() {
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={exportCSV}
               style={{ backgroundColor: 'white', color: '#475569', border: '1px solid #d1d5db',
-                padding: '7px 16px', borderRadius: '4px', cursor: 'pointer',
+                padding: '7px 16px', borderRadius: '8px', cursor: 'pointer',
                 fontWeight: '600', fontSize: '13px' }}>
               Export CSV
             </button>
@@ -117,13 +117,13 @@ export default function Discovery() {
             placeholder="Search opportunity or account..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
-            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', width: '240px' }}
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', width: '240px' }}
           />
           {statusLabels.map(s => (
             <button key={s.key}
               onClick={() => { setFilter(s.key); setPage(1) }}
               style={{
-                padding: '4px 12px', borderRadius: '4px', border: '1px solid #d1d5db',
+                padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                 cursor: 'pointer', fontSize: '12px', fontWeight: '500',
                 backgroundColor: filter === s.key ? '#1a1a2e' : 'white',
                 color: filter === s.key ? 'white' : '#475569'
@@ -148,7 +148,7 @@ export default function Discovery() {
             )}
           </div>
         ) : (
-          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>

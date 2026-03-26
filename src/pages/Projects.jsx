@@ -137,7 +137,7 @@ export default function Projects() {
               URL.revokeObjectURL(url)
             }}
               style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
-                border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer',
+                border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '500' }}>
               Export CSV
             </button>
@@ -150,10 +150,37 @@ export default function Projects() {
           </div>
         </div>
 
+        {/* Summary Stats */}
+        {projects.length > 0 && (() => {
+          const active = projects.filter(p => !['closed', 'on_hold'].includes(p.status))
+          const hGreen = active.filter(p => p.health === 'green').length
+          const hYellow = active.filter(p => p.health === 'yellow').length
+          const hRed = active.filter(p => p.health === 'red').length
+          const totalBudget = projects.reduce((s, p) => s + (Number(p.budget_cost) || 0), 0)
+          const upcoming = projects.filter(p => p.golive_target && new Date(p.golive_target) >= new Date() && new Date(p.golive_target) <= new Date(Date.now() + 90 * 86400000)).length
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '10px', marginBottom: '16px' }}>
+              {[
+                { label: 'Active', value: active.length, color: '#3b82f6' },
+                { label: 'Healthy', value: hGreen, color: '#10b981' },
+                { label: 'At Risk', value: hYellow + hRed, color: hYellow + hRed > 0 ? '#ef4444' : '#10b981' },
+                { label: 'Closed', value: projects.filter(p => p.status === 'closed').length, color: '#64748b' },
+                { label: 'Go-Lives (90d)', value: upcoming, color: '#6366f1' },
+                { label: 'Total Budget', value: totalBudget > 0 ? `$${Math.round(totalBudget / 1000)}K` : '—', color: '#1e293b' },
+              ].map(s => (
+                <div key={s.label} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '12px 14px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                  <p style={{ fontSize: '20px', fontWeight: '700', color: s.color, margin: '0 0 2px' }}>{s.value}</p>
+                  <p style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
+
         <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap", alignItems: "center" }}>
           <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
             placeholder="Search projects..."
-            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '4px',
+            style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
               fontSize: '13px', width: '240px' }} />
           {[
             { key: "all", label: "All" },
@@ -191,7 +218,7 @@ export default function Projects() {
             )}
           </div>
         ) : (
-          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>
+          <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
