@@ -112,6 +112,12 @@ export default function ScopeDetail() {
     setSaving(false)
   }
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this scope? This cannot be undone.')) return
+    await supabase.from("scopes").delete().eq("id", id)
+    navigate('/scope')
+  }
+
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
   const inputStyle = { width: "100%", padding: "10px", border: "1px solid #d1d5db",
@@ -212,6 +218,10 @@ export default function ScopeDetail() {
                 Create Project from Scope
               </button>
             )}
+            <button onClick={handleDelete}
+              style={{ padding: "8px 16px", backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+              Delete
+            </button>
           </div>
         </div>
 

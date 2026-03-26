@@ -76,6 +76,12 @@ export default function DiscoveryDetail() {
     fetchQuestions()
   }
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this discovery record? This cannot be undone.')) return
+    await supabase.from("discovery_records").delete().eq("id", id)
+    navigate('/discovery')
+  }
+
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
   const saveRecord = async () => {
     const payload = { ...form, complexity_score: parseInt(form.complexity_score) || 0,
@@ -173,6 +179,10 @@ export default function DiscoveryDetail() {
             <button onClick={() => navigate(`/scope/new?discovery=${id}`)}
               style={{ backgroundColor: "#3b82f6", color: "white", border: "none", padding: "8px 16px", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "13px" }}>
               Build Scope
+            </button>
+            <button onClick={handleDelete}
+              style={{ padding: "8px 16px", backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+              Delete
             </button>
           </div>
         </div>

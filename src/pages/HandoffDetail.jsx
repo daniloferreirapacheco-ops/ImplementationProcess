@@ -56,6 +56,12 @@ export default function HandoffDetail() {
     setLoading(false)
   }
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this handoff package? This cannot be undone.')) return
+    await supabase.from("handoff_packages").delete().eq("id", id)
+    navigate('/handoff')
+  }
+
   const updateStatus = async (status) => {
     setSaving(true)
     const updates = { approval_status: status, updated_at: new Date() }
@@ -193,6 +199,10 @@ export default function HandoffDetail() {
                 backgroundColor: "white", cursor: "pointer" }}>
               {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
+            <button onClick={handleDelete}
+              style={{ padding: "8px 16px", backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+              Delete
+            </button>
           </div>
         </div>
 
