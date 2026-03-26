@@ -123,12 +123,18 @@ export default function Handoff() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
         ) : handoffs.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>No handoff packages found</p>
+          <div style={{ textAlign: "center", padding: "60px 40px", backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, #10b981, #06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "28px" }}>🤝</div>
+            <p style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px' }}>No handoff packages yet</p>
+            <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 20px' }}>Create a handoff package when a project is ready for support transition.</p>
+            <button onClick={() => navigate('/handoff/new')}
+              style={{ padding: '10px 24px', backgroundColor: '#14b8a6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+              + New Handoff
+            </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>No matching handoff packages</p>
+          <div style={{ textAlign: "center", padding: "48px", backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>No matching handoff packages. Try adjusting your filters.</p>
           </div>
         ) : (
           <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>

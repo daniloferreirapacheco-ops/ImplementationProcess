@@ -84,30 +84,35 @@ export default function ContactDetail() {
       <NavBar current="Contacts" />
 
       <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
-        <button onClick={() => navigate('/contacts')}
-          style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
-            fontSize: '14px', padding: 0, marginBottom: '8px' }}>
-          ← Back to Contacts
-        </button>
+        {/* Breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/contacts")} style={{ color: "#94a3b8", cursor: "pointer" }}>Contacts</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>{contact.name}</span>
+        </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <div>
-            <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', margin: '0 0 4px 0' }}>
-              {contact.name}
-            </h1>
-            {contact.title && (
-              <p style={{ color: '#8b5cf6', fontSize: '14px', margin: 0, fontWeight: '500' }}>
-                {contact.title}
-              </p>
-            )}
-            {contact.accounts?.name && (
-              <p style={{ color: '#64748b', fontSize: '14px', margin: '4px 0 0 0' }}>
-                🏢 <span onClick={() => navigate(`/customers/${contact.account_id}`)}
-                  style={{ cursor: 'pointer', color: '#3b82f6', textDecoration: 'underline' }}>
-                  {contact.accounts.name}
-                </span>
-              </p>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '20px', fontWeight: '700' }}>
+              {contact.name?.charAt(0)?.toUpperCase() || 'C'}
+            </div>
+            <div>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1e293b', margin: '0 0 2px 0' }}>
+                {contact.name}
+              </h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {contact.title && <span style={{ color: '#8b5cf6', fontSize: '14px', fontWeight: '500' }}>{contact.title}</span>}
+                {contact.title && contact.accounts?.name && <span style={{ color: '#cbd5e1' }}>at</span>}
+                {contact.accounts?.name && (
+                  <span onClick={() => navigate(`/customers/${contact.account_id}`)}
+                    style={{ cursor: 'pointer', color: '#3b82f6', fontSize: '14px', fontWeight: '500' }}>
+                    {contact.accounts.name}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             {!editing ? (
