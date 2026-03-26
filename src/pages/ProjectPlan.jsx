@@ -392,12 +392,12 @@ export default function ProjectPlan() {
             </select>
           </div>
           <div style={{ display: "flex", gap: "4px", backgroundColor: "#f1f5f9", borderRadius: "8px", padding: "3px" }}>
-            {["table", "timeline"].map(v => (
+            {["table", "board", "timeline"].map(v => (
               <button key={v} onClick={() => setView(v)}
                 style={{ padding: "6px 14px", borderRadius: "6px", border: "none", fontSize: "12px", fontWeight: "600", cursor: "pointer",
                   backgroundColor: view === v ? "white" : "transparent", color: view === v ? "#1e293b" : "#64748b",
                   boxShadow: view === v ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
-                {v === "table" ? "Table" : "Timeline"}
+                {v === "table" ? "Table" : v === "board" ? "Board" : "Timeline"}
               </button>
             ))}
           </div>
@@ -530,6 +530,69 @@ export default function ProjectPlan() {
                 </div>
               )
             })()}
+          </div>
+        )}
+
+        {/* Board/Kanban View */}
+        {view === "board" && (
+          <div style={{ display: "flex", gap: "12px", overflowX: "auto", paddingBottom: "12px" }}>
+            {STATUSES.filter(s => s.value !== "cancelled").map(col => {
+              const colTasks = filtered.filter(t => t.status === col.value)
+              return (
+                <div key={col.value} style={{ minWidth: "240px", flex: "1 1 240px", backgroundColor: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 320px)" }}>
+                  {/* Column header */}
+                  <div style={{ padding: "12px 14px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: col.color }} />
+                      <span style={{ fontSize: "13px", fontWeight: "700", color: "#1e293b" }}>{col.label}</span>
+                    </div>
+                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#94a3b8", backgroundColor: "#e2e8f0", padding: "1px 8px", borderRadius: "10px" }}>{colTasks.length}</span>
+                  </div>
+                  {/* Cards */}
+                  <div style={{ flex: 1, overflowY: "auto", padding: "8px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {colTasks.length === 0 && (
+                      <p style={{ fontSize: "11px", color: "#cbd5e1", textAlign: "center", padding: "20px 0" }}>No tasks</p>
+                    )}
+                    {colTasks.map(task => {
+                      const health = getTaskHealth(task)
+                      const hi = healthIndicator[health]
+                      return (
+                        <div key={task.id} style={{ backgroundColor: "white", borderRadius: "8px", padding: "12px", border: `1px solid ${hi.border}`, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", cursor: "pointer" }}
+                          onClick={() => startEdit(task)}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "13px", fontWeight: "600", color: "#1e293b", lineHeight: "1.3" }}>{task.name}</span>
+                            <div style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: hi.dot, flexShrink: 0, marginTop: "4px" }} title={hi.label} />
+                          </div>
+                          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "10px", fontWeight: "600", padding: "2px 7px", borderRadius: "8px", backgroundColor: `${phaseColor(task.phase)}15`, color: phaseColor(task.phase) }}>{phaseLabel(task.phase)}</span>
+                            <span style={{ fontSize: "10px", fontWeight: "600", padding: "2px 7px", borderRadius: "8px", backgroundColor: `${priorityColor(task.priority)}15`, color: priorityColor(task.priority) }}>{task.priority}</span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div style={{ flex: 1, height: "4px", backgroundColor: "#e2e8f0", borderRadius: "2px", overflow: "hidden", marginRight: "8px" }}>
+                              <div style={{ width: `${task.completion_pct || 0}%`, height: "100%", backgroundColor: (task.completion_pct || 0) === 100 ? "#10b981" : "#3b82f6", borderRadius: "2px" }} />
+                            </div>
+                            <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b" }}>{task.completion_pct || 0}%</span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
+                            <span style={{ fontSize: "10px", color: "#94a3b8" }}>{task.assigned_name || "Unassigned"}</span>
+                            {task.estimated_hours > 0 && <span style={{ fontSize: "10px", color: "#94a3b8" }}>{task.estimated_hours}h</span>}
+                          </div>
+                          {/* Quick status buttons */}
+                          <div style={{ display: "flex", gap: "4px", marginTop: "8px" }}>
+                            {STATUSES.filter(s => s.value !== task.status && s.value !== "cancelled").slice(0, 3).map(s => (
+                              <button key={s.value} onClick={(e) => { e.stopPropagation(); quickUpdate(task.id, "status", s.value) }}
+                                style={{ flex: 1, padding: "3px", fontSize: "9px", fontWeight: "600", borderRadius: "4px", border: `1px solid ${s.color}30`, backgroundColor: `${s.color}08`, color: s.color, cursor: "pointer" }}>
+                                {s.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
 

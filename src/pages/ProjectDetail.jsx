@@ -241,6 +241,14 @@ export default function ProjectDetail() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Projects" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
+        {/* Breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/projects")} style={{ color: "#94a3b8", cursor: "pointer" }}>Projects</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>{project?.name}</span>
+        </div>
 
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "flex-start", marginBottom: "24px" }}>
@@ -248,7 +256,15 @@ export default function ProjectDetail() {
             <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
               {project?.name}
             </h1>
-            <p style={{ color: "#64748b", margin: 0 }}>🏢 {project?.accounts?.name}</p>
+            <p style={{ color: "#64748b", margin: 0 }}>
+              <span onClick={() => navigate(`/customers/${project?.account_id}`)} style={{ cursor: "pointer", color: "#3b82f6" }}>🏢 {project?.accounts?.name}</span>
+              {project?.golive_target && (() => {
+                const daysToGolive = Math.ceil((new Date(project.golive_target) - new Date()) / 86400000)
+                return <span style={{ marginLeft: "16px", fontSize: "12px", fontWeight: "600", color: daysToGolive <= 14 ? "#ef4444" : daysToGolive <= 30 ? "#f59e0b" : "#64748b" }}>
+                  {daysToGolive > 0 ? `${daysToGolive} days to go-live` : daysToGolive === 0 ? "Go-live today!" : `${Math.abs(daysToGolive)} days past go-live`}
+                </span>
+              })()}
+            </p>
           </div>
           <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
             <div style={{ display: "flex", gap: "8px" }}>
@@ -586,13 +602,19 @@ export default function ProjectDetail() {
                             textDecoration: m.status === "completed" ? "line-through" : "none" }}>
                             {m.name}
                           </p>
-                          {m.due_date && (
-                            <p style={{ margin: "2px 0 0 0", fontSize: "12px",
-                              color: isOverdue ? "#ef4444" : "#64748b" }}>
-                              {isOverdue ? "⚠️ Overdue — " : ""}
-                              Due: {new Date(m.due_date).toLocaleDateString()}
-                            </p>
-                          )}
+                          {m.due_date && (() => {
+                            const daysLeft = Math.ceil((new Date(m.due_date) - new Date()) / 86400000)
+                            return (
+                              <p style={{ margin: "2px 0 0 0", fontSize: "12px",
+                                color: isOverdue ? "#ef4444" : daysLeft <= 7 ? "#f59e0b" : "#64748b" }}>
+                                {m.status === "completed" ? `Completed — was due ${new Date(m.due_date).toLocaleDateString()}` :
+                                  isOverdue ? `Overdue by ${Math.abs(daysLeft)} day${Math.abs(daysLeft) !== 1 ? "s" : ""} — ${new Date(m.due_date).toLocaleDateString()}` :
+                                  daysLeft === 0 ? `Due today` :
+                                  daysLeft === 1 ? `Due tomorrow` :
+                                  `${daysLeft} days left — ${new Date(m.due_date).toLocaleDateString()}`}
+                              </p>
+                            )
+                          })()}
                         </div>
                       </div>
                       <span style={{ fontSize: "12px", padding: "3px 10px", borderRadius: "12px",
