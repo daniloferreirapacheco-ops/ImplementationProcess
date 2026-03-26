@@ -24,6 +24,7 @@ export default function ScopeDetail() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
+  const [openQuestions, setOpenQuestions] = useState([])
 
   useEffect(() => { fetchScope() }, [id])
 
@@ -43,6 +44,21 @@ export default function ScopeDetail() {
         data = res.data
       }
       setScope(data)
+      // Load open questions from linked discovery
+      if (data?.discovery_id) {
+        const { data: qs } = await supabase.from("open_questions").select("*")
+          .eq("discovery_id", data.discovery_id).order("created_at", { ascending: false })
+        setOpenQuestions(qs || [])
+      } else if (data?.opportunity_id) {
+        // Try to find discovery via opportunity
+        const { data: disc } = await supabase.from("discovery_records").select("id")
+          .eq("opportunity_id", data.opportunity_id).limit(1)
+        if (disc && disc.length > 0) {
+          const { data: qs } = await supabase.from("open_questions").select("*")
+            .eq("discovery_id", disc[0].id).order("created_at", { ascending: false })
+          setOpenQuestions(qs || [])
+        }
+      }
     } catch (err) {
       console.error("Error fetching scope:", err)
     } finally {
@@ -55,6 +71,12 @@ export default function ScopeDetail() {
     await supabase.from("scope_baselines")
       .update({ approval_status: status, updated_at: new Date() }).eq("id", id)
     setScope(prev => ({ ...prev, approval_status: status }))
+    // Auto-propagate: scope approved → advance opportunity stage
+    if (status === "approved" && scope?.opportunity_id) {
+      await supabase.from("opportunities")
+        .update({ stage: "scope_approved", updated_at: new Date().toISOString() })
+        .eq("id", scope.opportunity_id)
+    }
     setSaving(false)
   }
 
@@ -68,10 +90,12 @@ export default function ScopeDetail() {
     </div>
   )
 
+  const openQs = openQuestions.filter(q => q.status !== "closed")
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "workstreams", label: "Workstreams" },
     { id: "details", label: "Scope Details" },
+    { id: "questions", label: `Questions (${openQs.length})` },
     { id: "approval", label: "Approval" }
   ]
 
@@ -263,6 +287,33 @@ export default function ScopeDetail() {
                 <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{item.value}</p>
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === "questions" && (
+          <div style={cardStyle}>
+            <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
+              Open Questions from Discovery
+            </h2>
+            {openQuestions.length === 0 ? (
+              <p style={{ color: "#94a3b8", textAlign: "center", padding: "24px" }}>No questions found from discovery.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {openQuestions.map(q => (
+                  <div key={q.id} style={{ padding: "12px 16px", backgroundColor: q.status === "closed" ? "#f0fdf4" : "#fffbeb",
+                    borderRadius: "8px", borderLeft: `3px solid ${q.status === "closed" ? "#10b981" : "#f59e0b"}` }}>
+                    <p style={{ margin: 0, fontSize: "14px", color: "#1e293b" }}>{q.question}</p>
+                    <div style={{ display: "flex", gap: "12px", marginTop: "6px", fontSize: "11px", color: "#64748b" }}>
+                      <span style={{ fontWeight: "600", color: q.status === "closed" ? "#10b981" : "#f59e0b" }}>
+                        {q.status === "closed" ? "Resolved" : "Open"}
+                      </span>
+                      {q.answer && <span>Answer: {q.answer}</span>}
+                      {q.created_at && <span>{new Date(q.created_at).toLocaleDateString()}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

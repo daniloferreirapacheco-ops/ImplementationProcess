@@ -47,6 +47,9 @@ export default function ProjectDetail() {
   const [newMember, setNewMember] = useState({ member_name: "", role: "consultant" })
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState("")
+  const [testCycles, setTestCycles] = useState([])
+  const [handoffs, setHandoffs] = useState([])
+  const [planTasks, setPlanTasks] = useState([])
 
   useEffect(() => { fetchAll() }, [id])
 
@@ -71,6 +74,18 @@ export default function ProjectDetail() {
       const { data: nt } = await supabase.from("project_notes").select("*").eq("project_id", id).order("created_at", { ascending: false })
       setNotes(nt || [])
     } catch { setNotes([]) }
+    try {
+      const { data: tc } = await supabase.from("test_cycles").select("*").eq("project_id", id).order("created_at", { ascending: false })
+      setTestCycles(tc || [])
+    } catch { setTestCycles([]) }
+    try {
+      const { data: ho } = await supabase.from("handoff_packages").select("*").eq("project_id", id).order("created_at", { ascending: false })
+      setHandoffs(ho || [])
+    } catch { setHandoffs([]) }
+    try {
+      const { data: pt } = await supabase.from("project_plan_tasks").select("*").eq("project_id", id)
+      setPlanTasks(pt || [])
+    } catch { setPlanTasks([]) }
 
     setLoading(false)
   }
@@ -166,9 +181,10 @@ export default function ProjectDetail() {
     { id: "milestones", label: `Milestones (${milestones.length})` },
     { id: "blockers", label: `Blockers (${blockers.filter(b => b.status === "open").length})` },
     { id: "team", label: `Team (${team.length})` },
-    { id: "usecases", label: "Use Cases & Testing" },
+    { id: "testing", label: `Testing (${testCycles.length})` },
+    { id: "usecases", label: "Use Cases" },
     { id: "notes", label: `Notes (${notes.length})` },
-    { id: "handoff", label: "Handoff" }
+    { id: "handoff", label: `Handoff (${handoffs.length})` }
   ]
 
   const cardStyle = { backgroundColor: "white", borderRadius: "12px",
@@ -421,6 +437,49 @@ export default function ProjectDetail() {
                 </div>
               </div>
             </div>
+
+            {/* Plan Progress Card */}
+            {planTasks.length > 0 && (
+              <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                  <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: 0 }}>Plan Progress</h2>
+                  <button onClick={() => navigate(`/projects/${id}/plan`)}
+                    style={{ fontSize: "12px", color: "#3b82f6", background: "none", border: "none", cursor: "pointer", fontWeight: "500" }}>
+                    View Full Plan →
+                  </button>
+                </div>
+                {(() => {
+                  const ptTotal = planTasks.length
+                  const ptDone = planTasks.filter(t => t.status === "completed").length
+                  const ptOverdue = planTasks.filter(t => t.status !== "completed" && t.status !== "cancelled" && t.planned_end && new Date(t.planned_end) < new Date()).length
+                  const ptBlocked = planTasks.filter(t => t.status === "blocked").length
+                  const ptPlannedHrs = planTasks.reduce((s, t) => s + (Number(t.estimated_hours) || 0), 0)
+                  const ptActualHrs = planTasks.reduce((s, t) => s + (Number(t.actual_hours) || 0), 0)
+                  const ptPct = ptTotal > 0 ? Math.round((ptDone / ptTotal) * 100) : 0
+                  return (
+                    <>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "12px", marginBottom: "14px" }}>
+                        {[
+                          { label: "Tasks", value: `${ptDone}/${ptTotal}`, color: "#1e293b" },
+                          { label: "Completion", value: `${ptPct}%`, color: ptPct >= 70 ? "#10b981" : ptPct >= 40 ? "#f59e0b" : "#64748b" },
+                          { label: "Overdue", value: ptOverdue, color: ptOverdue > 0 ? "#ef4444" : "#10b981" },
+                          { label: "Blocked", value: ptBlocked, color: ptBlocked > 0 ? "#ef4444" : "#10b981" },
+                          { label: "Hours", value: `${ptActualHrs}/${ptPlannedHrs}h`, color: "#6366f1" },
+                        ].map(k => (
+                          <div key={k.label} style={{ textAlign: "center", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "8px" }}>
+                            <p style={{ fontSize: "10px", color: "#64748b", margin: "0 0 2px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>{k.label}</p>
+                            <p style={{ fontSize: "18px", fontWeight: "700", color: k.color, margin: 0 }}>{k.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ height: "8px", backgroundColor: "#e2e8f0", borderRadius: "4px", overflow: "hidden" }}>
+                        <div style={{ width: `${ptPct}%`, height: "100%", backgroundColor: ptPct >= 70 ? "#10b981" : ptPct >= 40 ? "#f59e0b" : "#3b82f6", borderRadius: "4px" }} />
+                      </div>
+                    </>
+                  )
+                })()}
+              </div>
+            )}
 
             {/* Project Details Card */}
             <div style={{ ...cardStyle, gridColumn: "1 / 3" }}>
@@ -771,18 +830,81 @@ export default function ProjectDetail() {
           </div>
         )}
 
+        {activeTab === "testing" && (
+          <div style={cardStyle}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: 0 }}>Test Cycles</h2>
+              <button onClick={() => navigate(`/testing/new?project=${id}`)}
+                style={{ backgroundColor: "#06b6d4", color: "white", border: "none", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", fontSize: "13px" }}>
+                + New Test Cycle
+              </button>
+            </div>
+            {testCycles.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8" }}>
+                <p style={{ margin: 0 }}>No test cycles yet</p>
+                <p style={{ fontSize: "13px", margin: "4px 0 0 0" }}>Create a test cycle to start tracking testing progress</p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {testCycles.map(tc => {
+                  const tcStatusColors = { planned: "#94a3b8", in_progress: "#3b82f6", completed: "#10b981", blocked: "#ef4444" }
+                  return (
+                    <div key={tc.id} onClick={() => navigate(`/testing/${tc.id}`)}
+                      style={{ padding: "14px 16px", backgroundColor: "#f8fafc", borderRadius: "8px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #e2e8f0" }}>
+                      <div>
+                        <p style={{ margin: 0, fontSize: "14px", fontWeight: "500", color: "#1e293b" }}>{tc.name || "Test Cycle"}</p>
+                        <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
+                          {tc.start_date || "No date"} {tc.end_date ? `→ ${tc.end_date}` : ""}
+                        </p>
+                      </div>
+                      <span style={{ fontSize: "11px", fontWeight: "600", padding: "3px 10px", borderRadius: "10px",
+                        backgroundColor: `${tcStatusColors[tc.status] || "#94a3b8"}18`, color: tcStatusColors[tc.status] || "#94a3b8" }}>
+                        {tc.status || "planned"}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === "handoff" && (
-          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
-            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>🤝</p>
-            <p style={{ color: "#64748b", fontSize: "18px", margin: "0 0 24px 0" }}>
-              Handoff module coming soon
-            </p>
-            <button onClick={() => navigate("/handoff")}
-              style={{ backgroundColor: "#14b8a6", color: "white", border: "none",
-                padding: "12px 24px", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>
-              Go to Handoff Center
-            </button>
+          <div style={cardStyle}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: 0 }}>Handoff Packages</h2>
+              <button onClick={() => navigate(`/handoff/new?project=${id}`)}
+                style={{ backgroundColor: "#14b8a6", color: "white", border: "none", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", fontSize: "13px" }}>
+                + New Handoff
+              </button>
+            </div>
+            {handoffs.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8" }}>
+                <p style={{ margin: 0 }}>No handoff packages yet</p>
+                <p style={{ fontSize: "13px", margin: "4px 0 0 0" }}>Create a handoff package when the project is ready for support transition</p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {handoffs.map(ho => {
+                  const hoColors = { not_started: "#94a3b8", in_preparation: "#f59e0b", awaiting_review: "#3b82f6", approved: "#10b981", completed: "#6366f1" }
+                  return (
+                    <div key={ho.id} onClick={() => navigate(`/handoff/${ho.id}`)}
+                      style={{ padding: "14px 16px", backgroundColor: "#f8fafc", borderRadius: "8px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #e2e8f0" }}>
+                      <div>
+                        <p style={{ margin: 0, fontSize: "14px", fontWeight: "500", color: "#1e293b" }}>{ho.name || "Handoff Package"}</p>
+                        <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
+                          Created {ho.created_at ? new Date(ho.created_at).toLocaleDateString() : ""}
+                        </p>
+                      </div>
+                      <span style={{ fontSize: "11px", fontWeight: "600", padding: "3px 10px", borderRadius: "10px",
+                        backgroundColor: `${hoColors[ho.approval_status] || "#94a3b8"}18`, color: hoColors[ho.approval_status] || "#94a3b8" }}>
+                        {(ho.approval_status || "not_started").replace(/_/g, " ")}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
       </main>

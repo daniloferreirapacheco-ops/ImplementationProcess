@@ -52,6 +52,12 @@ export default function DiscoveryDetail() {
     await supabase.from("discovery_records")
       .update({ status, updated_at: new Date() }).eq("id", id)
     setRecord(prev => ({ ...prev, status }))
+    // Auto-propagate: discovery completed → advance opportunity stage
+    if (status === "completed" && record?.opportunity_id) {
+      await supabase.from("opportunities")
+        .update({ stage: "discovery_complete", updated_at: new Date().toISOString() })
+        .eq("id", record.opportunity_id)
+    }
   }
 
   const closeQuestion = async (qId) => {

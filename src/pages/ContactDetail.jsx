@@ -102,7 +102,10 @@ export default function ContactDetail() {
             )}
             {contact.accounts?.name && (
               <p style={{ color: '#64748b', fontSize: '14px', margin: '4px 0 0 0' }}>
-                🏢 {contact.accounts.name}
+                🏢 <span onClick={() => navigate(`/customers/${contact.account_id}`)}
+                  style={{ cursor: 'pointer', color: '#3b82f6', textDecoration: 'underline' }}>
+                  {contact.accounts.name}
+                </span>
               </p>
             )}
           </div>

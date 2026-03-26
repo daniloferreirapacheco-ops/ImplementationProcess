@@ -32,6 +32,8 @@ export default function HandoffDetail() {
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
 
+  const [milestones, setMilestones] = useState([])
+
   // Training & Readiness local state
   const [trainingSessions, setTrainingSessions] = useState(defaultTrainingSessions)
   const [userAcceptance, setUserAcceptance] = useState(false)
@@ -43,9 +45,14 @@ export default function HandoffDetail() {
   const fetchHandoff = async () => {
     const { data } = await supabase
       .from("handoff_packages")
-      .select("*, projects(name, accounts(name))")
+      .select("*, projects(id, name, status, health, accounts(name))")
       .eq("id", id).single()
     setHandoff(data)
+    // Load milestones for readiness check
+    if (data?.project_id) {
+      const { data: miles } = await supabase.from("milestones").select("*").eq("project_id", data.project_id)
+      setMilestones(miles || [])
+    }
     setLoading(false)
   }
 
@@ -55,6 +62,14 @@ export default function HandoffDetail() {
     if (status === "completed") updates.completed_at = new Date()
     await supabase.from("handoff_packages").update(updates).eq("id", id)
     setHandoff(prev => ({ ...prev, approval_status: status }))
+    // Auto-propagate: handoff approved → project to handoff_to_support, completed → closed
+    if (handoff?.project_id) {
+      if (status === "approved") {
+        await supabase.from("projects").update({ status: "handoff_to_support", updated_at: new Date().toISOString() }).eq("id", handoff.project_id)
+      } else if (status === "completed") {
+        await supabase.from("projects").update({ status: "closed", updated_at: new Date().toISOString() }).eq("id", handoff.project_id)
+      }
+    }
     setSaving(false)
   }
 
@@ -96,6 +111,7 @@ export default function HandoffDetail() {
     { label: "Go-live plan documented", done: !!goLiveDate },
     { label: "Rollback procedures defined", done: !!handoff?.rollback_procedures },
     { label: "Post-go-live support schedule set", done: !!supportSLA },
+    { label: "All milestones completed", done: milestones.length > 0 && milestones.every(m => m.status === "completed") },
     { label: "Customer sign-off obtained", done: userAcceptance },
   ]
 
@@ -152,6 +168,12 @@ export default function HandoffDetail() {
             </h1>
             <p style={{ color: "#64748b", margin: 0 }}>
               {handoff?.projects?.accounts?.name}
+              {handoff?.project_id && (
+                <span onClick={() => navigate(`/projects/${handoff.project_id}`)}
+                  style={{ marginLeft: "12px", color: "#3b82f6", cursor: "pointer", fontSize: "13px" }}>
+                  View Project →
+                </span>
+              )}
             </p>
           </div>
           <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>

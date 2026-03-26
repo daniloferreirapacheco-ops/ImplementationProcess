@@ -119,6 +119,34 @@ export default function NewProject() {
         }
       }
 
+      // Auto-generate plan tasks from scope workstreams
+      if (scopeData && scopeData.workstream_hours) {
+        const ws = scopeData.workstream_hours
+        const planPhaseMap = {
+          discovery_design: "discovery", data_preparation: "data_preparation",
+          configuration: "configuration", advanced_setup: "advanced_setup",
+          integrations: "integrations", testing: "testing", training: "training",
+          project_management: "project_management", golive_support: "golive",
+          post_golive: "post_golive"
+        }
+        const planTasks = Object.entries(ws).map(([key, hours], i) => ({
+          project_id: data.id,
+          scope_id: payload.scope_id,
+          name: key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+          phase: planPhaseMap[key] || "configuration",
+          workstream: key,
+          estimated_hours: Number(hours) || 0,
+          status: "not_started",
+          priority: "medium",
+          completion_pct: 0,
+          sort_order: i,
+          created_by: profile?.id,
+        }))
+        if (planTasks.length > 0) {
+          await supabase.from("project_plan_tasks").insert(planTasks)
+        }
+      }
+
       navigate(`/projects/${data.id}`)
     } catch (err) {
       setError(err.message)
