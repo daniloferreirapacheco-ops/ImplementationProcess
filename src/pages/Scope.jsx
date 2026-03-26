@@ -35,10 +35,18 @@ export default function Scope() {
   useEffect(() => { fetchScopes() }, [])
 
   const fetchScopes = async () => {
-    const { data } = await supabase
+    let { data, error } = await supabase
       .from("scope_baselines")
       .select("*, opportunities(name, accounts(name))")
       .order("created_at", { ascending: false })
+    // Fallback if nested join fails
+    if (error || !data) {
+      const res = await supabase
+        .from("scope_baselines")
+        .select("*, opportunities(name)")
+        .order("created_at", { ascending: false })
+      data = res.data
+    }
     setScopes(data || [])
     setLoading(false)
   }
