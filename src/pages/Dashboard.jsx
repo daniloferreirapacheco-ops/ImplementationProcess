@@ -463,50 +463,53 @@ export default function Dashboard() {
                 <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
                   Recent Activity
                 </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {recentActivity.map((a, i) => (
-                    <div key={i} onClick={() => navigate(a.link)}
-                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
-                        padding: "8px 12px", borderRadius: "6px", cursor: "pointer" }}
-                      onMouseEnter={e => e.currentTarget.style.backgroundColor = "#f8fafc"}
-                      onMouseLeave={e => e.currentTarget.style.backgroundColor = "white"}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        <span style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "4px",
-                          backgroundColor: a.type === "Project" ? "#dbeafe" : "#fef3c7",
-                          color: a.type === "Project" ? "#1e40af" : "#92400e", fontWeight: "600" }}>
-                          {a.type}
-                        </span>
-                        <span style={{ fontSize: "13px", fontWeight: "500", color: "#1e293b" }}>{a.name}</span>
-                        {a.account && <span style={{ fontSize: "12px", color: "#94a3b8" }}>— {a.account}</span>}
+                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  {recentActivity.map((a, i) => {
+                    const mins = Math.round((Date.now() - new Date(a.date).getTime()) / 60000)
+                    const timeAgo = mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.round(mins / 60)}h ago` : `${Math.round(mins / 1440)}d ago`
+                    const icons = { Project: "📁", Opportunity: "💼", Discovery: "🔍", Scope: "📋", Handoff: "🤝" }
+                    return (
+                      <div key={i} onClick={() => navigate(a.link)}
+                        style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+                          padding: "10px 14px", borderRadius: "8px", cursor: "pointer", borderLeft: "3px solid transparent" }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = "#f8fafc"; e.currentTarget.style.borderLeftColor = a.type === "Project" ? "#3b82f6" : "#f59e0b" }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = "white"; e.currentTarget.style.borderLeftColor = "transparent" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <span style={{ fontSize: "16px" }}>{icons[a.type] || "📄"}</span>
+                          <div>
+                            <span style={{ fontSize: "13px", fontWeight: "600", color: "#1e293b" }}>{a.name}</span>
+                            {a.account && <span style={{ fontSize: "12px", color: "#94a3b8", marginLeft: "8px" }}>{a.account}</span>}
+                          </div>
+                        </div>
+                        <span style={{ fontSize: "11px", color: "#94a3b8", whiteSpace: "nowrap" }}>{timeAgo}</span>
                       </div>
-                      <span style={{ fontSize: "11px", color: "#94a3b8" }}>
-                        {new Date(a.date).toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )}
 
             {/* Quick Actions */}
             <div style={{ backgroundColor: "white", borderRadius: "12px", padding: "24px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)", border: "1px solid #e2e8f0" }}>
+              border: "1px solid #e2e8f0" }}>
               <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
                 Quick Actions
               </h2>
-              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
                 {[
-                  { label: "+ New Opportunity", color: "#f59e0b", link: "/opportunities/new" },
-                  { label: "+ New Project", color: "#3b82f6", link: "/projects/new" },
-                  { label: "+ New Discovery", color: "#10b981", link: "/discovery/new" },
-                  { label: "+ New Customer", color: "#8b5cf6", link: "/customers/new" },
-                  { label: "Log Time", color: "#6366f1", link: "/time" },
-                  { label: "Analytics", color: "#06b6d4", link: "/intelligence" },
+                  { label: "New Opportunity", icon: "💼", color: "#f59e0b", link: "/opportunities/new" },
+                  { label: "New Project", icon: "📁", color: "#3b82f6", link: "/projects/new" },
+                  { label: "New Discovery", icon: "🔍", color: "#8b5cf6", link: "/discovery/new" },
+                  { label: "New Customer", icon: "🏢", color: "#6366f1", link: "/customers/new" },
+                  { label: "Log Time", icon: "⏱️", color: "#10b981", link: "/time" },
+                  { label: "Analytics", icon: "📊", color: "#06b6d4", link: "/intelligence" },
                 ].map(a => (
                   <button key={a.label} onClick={() => navigate(a.link)}
-                    style={{ backgroundColor: a.color, color: "white", border: "none",
-                      padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-                      fontWeight: "600", fontSize: "14px" }}>
+                    style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: `${a.color}08`, color: a.color, border: `1px solid ${a.color}25`,
+                      padding: "12px 16px", borderRadius: "10px", cursor: "pointer", fontWeight: "600", fontSize: "13px", textAlign: "left" }}
+                    onMouseEnter={e => e.currentTarget.style.backgroundColor = `${a.color}15`}
+                    onMouseLeave={e => e.currentTarget.style.backgroundColor = `${a.color}08`}>
+                    <span style={{ fontSize: "18px" }}>{a.icon}</span>
                     {a.label}
                   </button>
                 ))}

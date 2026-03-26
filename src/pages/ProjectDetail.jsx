@@ -253,7 +253,9 @@ export default function ProjectDetail() {
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "flex-start", marginBottom: "24px" }}>
           <div>
-            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
+            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0", cursor: "text" }}
+              contentEditable suppressContentEditableWarning
+              onBlur={e => { const v = e.currentTarget.textContent.trim(); if (v && v !== project?.name) updateProject("name", v) }}>
               {project?.name}
             </h1>
             <p style={{ color: "#64748b", margin: 0 }}>
