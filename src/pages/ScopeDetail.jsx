@@ -30,16 +30,23 @@ export default function ScopeDetail() {
 
   const fetchScope = async () => {
     try {
-      // Try with nested join first
+      // Try with nested join first, then simpler fallbacks
       let { data, error } = await supabase
         .from("scope_baselines")
         .select("*, opportunities(name, accounts(name))")
         .eq("id", id).single()
-      // If nested join fails, fall back to simple query
       if (error || !data) {
         const res = await supabase
           .from("scope_baselines")
           .select("*, opportunities(name)")
+          .eq("id", id).single()
+        data = res.data
+        error = res.error
+      }
+      if (error || !data) {
+        const res = await supabase
+          .from("scope_baselines")
+          .select("*")
           .eq("id", id).single()
         data = res.data
       }

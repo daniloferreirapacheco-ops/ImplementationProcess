@@ -39,11 +39,18 @@ export default function Scope() {
       .from("scope_baselines")
       .select("*, opportunities(name, accounts(name))")
       .order("created_at", { ascending: false })
-    // Fallback if nested join fails
     if (error || !data) {
       const res = await supabase
         .from("scope_baselines")
         .select("*, opportunities(name)")
+        .order("created_at", { ascending: false })
+      data = res.data
+      error = res.error
+    }
+    if (error || !data) {
+      const res = await supabase
+        .from("scope_baselines")
+        .select("*")
         .order("created_at", { ascending: false })
       data = res.data
     }
