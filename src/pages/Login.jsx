@@ -29,28 +29,35 @@ export default function Login() {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '100vh',
-      backgroundColor: '#1a1a2e',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
     }}>
+      {/* Decorative background */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.05, backgroundImage: 'radial-gradient(circle at 25% 25%, #3b82f6 0%, transparent 50%), radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%)', pointerEvents: 'none' }} />
+
       <div style={{
         backgroundColor: '#ffffff',
         padding: '48px 40px',
-        borderRadius: '12px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-        width: '400px',
+        borderRadius: '16px',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+        width: '420px',
         maxWidth: '90vw',
+        position: 'relative',
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{ width: '56px', height: '56px', borderRadius: '14px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
+            <span style={{ fontSize: '28px' }}>⚡</span>
+          </div>
           <h1 style={{
-            fontSize: '28px',
+            fontSize: '26px',
             fontWeight: '700',
-            color: '#1a1a2e',
-            marginBottom: '8px',
+            color: '#1e293b',
+            marginBottom: '6px',
             marginTop: 0,
           }}>
-            ⚡ Ecalc OS
+            Ecalc OS
           </h1>
-          <p style={{ color: '#6b7280', fontSize: '15px', margin: 0 }}>
-            Sign in to your account
+          <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
+            Implementation Management Platform
           </p>
         </div>
 

@@ -57,6 +57,8 @@ export default function OpportunityDetail() {
   const [discoveries, setDiscoveries] = useState([])
   const [scopes, setScopes] = useState([])
   const [projects, setProjects] = useState([])
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({})
 
   useEffect(() => {
     fetchOpportunity()
@@ -73,6 +75,7 @@ export default function OpportunityDetail() {
     else {
       setOpp(data)
       setStage(data.stage)
+      setForm({ opportunity_type: data.opportunity_type || '', urgency: data.urgency || '', estimated_value: data.estimated_value || '', complexity_level: data.complexity_level || '', target_close_date: data.target_close_date || '', target_golive_date: data.target_golive_date || '', discovery_depth: data.discovery_depth || '', notes: data.notes || '', name: data.name || '' })
     }
     setDiscoveries(discs || [])
     setScopes(scs || [])
@@ -98,6 +101,24 @@ export default function OpportunityDetail() {
     }
     setSaving(false)
   }
+
+  const saveOpp = async () => {
+    setSaving(true)
+    const payload = {
+      name: form.name, opportunity_type: form.opportunity_type || null,
+      urgency: form.urgency || null, estimated_value: form.estimated_value ? Number(form.estimated_value) : null,
+      complexity_level: form.complexity_level || null, target_close_date: form.target_close_date || null,
+      target_golive_date: form.target_golive_date || null, discovery_depth: form.discovery_depth || null,
+      notes: form.notes || null, updated_at: new Date().toISOString()
+    }
+    await supabase.from('opportunities').update(payload).eq('id', id)
+    setOpp(prev => ({ ...prev, ...payload }))
+    setEditing(false)
+    setSaving(false)
+  }
+
+  const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
+  const fieldStyle = { width: '100%', padding: '8px 10px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }
 
   if (loading) return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -150,25 +171,35 @@ return (
               🏢 {opp.accounts?.name}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <select
-              value={stage}
-              onChange={e => updateStage(e.target.value)}
-              disabled={saving}
-              style={{ padding: '10px 16px', borderRadius: '8px', fontSize: '14px',
-                fontWeight: '600', border: `2px solid ${stageColors[stage] || '#94a3b8'}`,
-                color: stageColors[stage] || '#94a3b8', backgroundColor: 'white',
-                cursor: 'pointer' }}>
-              {stageOptions.map(s => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {!editing ? (
+              <button onClick={() => setEditing(true)}
+                style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', color: '#475569', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+                Edit
+              </button>
+            ) : (
+              <>
+                <button onClick={saveOpp} disabled={saving}
+                  style={{ padding: '8px 16px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
+                <button onClick={() => { setEditing(false); setForm({ opportunity_type: opp.opportunity_type || '', urgency: opp.urgency || '', estimated_value: opp.estimated_value || '', complexity_level: opp.complexity_level || '', target_close_date: opp.target_close_date || '', target_golive_date: opp.target_golive_date || '', discovery_depth: opp.discovery_depth || '', notes: opp.notes || '', name: opp.name || '' }) }}
+                  style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', color: '#475569', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+                  Cancel
+                </button>
+              </>
+            )}
+            <select value={stage} onChange={e => updateStage(e.target.value)} disabled={saving}
+              style={{ padding: '8px 14px', borderRadius: '8px', fontSize: '13px', fontWeight: '600', border: `2px solid ${stageColors[stage] || '#94a3b8'}`, color: stageColors[stage] || '#94a3b8', backgroundColor: 'white', cursor: 'pointer' }}>
+              {stageOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
-            <button
-              onClick={() => navigate(`/discovery/new?opportunity=${id}`)}
-              style={{ backgroundColor: '#8b5cf6', color: 'white', border: 'none',
-                padding: '10px 20px', borderRadius: '8px', cursor: 'pointer',
-                fontWeight: '600', fontSize: '14px' }}>
-              🔍 Start Discovery
+            <button onClick={() => navigate(`/discovery/new?opportunity=${id}`)}
+              style={{ backgroundColor: '#8b5cf6', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '13px' }}>
+              Start Discovery
+            </button>
+            <button onClick={handleDelete}
+              style={{ padding: '8px 16px', backgroundColor: '#fee2e2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+              Delete
             </button>
           </div>
         </div>
@@ -203,6 +234,35 @@ return (
               <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 20px 0' }}>
                 Opportunity Details
               </h2>
+              {editing ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Name</label><input value={form.name} onChange={e => updateForm('name', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Type</label>
+                    <select value={form.opportunity_type} onChange={e => updateForm('opportunity_type', e.target.value)} style={fieldStyle}>
+                      <option value="">Select...</option>
+                      {['new_implementation','expansion','upgrade','migration','integration'].map(t => <option key={t} value={t}>{t.replace(/_/g,' ')}</option>)}
+                    </select></div>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Urgency</label>
+                    <select value={form.urgency} onChange={e => updateForm('urgency', e.target.value)} style={fieldStyle}>
+                      <option value="">Select...</option>
+                      {['low','medium','high','critical'].map(u => <option key={u} value={u}>{u}</option>)}
+                    </select></div>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Estimated Value ($)</label><input type="number" value={form.estimated_value} onChange={e => updateForm('estimated_value', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Complexity</label>
+                    <select value={form.complexity_level} onChange={e => updateForm('complexity_level', e.target.value)} style={fieldStyle}>
+                      <option value="">Select...</option>
+                      {['low','medium','high'].map(c => <option key={c} value={c}>{c}</option>)}
+                    </select></div>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Discovery Depth</label>
+                    <select value={form.discovery_depth} onChange={e => updateForm('discovery_depth', e.target.value)} style={fieldStyle}>
+                      <option value="">Select...</option>
+                      {['light','standard','deep'].map(d => <option key={d} value={d}>{d}</option>)}
+                    </select></div>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Target Close Date</label><input type="date" value={form.target_close_date} onChange={e => updateForm('target_close_date', e.target.value)} style={fieldStyle} /></div>
+                  <div><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Target Go-Live</label><input type="date" value={form.target_golive_date} onChange={e => updateForm('target_golive_date', e.target.value)} style={fieldStyle} /></div>
+                  <div style={{ gridColumn: '1 / -1' }}><label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '4px' }}>Notes</label><textarea value={form.notes} onChange={e => updateForm('notes', e.target.value)} rows={3} style={{ ...fieldStyle, resize: 'vertical' }} /></div>
+                </div>
+              ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 {[
                   { label: 'Type', value: opp.opportunity_type?.replace(/_/g, ' ') },
@@ -225,6 +285,7 @@ return (
                   </div>
                 ))}
               </div>
+              )}
             </div>
 
             {/* Requested Modules */}
