@@ -162,6 +162,7 @@ export default function ProjectDetail() {
 
   const tabs = [
     { id: "overview", label: "Overview" },
+    { id: "plan", label: "Plan" },
     { id: "milestones", label: `Milestones (${milestones.length})` },
     { id: "blockers", label: `Blockers (${blockers.filter(b => b.status === "open").length})` },
     { id: "team", label: `Team (${team.length})` },
@@ -615,6 +616,25 @@ export default function ProjectDetail() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {activeTab === "plan" && (
+          <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
+            borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>&#128203;</p>
+            <p style={{ color: "#1e293b", fontSize: "18px", fontWeight: "600", margin: "0 0 8px 0" }}>
+              Project Plan
+            </p>
+            <p style={{ color: "#64748b", fontSize: "14px", margin: "0 0 24px 0" }}>
+              Manage tasks, assign resources, track dates, and visualize project progress
+            </p>
+            <button onClick={() => navigate(`/projects/${id}/plan`)}
+              style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
+                padding: "12px 28px", borderRadius: "8px", cursor: "pointer", fontWeight: "600",
+                fontSize: "15px" }}>
+              Open Project Plan
+            </button>
           </div>
         )}
 
