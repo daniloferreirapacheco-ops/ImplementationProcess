@@ -32,12 +32,12 @@ export default function ScopeDetail() {
     try {
       // Try with nested join first, then simpler fallbacks
       let { data, error } = await supabase
-        .from("scope_baselines")
+        .from("scopes")
         .select("*, opportunities(name, accounts(name))")
         .eq("id", id).single()
       if (error || !data) {
         const res = await supabase
-          .from("scope_baselines")
+          .from("scopes")
           .select("*, opportunities(name)")
           .eq("id", id).single()
         data = res.data
@@ -45,7 +45,7 @@ export default function ScopeDetail() {
       }
       if (error || !data) {
         const res = await supabase
-          .from("scope_baselines")
+          .from("scopes")
           .select("*")
           .eq("id", id).single()
         data = res.data
@@ -75,7 +75,7 @@ export default function ScopeDetail() {
 
   const updateStatus = async (status) => {
     setSaving(true)
-    await supabase.from("scope_baselines")
+    await supabase.from("scopes")
       .update({ approval_status: status, updated_at: new Date() }).eq("id", id)
     setScope(prev => ({ ...prev, approval_status: status }))
     // Auto-propagate: scope approved → advance opportunity stage

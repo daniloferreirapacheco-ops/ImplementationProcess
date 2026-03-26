@@ -106,7 +106,7 @@ export default function ProjectPlan() {
       setTeam(tm || [])
 
       if (proj?.scope_id) {
-        const { data: sc } = await supabase.from("scope_baselines").select("id, name, workstream_hours")
+        const { data: sc } = await supabase.from("scopes").select("id, name, workstream_hours")
           .eq("id", proj.scope_id).single()
         setScope(sc)
       }

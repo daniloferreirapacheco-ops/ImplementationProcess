@@ -42,7 +42,7 @@ export default function NewProject() {
 
     // Auto-populate from scope if linked
     if (scopeId) {
-      const { data: scope } = await supabase.from("scope_baselines")
+      const { data: scope } = await supabase.from("scopes")
         .select("*, opportunities(name, account_id, accounts(name))")
         .eq("id", scopeId).single()
       if (scope) {

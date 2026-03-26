@@ -56,7 +56,7 @@ export default function CustomerDetail() {
     if (oppIds.length > 0) {
       const [discRes, scopeRes, handoffRes] = await Promise.all([
         supabase.from('discovery_records').select('*, opportunities(name)').in('opportunity_id', oppIds).order('created_at', { ascending: false }),
-        supabase.from('scope_baselines').select('*, opportunities(name)').in('opportunity_id', oppIds).order('created_at', { ascending: false }),
+        supabase.from('scopes').select('*, opportunities(name)').in('opportunity_id', oppIds).order('created_at', { ascending: false }),
         supabase.from('handoff_packages').select('*').in('project_id', (projRes.data || []).map(p => p.id)).order('created_at', { ascending: false })
       ])
       setDiscoveries(discRes.data || [])

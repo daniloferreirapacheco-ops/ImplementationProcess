@@ -108,7 +108,7 @@ export default function NewScope() {
       if (!payload.phase_plan) payload.phase_plan = null
       if (!payload.notes) payload.notes = null
       const { data, error: err } = await supabase
-        .from("scope_baselines")
+        .from("scopes")
         .insert(payload)
         .select().single()
       if (err) throw err

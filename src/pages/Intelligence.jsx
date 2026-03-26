@@ -25,7 +25,7 @@ export default function Intelligence() {
       supabase.from("projects").select("id, name, status, health, budget_cost, budget_hours, golive_target, accounts(name), created_at"),
       supabase.from("opportunities").select("id, stage, name, estimated_value, accounts(name), created_at"),
       supabase.from("discovery_records").select("id, status, complexity_score, created_at"),
-      supabase.from("scope_baselines").select("id, approval_status, confidence_score, estimated_hours_min, estimated_hours_max, workstream_hours, created_at"),
+      supabase.from("scopes").select("id, approval_status, confidence_score, estimated_hours_min, estimated_hours_max, workstream_hours, created_at"),
       supabase.from("handoff_packages").select("id, approval_status, created_at"),
       supabase.from("time_entries").select("project_id, hours, cost, category"),
       supabase.from("blockers").select("project_id, severity, status"),

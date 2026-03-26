@@ -66,7 +66,7 @@ export default function OpportunityDetail() {
     const [{ data, error }, { data: discs }, { data: scs }, { data: projs }] = await Promise.all([
       supabase.from('opportunities').select('*, accounts(name)').eq('id', id).single(),
       supabase.from('discovery_records').select('id, status, complexity_score, created_at').eq('opportunity_id', id),
-      supabase.from('scope_baselines').select('id, name, approval_status, estimated_hours_min, estimated_hours_max, workstream_hours').eq('opportunity_id', id),
+      supabase.from('scopes').select('id, name, approval_status, estimated_hours_min, estimated_hours_max, workstream_hours').eq('opportunity_id', id),
       supabase.from('projects').select('id, name, status, health').eq('opportunity_id', id)
     ])
     if (error) console.error(error)

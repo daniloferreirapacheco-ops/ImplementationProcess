@@ -107,7 +107,7 @@ export default function Dashboard() {
       supabase.from("opportunities").select("id, stage, name, accounts(name), updated_at"),
       supabase.from("blockers").select("project_id, severity, status").eq("status", "open"),
       supabase.from("milestones").select("project_id, name, status, due_date, projects(name)"),
-      supabase.from("scope_baselines").select("id, approval_status"),
+      supabase.from("scopes").select("id, approval_status"),
       supabase.from("handoff_packages").select("id, approval_status"),
       supabase.from("time_entries").select("project_id, hours, cost"),
       supabase.from("discovery_records").select("id, status")

@@ -36,12 +36,12 @@ export default function Scope() {
 
   const fetchScopes = async () => {
     let { data, error } = await supabase
-      .from("scope_baselines")
+      .from("scopes")
       .select("*, opportunities(name, accounts(name))")
       .order("created_at", { ascending: false })
     if (error || !data) {
       const res = await supabase
-        .from("scope_baselines")
+        .from("scopes")
         .select("*, opportunities(name)")
         .order("created_at", { ascending: false })
       data = res.data
@@ -49,7 +49,7 @@ export default function Scope() {
     }
     if (error || !data) {
       const res = await supabase
-        .from("scope_baselines")
+        .from("scopes")
         .select("*")
         .order("created_at", { ascending: false })
       data = res.data

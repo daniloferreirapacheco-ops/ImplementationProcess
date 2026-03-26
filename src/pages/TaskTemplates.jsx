@@ -82,10 +82,10 @@ export default function TaskTemplates() {
     // Check if project has a linked scope
     const { data: proj } = await supabase.from('projects').select('scope_id, opportunity_id').eq('id', projectId).single()
     if (proj?.scope_id) {
-      const { data: scope } = await supabase.from('scope_baselines').select('workstream_hours').eq('id', proj.scope_id).single()
+      const { data: scope } = await supabase.from('scopes').select('workstream_hours').eq('id', proj.scope_id).single()
       setScopeWorkstreams(scope?.workstream_hours || null)
     } else if (proj?.opportunity_id) {
-      const { data: scopes } = await supabase.from('scope_baselines').select('workstream_hours').eq('opportunity_id', proj.opportunity_id).eq('approval_status', 'approved').limit(1)
+      const { data: scopes } = await supabase.from('scopes').select('workstream_hours').eq('opportunity_id', proj.opportunity_id).eq('approval_status', 'approved').limit(1)
       setScopeWorkstreams(scopes?.[0]?.workstream_hours || null)
     } else {
       setScopeWorkstreams(null)
