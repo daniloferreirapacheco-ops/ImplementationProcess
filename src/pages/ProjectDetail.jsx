@@ -504,50 +504,42 @@ export default function ProjectDetail() {
               </div>
             )}
 
-            {/* Project Details Card */}
+            {/* Project Details Card - Editable */}
             <div style={{ ...cardStyle, gridColumn: "1 / 3" }}>
               <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
                 Project Details
               </h2>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
-                {[
-                  { label: "Start Date", value: project?.start_date ? new Date(project.start_date).toLocaleDateString() : "Not set" },
-                  { label: "Planned End", value: project?.planned_end_date ? new Date(project.planned_end_date).toLocaleDateString() : "Not set" },
-                  { label: "Go-Live Target", value: project?.golive_target ? new Date(project.golive_target).toLocaleDateString() : "Not set" },
-                  { label: "Health", value: project?.health || "grey" },
-                  { label: "Budget Hours", value: budgetHours ? `${budgetHours}h` : "Not set" },
-                  { label: "Budget Cost", value: budgetCost ? fmt(budgetCost) : "Not set" },
-                ].map(item => (
-                  <div key={item.label} style={{ display: "flex", justifyContent: "space-between",
-                    padding: "8px 0", borderBottom: "1px solid #f1f5f9" }}>
-                    <span style={{ fontSize: "13px", color: "#64748b" }}>{item.label}</span>
-                    <span style={{ fontSize: "13px", fontWeight: "600", color: "#1e293b",
-                      textTransform: "capitalize" }}>{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Budget Edit Card */}
-            <div style={cardStyle}>
-              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
-                Edit Budget
-              </h2>
-              <div style={{ marginBottom: "12px" }}>
-                <label style={{ fontSize: "12px", color: "#64748b", display: "block", marginBottom: "4px" }}>Budget Hours</label>
-                <input type="number" min="0" step="1"
-                  defaultValue={project?.budget_hours || ""}
-                  onBlur={e => updateProject("budget_hours", e.target.value ? Number(e.target.value) : null)}
-                  style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }}
-                  placeholder="e.g. 200" />
-              </div>
-              <div>
-                <label style={{ fontSize: "12px", color: "#64748b", display: "block", marginBottom: "4px" }}>Budget Cost ($)</label>
-                <input type="number" min="0" step="100"
-                  defaultValue={project?.budget_cost || ""}
-                  onBlur={e => updateProject("budget_cost", e.target.value ? Number(e.target.value) : null)}
-                  style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }}
-                  placeholder="e.g. 30000" />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Start Date</label>
+                  <input type="date" defaultValue={project?.start_date || ""} onBlur={e => updateProject("start_date", e.target.value || null)}
+                    style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Planned End</label>
+                  <input type="date" defaultValue={project?.planned_end_date || ""} onBlur={e => updateProject("planned_end_date", e.target.value || null)}
+                    style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Go-Live Target</label>
+                  <input type="date" defaultValue={project?.golive_target || ""} onBlur={e => updateProject("golive_target", e.target.value || null)}
+                    style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Budget Hours</label>
+                  <input type="number" min="0" defaultValue={project?.budget_hours || ""} onBlur={e => updateProject("budget_hours", e.target.value ? Number(e.target.value) : null)}
+                    style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }} placeholder="e.g. 200" />
+                </div>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Budget Cost ($)</label>
+                  <input type="number" min="0" step="100" defaultValue={project?.budget_cost || ""} onBlur={e => updateProject("budget_cost", e.target.value ? Number(e.target.value) : null)}
+                    style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }} placeholder="e.g. 30000" />
+                </div>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Readiness Score (0-100)</label>
+                  <input type="number" min="0" max="100" defaultValue={project?.readiness_score || ""} onBlur={e => updateProject("readiness_score", e.target.value ? Number(e.target.value) : null)}
+                    style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }} placeholder="0-100" />
+                </div>
               </div>
             </div>
 

@@ -152,12 +152,13 @@ export default function Scope() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '25%' }}>Name</th>
-                  <th style={{ ...thStyle, width: '20%' }}>Account</th>
-                  <th style={{ ...thStyle, width: '15%' }}>Status</th>
-                  <th style={{ ...thStyle, width: '15%', textAlign: 'right' }}>Hours (Min-Max)</th>
-                  <th style={{ ...thStyle, width: '12%', textAlign: 'right' }}>Confidence</th>
-                  <th style={{ ...thStyle, width: '13%' }}>Created</th>
+                  <th style={{ ...thStyle, width: '22%' }}>Name</th>
+                  <th style={{ ...thStyle, width: '16%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '12%' }}>Status</th>
+                  <th style={{ ...thStyle, width: '10%' }}>Risk</th>
+                  <th style={{ ...thStyle, width: '14%', textAlign: 'right' }}>Hours</th>
+                  <th style={{ ...thStyle, width: '12%', textAlign: 'center' }}>Confidence</th>
+                  <th style={{ ...thStyle, width: '14%' }}>Created</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,11 +184,22 @@ export default function Scope() {
                         {scope.approval_status?.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td style={{ ...tdStyle, textAlign: 'right' }}>
-                      {scope.estimated_hours_min || 0}–{scope.estimated_hours_max || 0}
+                    <td style={tdStyle}>
+                      {(() => {
+                        const r = scope.risk_level || 'medium'
+                        const rc = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' }
+                        return <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '3px', backgroundColor: `${rc[r] || '#94a3b8'}18`, color: rc[r] || '#94a3b8', textTransform: 'capitalize' }}>{r}</span>
+                      })()}
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'right' }}>
-                      {scope.confidence_score || 0}%
+                      <span style={{ fontWeight: '600' }}>{scope.estimated_hours_min || 0}–{scope.estimated_hours_max || 0}h</span>
+                    </td>
+                    <td style={{ ...tdStyle, textAlign: 'center' }}>
+                      {(() => {
+                        const c = scope.confidence_score || 0
+                        const color = c >= 75 ? '#10b981' : c >= 60 ? '#f59e0b' : '#ef4444'
+                        return <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '12px', backgroundColor: `${color}15`, color }}>{c}%</span>
+                      })()}
                     </td>
                     <td style={tdStyle}>
                       {scope.created_at ? new Date(scope.created_at).toLocaleDateString() : '—'}
