@@ -148,6 +148,13 @@ export default function ScopeDetail() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Scope" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/scope")} style={{ color: "#94a3b8", cursor: "pointer" }}>Scope</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>{scope?.name}</span>
+        </div>
 
         <button onClick={() => navigate('/scope')}
           style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer",

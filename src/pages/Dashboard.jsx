@@ -200,13 +200,35 @@ export default function Dashboard() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Dashboard" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px" }}>
-        <div style={{ marginBottom: "28px" }}>
-          <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 8px 0" }}>
-            Welcome back, {profile?.full_name?.split(" ")[0] || "there"}
-          </h1>
-          <p style={{ color: "#64748b", margin: 0, fontSize: "16px" }}>
-            {roleLabel} dashboard — {new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
-          </p>
+        {/* Welcome Banner */}
+        <div style={{ background: "linear-gradient(135deg, #1e293b 0%, #334155 100%)", borderRadius: "16px", padding: "28px 32px", marginBottom: "24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h1 style={{ fontSize: "24px", fontWeight: "700", color: "white", margin: "0 0 6px 0" }}>
+              Welcome back, {profile?.full_name?.split(" ")[0] || "there"}
+            </h1>
+            <p style={{ color: "#94a3b8", margin: 0, fontSize: "14px" }}>
+              {roleLabel} dashboard — {new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+            </p>
+          </div>
+          {stats && (stats.overdueMilestones > 0 || stats.openBlockers > 0 || stats.pendingApprovals > 0) && (
+            <div style={{ display: "flex", gap: "10px" }}>
+              {stats.overdueMilestones > 0 && (
+                <div onClick={() => navigate("/projects")} style={{ padding: "8px 14px", backgroundColor: "#ef444420", borderRadius: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ color: "#ef4444", fontSize: "13px", fontWeight: "600" }}>{stats.overdueMilestones} overdue</span>
+                </div>
+              )}
+              {stats.openBlockers > 0 && (
+                <div onClick={() => navigate("/projects")} style={{ padding: "8px 14px", backgroundColor: "#f59e0b20", borderRadius: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ color: "#f59e0b", fontSize: "13px", fontWeight: "600" }}>{stats.openBlockers} blockers</span>
+                </div>
+              )}
+              {stats.pendingApprovals > 0 && (
+                <div onClick={() => navigate("/scope")} style={{ padding: "8px 14px", backgroundColor: "#3b82f620", borderRadius: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ color: "#60a5fa", fontSize: "13px", fontWeight: "600" }}>{stats.pendingApprovals} approvals</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {!stats ? (

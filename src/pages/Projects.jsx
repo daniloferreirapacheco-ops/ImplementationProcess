@@ -175,8 +175,20 @@ export default function Projects() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px", color: '#94a3b8' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>No projects found</p>
+          <div style={{ textAlign: "center", padding: "60px 40px", color: '#94a3b8', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, #3b82f6, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "28px" }}>📁</div>
+            <p style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px' }}>
+              {search || filter !== 'active' ? 'No matching projects' : 'No projects yet'}
+            </p>
+            <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 20px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+              {search || filter !== 'active' ? 'Try adjusting your search or filters.' : 'Create your first project from an approved scope, or start fresh.'}
+            </p>
+            {!search && filter === 'active' && (
+              <button onClick={() => navigate('/projects/new')}
+                style={{ padding: '10px 24px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                + Create Project
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ flex: 1, overflow: 'auto', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white' }}>

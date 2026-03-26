@@ -148,6 +148,13 @@ return (
       <NavBar current="Opportunities" />
 
       <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/opportunities")} style={{ color: "#94a3b8", cursor: "pointer" }}>Opportunities</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>{opp?.name}</span>
+        </div>
 
         <button onClick={() => navigate('/opportunities')}
           style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',

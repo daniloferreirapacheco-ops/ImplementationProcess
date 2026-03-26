@@ -144,17 +144,21 @@ export default function CustomerDetail() {
       <NavBar current="Customers" />
 
       <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
+        {/* Breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/customers")} style={{ color: "#94a3b8", cursor: "pointer" }}>Customers</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>{account.name}</span>
+        </div>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
-            <button onClick={() => navigate('/customers')}
-              style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
-                fontSize: '14px', padding: 0, marginBottom: '8px' }}>
-              ← Back to Customers
-            </button>
             <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', margin: 0 }}>
               🏢 {account.name}
             </h1>
+            {account.industry && <p style={{ color: '#64748b', margin: '4px 0 0', fontSize: '14px' }}>{account.industry} {account.city ? `· ${account.city}, ${account.state || ''}` : ''}</p>}
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             {!editing ? (
