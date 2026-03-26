@@ -25,6 +25,9 @@ export default function ScopeDetail() {
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
   const [openQuestions, setOpenQuestions] = useState([])
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({})
+  const [wsForm, setWsForm] = useState({})
 
   useEffect(() => { fetchScope() }, [id])
 
@@ -35,6 +38,16 @@ export default function ScopeDetail() {
         .select("*")
         .eq("id", id).single()
       setScope(data)
+      if (data) {
+        setForm({
+          name: data.name || "", risk_level: data.risk_level || "medium",
+          onsite_days: data.onsite_days || 0, included_modules: data.included_modules || "",
+          excluded_modules: data.excluded_modules || "", assumptions: data.assumptions || "",
+          exclusions: data.exclusions || "", risks: data.risks || "", notes: data.notes || "",
+          team_recommendation: data.team_recommendation || "", phase_plan: data.phase_plan || "",
+        })
+        setWsForm(data.workstream_hours || {})
+      }
       // Load open questions from linked discovery
       if (data?.discovery_id) {
         const { data: qs } = await supabase.from("open_questions").select("*")
@@ -70,6 +83,41 @@ export default function ScopeDetail() {
     }
     setSaving(false)
   }
+
+  const riskLevels = [
+    { value: "low", label: "Low Risk", multiplier: 1.0 },
+    { value: "medium", label: "Medium Risk", multiplier: 1.2 },
+    { value: "high", label: "High Risk", multiplier: 1.5 }
+  ]
+
+  const saveScope = async () => {
+    setSaving(true)
+    const totalBase = Object.values(wsForm).reduce((a, b) => a + (Number(b) || 0), 0)
+    const multiplier = riskLevels.find(r => r.value === form.risk_level)?.multiplier || 1.2
+    const payload = {
+      ...form,
+      workstream_hours: wsForm,
+      estimated_hours_min: Math.round(totalBase * 0.9),
+      estimated_hours_max: Math.round(totalBase * multiplier * 1.1),
+      onsite_days: parseInt(form.onsite_days) || 0,
+      updated_at: new Date().toISOString(),
+    }
+    // null out empty strings
+    for (const k of ["included_modules", "excluded_modules", "assumptions", "exclusions", "risks", "notes", "team_recommendation", "phase_plan"]) {
+      if (!payload[k]) payload[k] = null
+    }
+    await supabase.from("scopes").update(payload).eq("id", id)
+    setScope(prev => ({ ...prev, ...payload }))
+    setEditing(false)
+    setSaving(false)
+  }
+
+  const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
+
+  const inputStyle = { width: "100%", padding: "10px", border: "1px solid #d1d5db",
+    borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }
+  const labelStyle = { display: "block", marginBottom: "6px",
+    fontWeight: "500", fontSize: "14px", color: "#374151" }
 
   if (loading || !scope) return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
@@ -110,14 +158,36 @@ export default function ScopeDetail() {
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "flex-start", marginBottom: "24px" }}>
           <div>
-            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
-              {scope?.name || "Scope Record"}
-            </h1>
-            <p style={{ color: "#64748b", margin: 0 }}>
-              🏢 {scope?.opportunities?.accounts?.name} — {scope?.opportunities?.name}
+            {editing ? (
+              <input value={form.name} onChange={e => updateForm("name", e.target.value)}
+                style={{ fontSize: "24px", fontWeight: "700", color: "#1e293b", border: "1px solid #d1d5db", borderRadius: "8px", padding: "6px 12px", width: "400px" }} />
+            ) : (
+              <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
+                {scope?.name || "Scope Record"}
+              </h1>
+            )}
+            <p style={{ color: "#64748b", margin: "4px 0 0" }}>
+              🏢 {scope?.opportunities?.accounts?.name || ""} {scope?.opportunities?.name ? `— ${scope.opportunities.name}` : ""}
             </p>
           </div>
           <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            {!editing ? (
+              <button onClick={() => setEditing(true)}
+                style={{ padding: "8px 18px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #d1d5db", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+                Edit Scope
+              </button>
+            ) : (
+              <>
+                <button onClick={saveScope} disabled={saving}
+                  style={{ padding: "8px 18px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+                <button onClick={() => { setEditing(false); setForm({ name: scope.name || "", risk_level: scope.risk_level || "medium", onsite_days: scope.onsite_days || 0, included_modules: scope.included_modules || "", excluded_modules: scope.excluded_modules || "", assumptions: scope.assumptions || "", exclusions: scope.exclusions || "", risks: scope.risks || "", notes: scope.notes || "", team_recommendation: scope.team_recommendation || "", phase_plan: scope.phase_plan || "" }); setWsForm(scope.workstream_hours || {}) }}
+                  style={{ padding: "8px 18px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #d1d5db", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+                  Cancel
+                </button>
+              </>
+            )}
             <select value={scope?.approval_status || "draft"}
               onChange={e => updateStatus(e.target.value)}
               disabled={saving}
@@ -156,26 +226,36 @@ export default function ScopeDetail() {
               <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
                 Estimate Summary
               </h2>
-              {[
-                { label: "Hour Range", value: `${scope?.estimated_hours_min || 0}–${scope?.estimated_hours_max || 0} hrs` },
-                { label: "Confidence Score", value: `${scope?.confidence_score || 0}%`,
-                  color: (scope?.confidence_score || 0) >= 75 ? "#10b981" : (scope?.confidence_score || 0) >= 60 ? "#f59e0b" : "#ef4444" },
-                { label: "Risk Level", value: scope?.risk_level || "medium", textTransform: "capitalize" },
-                { label: "Onsite Days", value: scope?.onsite_days || 0 },
-                { label: "Version", value: `v${scope?.version || 1}` },
-                { label: "Status", value: scope?.approval_status?.replace(/_/g, " ") || "draft",
-                  color: statusColors[scope?.approval_status], textTransform: "capitalize" }
-              ].map(item => (
-                <div key={item.label} style={{ display: "flex", justifyContent: "space-between",
-                  padding: "8px 0", borderBottom: "1px solid #f1f5f9" }}>
-                  <span style={{ fontSize: "14px", color: "#64748b" }}>{item.label}</span>
-                  <span style={{ fontSize: "14px", fontWeight: "600",
-                    color: item.color || "#1e293b",
-                    textTransform: item.textTransform || "none" }}>
-                    {item.value}
-                  </span>
+              {editing ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div>
+                    <label style={labelStyle}>Risk Level</label>
+                    <select value={form.risk_level} onChange={e => updateForm("risk_level", e.target.value)} style={inputStyle}>
+                      {riskLevels.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Onsite Days</label>
+                    <input type="number" value={form.onsite_days} onChange={e => updateForm("onsite_days", e.target.value)} style={inputStyle} />
+                  </div>
+                  <div style={{ padding: "10px", backgroundColor: "#f0f9ff", borderRadius: "8px", fontSize: "13px", color: "#0369a1" }}>
+                    Hour range and confidence will be recalculated on save based on workstream hours and risk level.
+                  </div>
                 </div>
-              ))}
+              ) : (
+                [{label:"Hour Range",value:`${scope?.estimated_hours_min||0}–${scope?.estimated_hours_max||0} hrs`},
+                  {label:"Confidence Score",value:`${scope?.confidence_score||0}%`,color:(scope?.confidence_score||0)>=75?"#10b981":(scope?.confidence_score||0)>=60?"#f59e0b":"#ef4444"},
+                  {label:"Risk Level",value:scope?.risk_level||"medium",textTransform:"capitalize"},
+                  {label:"Onsite Days",value:scope?.onsite_days||0},
+                  {label:"Version",value:`v${scope?.version||1}`},
+                  {label:"Status",value:scope?.approval_status?.replace(/_/g," ")||"draft",color:statusColors[scope?.approval_status],textTransform:"capitalize"}
+                ].map(item => (
+                  <div key={item.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f1f5f9" }}>
+                    <span style={{ fontSize: "14px", color: "#64748b" }}>{item.label}</span>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: item.color || "#1e293b", textTransform: item.textTransform || "none" }}>{item.value}</span>
+                  </div>
+                ))
+              )}
             </div>
             <div style={cardStyle}>
               <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 16px 0" }}>
@@ -202,20 +282,24 @@ export default function ScopeDetail() {
                 </p>
               </div>
             </div>
-            {scope?.team_recommendation && (
+            {(editing || scope?.team_recommendation) && (
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>
-                  Team Recommendation
-                </h2>
-                <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{scope.team_recommendation}</p>
+                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>Team Recommendation</h2>
+                {editing ? (
+                  <textarea value={form.team_recommendation} onChange={e => updateForm("team_recommendation", e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+                ) : (
+                  <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{scope.team_recommendation}</p>
+                )}
               </div>
             )}
-            {scope?.phase_plan && (
+            {(editing || scope?.phase_plan) && (
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>
-                  Phase Plan
-                </h2>
-                <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{scope.phase_plan}</p>
+                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>Phase Plan</h2>
+                {editing ? (
+                  <textarea value={form.phase_plan} onChange={e => updateForm("phase_plan", e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+                ) : (
+                  <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{scope.phase_plan}</p>
+                )}
               </div>
             )}
           </div>
@@ -224,37 +308,50 @@ export default function ScopeDetail() {
         {activeTab === "workstreams" && (
           <div style={cardStyle}>
             <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 20px 0" }}>
-              Workstream Hours
+              Workstream Hours {editing && <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "400" }}>(click hours to edit)</span>}
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {Object.entries(workstreams).map(([key, hours]) => {
-                const pct = totalHours > 0 ? Math.round((parseInt(hours) / totalHours) * 100) : 0
+              {(editing ? Object.entries(wsForm) : Object.entries(workstreams)).map(([key, hours]) => {
+                const wsTotalHrs = Object.values(editing ? wsForm : workstreams).reduce((a, b) => a + (parseInt(b) || 0), 0)
+                const pct = wsTotalHrs > 0 ? Math.round((parseInt(hours) / wsTotalHrs) * 100) : 0
                 return (
-                  <div key={key} style={{ padding: "12px 16px", backgroundColor: "#f8fafc",
-                    borderRadius: "8px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between",
-                      marginBottom: "6px" }}>
-                      <span style={{ fontSize: "14px", fontWeight: "500", color: "#374151",
-                        textTransform: "capitalize" }}>
+                  <div key={key} style={{ padding: "12px 16px", backgroundColor: "#f8fafc", borderRadius: "8px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                      <span style={{ fontSize: "14px", fontWeight: "500", color: "#374151", textTransform: "capitalize" }}>
                         {key.replace(/_/g, " ")}
                       </span>
-                      <span style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b" }}>
-                        {hours} hrs ({pct}%)
-                      </span>
+                      {editing ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <input type="number" value={hours} onChange={e => setWsForm(prev => ({ ...prev, [key]: parseInt(e.target.value) || 0 }))}
+                            style={{ width: "70px", padding: "5px 8px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", textAlign: "center" }} />
+                          <span style={{ fontSize: "12px", color: "#64748b" }}>hrs</span>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b" }}>{hours} hrs ({pct}%)</span>
+                      )}
                     </div>
-                    <div style={{ backgroundColor: "#e2e8f0", borderRadius: "4px",
-                      height: "6px", overflow: "hidden" }}>
-                      <div style={{ width: `${pct}%`, height: "100%",
-                        backgroundColor: "#3b82f6", transition: "width 0.3s" }} />
+                    <div style={{ backgroundColor: "#e2e8f0", borderRadius: "4px", height: "6px", overflow: "hidden" }}>
+                      <div style={{ width: `${pct}%`, height: "100%", backgroundColor: "#3b82f6", transition: "width 0.3s" }} />
                     </div>
                   </div>
                 )
               })}
-              <div style={{ padding: "12px 16px", backgroundColor: "#1e293b",
-                borderRadius: "8px", display: "flex", justifyContent: "space-between" }}>
+              {editing && (
+                <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                  <input id="newWsKey" placeholder="Workstream name (e.g. data_migration)" style={{ flex: 1, padding: "8px 12px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "13px" }} />
+                  <button onClick={() => {
+                    const inp = document.getElementById("newWsKey")
+                    const key = inp.value.trim().toLowerCase().replace(/\s+/g, "_")
+                    if (key && !wsForm[key]) { setWsForm(prev => ({ ...prev, [key]: 0 })); inp.value = "" }
+                  }} style={{ padding: "8px 16px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+                    + Add
+                  </button>
+                </div>
+              )}
+              <div style={{ padding: "12px 16px", backgroundColor: "#1e293b", borderRadius: "8px", display: "flex", justifyContent: "space-between" }}>
                 <span style={{ fontSize: "14px", fontWeight: "700", color: "white" }}>TOTAL</span>
                 <span style={{ fontSize: "14px", fontWeight: "700", color: "white" }}>
-                  {totalHours} hrs
+                  {Object.values(editing ? wsForm : workstreams).reduce((a, b) => a + (parseInt(b) || 0), 0)} hrs
                 </span>
               </div>
             </div>
@@ -264,20 +361,26 @@ export default function ScopeDetail() {
         {activeTab === "details" && (
           <div>
             {[
-              { label: "Included Modules", value: scope?.included_modules },
-              { label: "Excluded Modules", value: scope?.excluded_modules },
-              { label: "Assumptions", value: scope?.assumptions },
-              { label: "Exclusions", value: scope?.exclusions },
-              { label: "Risks", value: scope?.risks },
-              { label: "Notes", value: scope?.notes }
-            ].map(item => item.value && (
+              { label: "Included Modules", field: "included_modules", placeholder: "List all included modules..." },
+              { label: "Excluded Modules", field: "excluded_modules", placeholder: "List excluded items..." },
+              { label: "Assumptions", field: "assumptions", placeholder: "Key assumptions..." },
+              { label: "Exclusions", field: "exclusions", placeholder: "Out-of-scope items..." },
+              { label: "Risks", field: "risks", placeholder: "Known risks..." },
+              { label: "Notes", field: "notes", placeholder: "Additional notes..." },
+            ].map(item => (editing || scope?.[item.field]) ? (
               <div key={item.label} style={cardStyle}>
                 <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b", margin: "0 0 12px 0" }}>
                   {item.label}
                 </h2>
-                <p style={{ color: "#475569", lineHeight: "1.6", margin: 0 }}>{item.value}</p>
+                {editing ? (
+                  <textarea value={form[item.field]} onChange={e => updateForm(item.field, e.target.value)}
+                    placeholder={item.placeholder} rows={3}
+                    style={{ ...inputStyle, resize: "vertical" }} />
+                ) : (
+                  <p style={{ color: "#475569", lineHeight: "1.6", margin: 0, whiteSpace: "pre-wrap" }}>{scope[item.field]}</p>
+                )}
               </div>
-            ))}
+            ) : null)}
           </div>
         )}
 
