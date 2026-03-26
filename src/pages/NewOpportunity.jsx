@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
@@ -42,11 +42,13 @@ const modules = [
 export default function NewOpportunity() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const preAccountId = searchParams.get('account_id') || ''
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [accounts, setAccounts] = useState([])
   const [form, setForm] = useState({
-    account_id: '',
+    account_id: preAccountId,
     name: '',
     opportunity_type: 'new_implementation',
     urgency: 'medium',

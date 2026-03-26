@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
@@ -7,11 +7,13 @@ import NavBar from "../components/layout/NavBar"
 export default function NewHandoff() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const preProjectId = searchParams.get('project') || ''
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [projects, setProjects] = useState([])
   const [form, setForm] = useState({
-    project_id: "",
+    project_id: preProjectId,
     delivered_modules: [],
     environment_notes: "",
     known_issues: "",
