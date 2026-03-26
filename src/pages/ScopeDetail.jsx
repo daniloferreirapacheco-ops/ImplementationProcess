@@ -30,26 +30,10 @@ export default function ScopeDetail() {
 
   const fetchScope = async () => {
     try {
-      // Try with nested join first, then simpler fallbacks
-      let { data, error } = await supabase
+      const { data } = await supabase
         .from("scopes")
-        .select("*, opportunities(name, accounts(name))")
+        .select("*")
         .eq("id", id).single()
-      if (error || !data) {
-        const res = await supabase
-          .from("scopes")
-          .select("*, opportunities(name)")
-          .eq("id", id).single()
-        data = res.data
-        error = res.error
-      }
-      if (error || !data) {
-        const res = await supabase
-          .from("scopes")
-          .select("*")
-          .eq("id", id).single()
-        data = res.data
-      }
       setScope(data)
       // Load open questions from linked discovery
       if (data?.discovery_id) {

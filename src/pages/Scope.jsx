@@ -35,25 +35,10 @@ export default function Scope() {
   useEffect(() => { fetchScopes() }, [])
 
   const fetchScopes = async () => {
-    let { data, error } = await supabase
+    const { data } = await supabase
       .from("scopes")
-      .select("*, opportunities(name, accounts(name))")
+      .select("*")
       .order("created_at", { ascending: false })
-    if (error || !data) {
-      const res = await supabase
-        .from("scopes")
-        .select("*, opportunities(name)")
-        .order("created_at", { ascending: false })
-      data = res.data
-      error = res.error
-    }
-    if (error || !data) {
-      const res = await supabase
-        .from("scopes")
-        .select("*")
-        .order("created_at", { ascending: false })
-      data = res.data
-    }
     setScopes(data || [])
     setLoading(false)
   }
