@@ -255,6 +255,33 @@ export default function Dashboard() {
               ))}
             </div>
 
+            {/* Health Distribution Bar */}
+            {stats.active > 0 && (
+              <div style={{ backgroundColor: "white", borderRadius: "12px", padding: "16px 20px", border: "1px solid #e2e8f0", marginBottom: "16px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                  <span style={{ fontSize: "13px", fontWeight: "600", color: "#1e293b" }}>Portfolio Health</span>
+                  <div style={{ display: "flex", gap: "14px", fontSize: "12px" }}>
+                    {[
+                      { label: "Healthy", count: healthDist.green, color: "#10b981" },
+                      { label: "Warning", count: healthDist.yellow, color: "#f59e0b" },
+                      { label: "Critical", count: healthDist.red, color: "#ef4444" },
+                    ].map(h => h.count > 0 && (
+                      <span key={h.label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: h.color }} />
+                        <span style={{ color: "#64748b" }}>{h.count} {h.label}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ display: "flex", height: "12px", borderRadius: "6px", overflow: "hidden", backgroundColor: "#f1f5f9" }}>
+                  {healthDist.green > 0 && <div style={{ flex: healthDist.green, backgroundColor: "#10b981", transition: "flex 0.3s" }} />}
+                  {healthDist.yellow > 0 && <div style={{ flex: healthDist.yellow, backgroundColor: "#f59e0b", transition: "flex 0.3s" }} />}
+                  {healthDist.red > 0 && <div style={{ flex: healthDist.red, backgroundColor: "#ef4444", transition: "flex 0.3s" }} />}
+                  {healthDist.grey > 0 && <div style={{ flex: healthDist.grey, backgroundColor: "#cbd5e1", transition: "flex 0.3s" }} />}
+                </div>
+              </div>
+            )}
+
             {/* Cost Overview + Pipeline Row */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
               {/* Cost Overview */}
