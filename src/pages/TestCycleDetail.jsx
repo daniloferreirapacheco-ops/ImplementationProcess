@@ -49,6 +49,7 @@ export default function TestCycleDetail() {
   const updateCycleStatus = async (status) => {
     await supabase.from("test_cycles").update({ status, updated_at: new Date() }).eq("id", id)
     setCycle(prev => ({ ...prev, status }))
+    toast(`Cycle ${status.replace(/_/g, ' ')}`)
   }
 
   const addCase = async () => {
@@ -61,6 +62,7 @@ export default function TestCycleDetail() {
     setNewCase({ name: "", scenario: "", expected_result: "", severity: "medium" })
     setShowAddCase(false)
     setSaving(false)
+    toast("Test case added")
   }
 
   const updateCaseStatus = async (caseId, status) => {
@@ -74,6 +76,7 @@ export default function TestCycleDetail() {
       completion_percentage: Math.round(((passed + failed) / updated.length) * 100)
     }).eq("id", id)
     setCycle(prev => ({ ...prev, pass_count: passed, fail_count: failed }))
+    toast(`Test case ${status}`)
   }
 
   const handleDelete = async () => {
