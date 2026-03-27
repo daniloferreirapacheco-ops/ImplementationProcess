@@ -63,12 +63,28 @@ export default function Contacts() {
               {filtered.length} of {contacts.length} contacts
             </p>
           </div>
-          <button onClick={() => navigate('/contacts/new')}
-            style={{ padding: '7px 16px', backgroundColor: '#8b5cf6', color: 'white',
-              border: 'none', borderRadius: '8px', cursor: 'pointer',
-              fontSize: '13px', fontWeight: '600' }}>
-            + New Contact
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => {
+              const headers = ['Name', 'Title', 'Email', 'Phone', 'Company', 'Role']
+              const rows = filtered.map(c => [c.name, c.title, c.email, c.phone, c.accounts?.name, c.role].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+              const csv = [headers.join(','), ...rows].join('\n')
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a'); a.href = url; a.download = 'contacts.csv'; a.click()
+              URL.revokeObjectURL(url)
+            }}
+              style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
+                border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '500' }}>
+              Export CSV
+            </button>
+            <button onClick={() => navigate('/contacts/new')}
+              style={{ padding: '7px 16px', backgroundColor: '#8b5cf6', color: 'white',
+                border: 'none', borderRadius: '8px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '600' }}>
+              + New Contact
+            </button>
+          </div>
         </div>
 
         {/* Summary Stats */}

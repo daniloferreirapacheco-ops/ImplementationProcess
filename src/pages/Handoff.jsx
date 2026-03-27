@@ -89,12 +89,28 @@ export default function Handoff() {
             </h1>
             <p style={{ color: "#64748b", fontSize: '12px', margin: 0 }}>{filtered.length} of {handoffs.length} handoff packages</p>
           </div>
-          <button onClick={() => navigate("/handoff/new")}
-            style={{ backgroundColor: "#14b8a6", color: "white", border: "none",
-              padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
-              fontWeight: "600", fontSize: "13px" }}>
-            + New Handoff Package
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => {
+              const headers = ['Project', 'Status', 'Created']
+              const rows = filtered.map(h => [h.projects?.name, h.approval_status, h.created_at ? new Date(h.created_at).toLocaleDateString() : ''].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+              const csv = [headers.join(','), ...rows].join('\n')
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a'); a.href = url; a.download = 'handoffs.csv'; a.click()
+              URL.revokeObjectURL(url)
+            }}
+              style={{ padding: '7px 16px', backgroundColor: '#f1f5f9', color: '#475569',
+                border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer',
+                fontSize: '13px', fontWeight: '500' }}>
+              Export CSV
+            </button>
+            <button onClick={() => navigate("/handoff/new")}
+              style={{ backgroundColor: "#14b8a6", color: "white", border: "none",
+                padding: "7px 16px", borderRadius: "8px", cursor: "pointer",
+                fontWeight: "600", fontSize: "13px" }}>
+              + New Handoff Package
+            </button>
+          </div>
         </div>
 
         {/* Summary Stats */}
