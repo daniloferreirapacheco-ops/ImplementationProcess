@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
@@ -33,6 +34,7 @@ const inputStyle = {
 }
 
 export default function Users() {
+  const navigate = useNavigate()
   const { profile } = useAuth()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -124,6 +126,11 @@ export default function Users() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Users" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1200px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>Users</span>
+        </div>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <div>
