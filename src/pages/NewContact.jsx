@@ -63,11 +63,13 @@ export default function NewContact() {
       <NavBar current="Contacts" />
 
       <main style={{ marginLeft: '220px', flex: 1, padding: '32px', maxWidth: '1420px' }}>
-        <button onClick={() => navigate('/contacts')}
-          style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
-            fontSize: '14px', padding: 0, marginBottom: '16px' }}>
-          ← Back to Contacts
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/contacts")} style={{ color: "#94a3b8", cursor: "pointer" }}>Contacts</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>New Contact</span>
+        </div>
 
         <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', margin: '0 0 24px 0' }}>
           New Contact

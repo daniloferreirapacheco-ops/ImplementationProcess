@@ -130,11 +130,13 @@ export default function NewDiscovery() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Discovery" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
-        <button onClick={() => navigate("/discovery")}
-          style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
-            fontSize: '14px', padding: 0, marginBottom: '8px' }}>
-          ← Back to Discovery
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/discovery")} style={{ color: "#94a3b8", cursor: "pointer" }}>Discovery</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>New Discovery</span>
+        </div>
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "center", marginBottom: "24px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: 0 }}>

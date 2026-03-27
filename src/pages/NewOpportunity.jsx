@@ -158,11 +158,13 @@ return (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '24px' }}>
 
           <div>
-            <button onClick={() => navigate('/opportunities')}
-              style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer',
-                fontSize: '14px', padding: 0, marginBottom: '16px' }}>
-              ← Back to Opportunities
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px", fontSize: "13px" }}>
+              <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+              <span style={{ color: "#cbd5e1" }}>/</span>
+              <span onClick={() => navigate("/opportunities")} style={{ color: "#94a3b8", cursor: "pointer" }}>Opportunities</span>
+              <span style={{ color: "#cbd5e1" }}>/</span>
+              <span style={{ color: "#1e293b", fontWeight: "500" }}>New Opportunity</span>
+            </div>
             <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', margin: '0 0 24px 0' }}>
               New Opportunity
             </h1>

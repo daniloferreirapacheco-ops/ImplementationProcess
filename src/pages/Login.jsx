@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../supabase'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -9,6 +10,16 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
+
+  const handleForgotPassword = async () => {
+    if (!email) { setError('Enter your email address first'); return }
+    setLoading(true)
+    const { error } = await supabase.auth.resetPasswordForEmail(email)
+    setLoading(false)
+    if (error) setError(error.message)
+    else setResetSent(true)
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -158,19 +169,18 @@ export default function Login() {
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <a
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            style={{
-              color: '#6366f1',
-              fontSize: '14px',
-              textDecoration: 'none',
-            }}
-            onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
-            onMouseOut={(e) => e.target.style.textDecoration = 'none'}
-          >
-            Forgot password?
-          </a>
+          {resetSent ? (
+            <p style={{ color: '#10b981', fontSize: '14px', margin: 0 }}>
+              Password reset email sent! Check your inbox.
+            </p>
+          ) : (
+            <button onClick={handleForgotPassword} disabled={loading}
+              style={{ background: 'none', border: 'none', color: '#6366f1', fontSize: '14px', cursor: 'pointer', textDecoration: 'none' }}
+              onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+              onMouseOut={(e) => e.target.style.textDecoration = 'none'}>
+              Forgot password?
+            </button>
+          )}
         </div>
       </div>
     </div>
