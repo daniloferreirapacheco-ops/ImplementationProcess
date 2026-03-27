@@ -139,12 +139,11 @@ export default function Customers() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '30%' }}>Name</th>
-                  <th style={{ ...thStyle, width: '15%' }}>Industry</th>
-                  <th style={{ ...thStyle, width: '20%' }}>Location</th>
-                  <th style={{ ...thStyle, width: '15%' }}>Phone</th>
-                  <th style={{ ...thStyle, width: '10%' }}>Status</th>
-                  <th style={{ ...thStyle, width: '10%' }}>Website</th>
+                  <th style={{ ...thStyle, width: '32%' }}>Customer</th>
+                  <th style={{ ...thStyle, width: '18%' }}>Location</th>
+                  <th style={{ ...thStyle, width: '16%' }}>Phone</th>
+                  <th style={{ ...thStyle, width: '12%' }}>Status</th>
+                  <th style={{ ...thStyle, width: '12%' }}>Created</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,24 +156,25 @@ export default function Customers() {
                       cursor: 'pointer',
                       backgroundColor: hoveredRow === account.id ? '#eff6ff' : 'white'
                     }}>
-                    <td style={tdStyle}>
-                      <span style={{ fontWeight: '500' }}>{account.name}</span>
+                    <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
+                      {account.name}
+                      {account.industry && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#94a3b8' }}>{account.industry}</span>}
                     </td>
-                    <td style={tdStyle}>{account.industry || '—'}</td>
                     <td style={tdStyle}>
                       {account.city ? `${account.city}${account.state ? `, ${account.state}` : ''}` : '—'}
                     </td>
                     <td style={tdStyle}>{account.phone || '—'}</td>
                     <td style={tdStyle}>
                       <span style={{
-                        backgroundColor: (account.status === 'inactive' ? '#94a3b8' : '#10b981') + '18',
-                        color: account.status === 'inactive' ? '#94a3b8' : '#10b981',
-                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px', fontWeight: '600',
-                        textTransform: 'capitalize' }}>
+                        backgroundColor: (account.status === 'inactive' ? '#94a3b8' : account.status === 'prospect' ? '#3b82f6' : '#10b981') + '15',
+                        color: account.status === 'inactive' ? '#94a3b8' : account.status === 'prospect' ? '#3b82f6' : '#10b981',
+                        padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '600',
+                        textTransform: 'capitalize',
+                        border: `1px solid ${(account.status === 'inactive' ? '#94a3b8' : account.status === 'prospect' ? '#3b82f6' : '#10b981')}30` }}>
                         {account.status || 'active'}
                       </span>
                     </td>
-                    <td style={tdStyle}>{account.website || '—'}</td>
+                    <td style={{ ...tdStyle, fontSize: '12px', color: '#94a3b8' }}>{account.created_at ? new Date(account.created_at).toLocaleDateString() : '—'}</td>
                   </tr>
                 ))}
               </tbody>

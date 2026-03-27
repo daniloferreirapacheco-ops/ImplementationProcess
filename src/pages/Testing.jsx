@@ -170,8 +170,7 @@ export default function Testing() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '28%' }}>Cycle Name</th>
-                  <th style={{ ...thStyle, width: '22%' }}>Project</th>
+                  <th style={{ ...thStyle, width: '36%' }}>Test Cycle</th>
                   <th style={{ ...thStyle, width: '14%' }}>Status</th>
                   <th style={{ ...thStyle, width: '10%', textAlign: 'right' }}>Passed</th>
                   <th style={{ ...thStyle, width: '10%', textAlign: 'right' }}>Failed</th>
@@ -192,21 +191,22 @@ export default function Testing() {
                         cursor: 'pointer',
                         backgroundColor: hoveredRow === cycle.id ? '#eff6ff' : 'white'
                       }}>
-                      <td style={{ ...tdStyle, fontWeight: '500' }}>{cycle.name}</td>
-                      <td style={tdStyle}>
-                        {cycle.project_id ? (
+                      <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
+                        {cycle.name}
+                        {cycle.project_id && (
                           <span onClick={(e) => { e.stopPropagation(); navigate(`/projects/${cycle.project_id}`) }}
-                            style={{ color: '#3b82f6', cursor: 'pointer', fontWeight: '500' }}>
+                            style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#3b82f6', cursor: 'pointer' }}>
                             {cycle.projects?.name || 'View Project'}
                           </span>
-                        ) : '—'}
+                        )}
                       </td>
                       <td style={tdStyle}>
                         <span style={{
-                          backgroundColor: (statusColors[cycle.status] || '#94a3b8') + '18',
+                          backgroundColor: (statusColors[cycle.status] || '#94a3b8') + '15',
                           color: statusColors[cycle.status] || '#94a3b8',
-                          padding: '2px 8px', borderRadius: '3px', fontSize: '11px',
-                          fontWeight: '600', textTransform: 'capitalize' }}>
+                          padding: '3px 10px', borderRadius: '12px', fontSize: '11px',
+                          fontWeight: '600', textTransform: 'capitalize',
+                          border: `1px solid ${(statusColors[cycle.status] || '#94a3b8')}30` }}>
                           {cycle.status?.replace(/_/g, ' ')}
                         </span>
                       </td>
