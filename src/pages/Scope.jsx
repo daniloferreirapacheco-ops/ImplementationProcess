@@ -130,8 +130,8 @@ export default function Scope() {
             <button key={f} onClick={() => { setFilter(f); setPage(1) }}
               style={{ padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                 cursor: 'pointer', fontSize: '12px', fontWeight: '500',
-                backgroundColor: filter === f ? '#1a1a2e' : 'white',
-                color: filter === f ? 'white' : '#475569', textTransform: 'capitalize' }}>
+                backgroundColor: filter === f ? '#1e293b' : 'white',
+                color: filter === f ? 'white' : '#475569', textTransform: 'capitalize', transition: 'all 0.15s' }}>
               {f.replace(/_/g, ' ')}
             </button>
           ))}
@@ -202,7 +202,7 @@ export default function Scope() {
                       {(() => {
                         const r = scope.risk_level || 'medium'
                         const rc = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' }
-                        return <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '3px', backgroundColor: `${rc[r] || '#94a3b8'}18`, color: rc[r] || '#94a3b8', textTransform: 'capitalize' }}>{r}</span>
+                        return <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '3px', backgroundColor: `${rc[r] || '#94a3b8'}18`, color: rc[r] || '#94a3b8', textTransform: 'capitalize', transition: 'all 0.15s' }}>{r}</span>
                       })()}
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'right' }}>

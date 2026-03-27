@@ -153,7 +153,7 @@ export default function Handoff() {
                 style={{
                   padding: '4px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
                   cursor: 'pointer', fontSize: '12px', fontWeight: '500',
-                  backgroundColor: filter === s ? '#1a1a2e' : 'white',
+                  backgroundColor: filter === s ? '#1e293b' : 'white',
                   color: filter === s ? 'white' : '#475569',
                   textTransform: 'capitalize'
                 }}>

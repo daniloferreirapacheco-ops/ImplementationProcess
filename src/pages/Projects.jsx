@@ -181,7 +181,7 @@ export default function Projects() {
 
         <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap", alignItems: "center" }}>
           <input value={search} onChange={e => { setSearch(e.target.value); setPage(1) }}
-            placeholder="Search projects..."
+            placeholder="Search projects... (Ctrl+K for global)"
             style={{ padding: '5px 10px', border: '1px solid #d1d5db', borderRadius: '8px',
               fontSize: '13px', width: '240px' }} />
           {[
