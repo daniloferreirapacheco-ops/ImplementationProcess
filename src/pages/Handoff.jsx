@@ -36,6 +36,8 @@ export default function Handoff() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [sortField, setSortField] = useState('created_at')
+  const [sortDir, setSortDir] = useState('desc')
 
   useEffect(() => { fetchHandoffs() }, [])
 
@@ -63,7 +65,21 @@ export default function Handoff() {
       (h.projects?.accounts?.name || '').toLowerCase().includes(q)
     const matchesFilter = filter === 'all' || h.approval_status === filter
     return matchesSearch && matchesFilter
+  }).sort((a, b) => {
+    let va = '', vb = ''
+    if (sortField === 'approval_status') { va = a.approval_status || ''; vb = b.approval_status || '' }
+    else if (sortField === 'created_at') { va = a.created_at || ''; vb = b.created_at || '' }
+    else { va = (a.projects?.name || '').toLowerCase(); vb = (b.projects?.name || '').toLowerCase() }
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+  const toggleSort = (field) => { if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc'); else { setSortField(field); setSortDir('asc') } }
+  const SortHeader = ({ field, children, ...rest }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, ...rest, cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
@@ -186,9 +202,9 @@ export default function Handoff() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '38%' }}>Handoff</th>
-                  <th style={{ ...thStyle, width: '18%' }}>Status</th>
-                  <th style={{ ...thStyle, width: '16%' }}>Created</th>
+                  <SortHeader field="name" width="38%">Handoff</SortHeader>
+                  <SortHeader field="approval_status" width="18%">Status</SortHeader>
+                  <SortHeader field="created_at" width="16%">Created</SortHeader>
                   <th style={{ ...thStyle, width: '16%' }}>Updated</th>
                 </tr>
               </thead>

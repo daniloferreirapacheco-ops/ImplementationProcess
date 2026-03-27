@@ -43,6 +43,8 @@ export default function Discovery() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [sortField, setSortField] = useState('created_at')
+  const [sortDir, setSortDir] = useState('desc')
 
   useEffect(() => { fetchRecords() }, [])
 
@@ -70,7 +72,22 @@ export default function Discovery() {
       (rec.opportunities?.accounts?.name || '').toLowerCase().includes(q)
     const matchesFilter = filter === 'all' || rec.status === filter
     return matchesSearch && matchesFilter
+  }).sort((a, b) => {
+    let va = '', vb = ''
+    if (sortField === 'status') { va = a.status || ''; vb = b.status || '' }
+    else if (sortField === 'complexity_score') { va = Number(a.complexity_score) || 0; vb = Number(b.complexity_score) || 0 }
+    else if (sortField === 'created_at') { va = a.created_at || ''; vb = b.created_at || '' }
+    else { va = (a.opportunities?.name || '').toLowerCase(); vb = (b.opportunities?.name || '').toLowerCase() }
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+  const toggleSort = (field) => { if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc'); else { setSortField(field); setSortDir('asc') } }
+  const SortHeader = ({ field, children, ...rest }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, ...rest, cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
@@ -186,10 +203,10 @@ export default function Discovery() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '35%' }}>Discovery</th>
-                  <th style={{ ...thStyle, width: '14%' }}>Status</th>
-                  <th style={{ ...thStyle, width: '12%', textAlign: 'center' }}>Complexity</th>
-                  <th style={{ ...thStyle, width: '14%' }}>Created</th>
+                  <SortHeader field="name" width="35%">Discovery</SortHeader>
+                  <SortHeader field="status" width="14%">Status</SortHeader>
+                  <SortHeader field="complexity_score" width="12%" textAlign="center">Complexity</SortHeader>
+                  <SortHeader field="created_at" width="14%">Created</SortHeader>
                   <th style={{ ...thStyle, width: '14%' }}>Updated</th>
                 </tr>
               </thead>
