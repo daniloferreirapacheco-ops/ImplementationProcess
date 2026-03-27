@@ -2,7 +2,8 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
-import NavBar from "../components/layout/NavBar"
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from "../components/layout/NavBar"
 import { useToast } from "../components/Toast"
 
 const statusOptions = [
@@ -54,6 +55,8 @@ export default function ProjectDetail() {
   const [testCycles, setTestCycles] = useState([])
   const [handoffs, setHandoffs] = useState([])
   const [planTasks, setPlanTasks] = useState([])
+
+  usePageTitle(project?.name)
 
   useEffect(() => { fetchAll() }, [id])
 

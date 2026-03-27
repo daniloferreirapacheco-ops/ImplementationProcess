@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
-import NavBar from '../components/layout/NavBar'
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from '../components/layout/NavBar'
 import { useToast } from '../components/Toast'
 
 export default function ContactDetail() {
@@ -15,6 +16,8 @@ export default function ContactDetail() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const [accounts, setAccounts] = useState([])
+
+  usePageTitle(contact?.name || 'Contact')
 
   useEffect(() => {
     loadData()

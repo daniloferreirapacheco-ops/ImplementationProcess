@@ -1,7 +1,8 @@
 ﻿import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
-import NavBar from "../components/layout/NavBar"
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from "../components/layout/NavBar"
 import { useToast } from "../components/Toast"
 
 const severityColors = {
@@ -25,6 +26,8 @@ export default function TestCycleDetail() {
     name: "", scenario: "", expected_result: "", severity: "medium"
   })
   const [showAddCase, setShowAddCase] = useState(false)
+
+  usePageTitle(cycle?.name || 'Test Cycle')
 
   useEffect(() => { fetchAll() }, [id])
 

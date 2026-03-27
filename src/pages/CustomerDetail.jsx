@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
-import NavBar from '../components/layout/NavBar'
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from '../components/layout/NavBar'
 import { useToast } from '../components/Toast'
 
 export default function CustomerDetail() {
@@ -25,6 +26,8 @@ export default function CustomerDetail() {
   const [discoveries, setDiscoveries] = useState([])
   const [scopes, setScopes] = useState([])
   const [handoffs, setHandoffs] = useState([])
+
+  usePageTitle(account?.name || 'Customer')
 
   useEffect(() => {
     loadData()

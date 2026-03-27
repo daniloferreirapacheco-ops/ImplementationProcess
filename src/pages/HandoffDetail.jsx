@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
-import NavBar from "../components/layout/NavBar"
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from "../components/layout/NavBar"
 import { useToast } from "../components/Toast"
 
 const statusOptions = [
@@ -41,6 +42,8 @@ export default function HandoffDetail() {
   const [userAcceptance, setUserAcceptance] = useState(false)
   const [goLiveDate, setGoLiveDate] = useState("")
   const [supportSLA, setSupportSLA] = useState("")
+
+  usePageTitle(handoff?.projects?.name || 'Handoff')
 
   useEffect(() => { fetchHandoff() }, [id])
 

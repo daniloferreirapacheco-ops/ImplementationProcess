@@ -1,7 +1,8 @@
 ﻿import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
-import NavBar from "../components/layout/NavBar"
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from "../components/layout/NavBar"
 import { useToast } from "../components/Toast"
 
 const statusOptions = [
@@ -30,6 +31,8 @@ export default function ScopeDetail() {
   const [form, setForm] = useState({})
   const [wsForm, setWsForm] = useState({})
   const { toast } = useToast()
+
+  usePageTitle(scope?.name || 'Scope')
 
   useEffect(() => { fetchScope() }, [id])
 

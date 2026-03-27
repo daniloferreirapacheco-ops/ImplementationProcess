@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../supabase'
-import NavBar from '../components/layout/NavBar'
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from '../components/layout/NavBar'
 import { useToast } from '../components/Toast'
 
 const stageOptions = [
@@ -61,6 +62,8 @@ export default function OpportunityDetail() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const { toast } = useToast()
+
+  usePageTitle(opp?.name)
 
   useEffect(() => {
     fetchOpportunity()

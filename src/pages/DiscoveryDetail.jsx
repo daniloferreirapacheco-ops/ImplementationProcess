@@ -2,7 +2,8 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
-import NavBar from "../components/layout/NavBar"
+import NavBar
+import usePageTitle from "../hooks/usePageTitle" from "../components/layout/NavBar"
 import { useToast } from "../components/Toast"
 
 export default function DiscoveryDetail() {
@@ -18,6 +19,8 @@ export default function DiscoveryDetail() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const { toast } = useToast()
+
+  usePageTitle(record?.opportunities?.name || 'Discovery')
 
   useEffect(() => { fetchRecord(); fetchQuestions() }, [id])
 
