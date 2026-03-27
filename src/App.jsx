@@ -37,6 +37,7 @@ import Users from "./pages/Users"
 import ProjectPlan from "./pages/ProjectPlan"
 import { ToastProvider } from "./components/Toast"
 import useKeyboardShortcuts from "./hooks/useKeyboardShortcuts"
+import NotFound from "./pages/NotFound"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -84,7 +85,7 @@ function AppRoutes() {
       <Route path="/products" element={<ProtectedRoute><ProductList /></ProtectedRoute>} />
       <Route path="/templates" element={<ProtectedRoute><TaskTemplates /></ProtectedRoute>} />
       <Route path="/time" element={<ProtectedRoute><TimeTracking /></ProtectedRoute>} />
-      <Route path="*" element={<Navigate to="/dashboard" />} />
+      <Route path="*" element={user ? <NotFound /> : <Navigate to="/login" />} />
     </Routes>
   )
 }

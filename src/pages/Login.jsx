@@ -172,7 +172,12 @@ export default function Login() {
               transition: 'opacity 0.2s',
             }}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <span style={{ width: '16px', height: '16px', border: '2px solid #ffffff40', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.6s linear infinite', display: 'inline-block' }} />
+                Signing in...
+              </span>
+            ) : 'Sign In'}
           </button>
         </form>
 

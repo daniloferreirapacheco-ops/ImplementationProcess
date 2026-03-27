@@ -502,7 +502,7 @@ export default function ScopeDetail() {
         <div style={{ marginTop: "24px", padding: "12px 0", borderTop: "1px solid #e2e8f0", display: "flex", gap: "24px", fontSize: "11px", color: "#94a3b8" }}>
           <span>Created: {scope?.created_at ? new Date(scope.created_at).toLocaleString() : "—"}</span>
           <span>Updated: {scope?.updated_at ? new Date(scope.updated_at).toLocaleString() : "—"}</span>
-          <span style={{ fontFamily: "monospace", fontSize: "10px" }}>ID: {scope?.id?.substring(0, 8)}</span>
+          <span style={{ fontFamily: "monospace", fontSize: "10px", cursor: "pointer" }} onClick={() => { navigator.clipboard.writeText(id); toast && toast("ID copied to clipboard") }} title="Click to copy full ID">ID: {scope?.id?.substring(0, 8)}</span>
         </div>
       </main>
     </div>
