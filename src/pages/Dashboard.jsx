@@ -93,24 +93,16 @@ export default function Dashboard() {
   useEffect(() => { fetchStats() }, [])
 
   const fetchStats = async () => {
-    const [
-      { data: projects },
-      { data: opps },
-      { data: blockers },
-      { data: milestones },
-      { data: scopes },
-      { data: handoffs },
-      { data: timeEntries },
-      { data: discoveries }
-    ] = await Promise.all([
-      supabase.from("projects").select("id, name, status, health, budget_cost, budget_hours, golive_target, accounts(name), updated_at"),
-      supabase.from("opportunities").select("id, stage, name, accounts(name), updated_at"),
-      supabase.from("blockers").select("project_id, severity, status").eq("status", "open"),
-      supabase.from("milestones").select("project_id, name, status, due_date, projects(name)"),
-      supabase.from("scopes").select("id, approval_status"),
-      supabase.from("handoff_packages").select("id, approval_status"),
-      supabase.from("time_entries").select("project_id, hours, cost"),
-      supabase.from("discovery_records").select("id, status")
+    const safe = async (fn) => { try { const r = await fn(); return r.data || [] } catch { return [] } }
+    const [projects, opps, blockers, milestones, scopes, handoffs, timeEntries, discoveries] = await Promise.all([
+      safe(() => supabase.from("projects").select("id, name, status, health, budget_cost, budget_hours, golive_target, updated_at")),
+      safe(() => supabase.from("opportunities").select("id, stage, name, updated_at")),
+      safe(() => supabase.from("blockers").select("project_id, severity, status").eq("status", "open")),
+      safe(() => supabase.from("milestones").select("project_id, name, status, due_date")),
+      safe(() => supabase.from("scopes").select("id, approval_status")),
+      safe(() => supabase.from("handoff_packages").select("id, approval_status")),
+      safe(() => supabase.from("time_entries").select("project_id, hours, cost")),
+      safe(() => supabase.from("discovery_records").select("id, status")),
     ])
 
     const allProjects = projects || []
