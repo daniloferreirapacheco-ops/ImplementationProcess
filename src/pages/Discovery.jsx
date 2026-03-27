@@ -45,11 +45,19 @@ export default function Discovery() {
   useEffect(() => { fetchRecords() }, [])
 
   const fetchRecords = async () => {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("discovery_records")
       .select("*, opportunities(name, accounts(name))")
       .order("created_at", { ascending: false })
-    if (!error) setRecords(data || [])
+    if (error || !data) {
+      const res = await supabase.from("discovery_records").select("*, opportunities(name)").order("created_at", { ascending: false })
+      data = res.data; error = res.error
+    }
+    if (error || !data) {
+      const res = await supabase.from("discovery_records").select("*").order("created_at", { ascending: false })
+      data = res.data
+    }
+    setRecords(data || [])
     setLoading(false)
   }
 

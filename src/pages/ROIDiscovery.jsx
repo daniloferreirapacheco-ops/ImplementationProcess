@@ -160,6 +160,14 @@ export default function ROIDiscovery() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Discovery" />
       <main style={{ marginLeft: "220px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        {/* Breadcrumb */}
+        <div style={{ padding: "12px 24px 0", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate(backPath)} style={{ color: "#94a3b8", cursor: "pointer" }}>{parentRecord?.name || "Record"}</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>ROI Analysis</span>
+        </div>
         {/* Header */}
         <div style={{ padding: "16px 24px", backgroundColor: "white", borderBottom: "0.5px solid #e2e8f0" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

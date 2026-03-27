@@ -38,10 +38,18 @@ export default function Handoff() {
   useEffect(() => { fetchHandoffs() }, [])
 
   const fetchHandoffs = async () => {
-    const { data } = await supabase
+    let { data, error } = await supabase
       .from("handoff_packages")
       .select("*, projects(name, accounts(name))")
       .order("created_at", { ascending: false })
+    if (error || !data) {
+      const res = await supabase.from("handoff_packages").select("*, projects(name)").order("created_at", { ascending: false })
+      data = res.data; error = res.error
+    }
+    if (error || !data) {
+      const res = await supabase.from("handoff_packages").select("*").order("created_at", { ascending: false })
+      data = res.data
+    }
     setHandoffs(data || [])
     setLoading(false)
   }
