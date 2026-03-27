@@ -71,24 +71,24 @@ export default function CustomerDetail() {
 
   const addMachine = async (machineId) => {
     const { error } = await supabase.from('account_machines').insert({ account_id: id, machine_id: machineId })
-    if (!error) loadData()
+    if (!error) { loadData(); toast("Machine added") }
   }
 
   const removeMachine = async (machineId) => {
     const { error } = await supabase.from('account_machines').delete()
       .eq('account_id', id).eq('machine_id', machineId)
-    if (!error) loadData()
+    if (!error) { loadData(); toast("Machine removed") }
   }
 
   const addProduct = async (productId) => {
     const { error } = await supabase.from('account_products').insert({ account_id: id, product_id: productId })
-    if (!error) loadData()
+    if (!error) { loadData(); toast("Product added") }
   }
 
   const removeProduct = async (productId) => {
     const { error } = await supabase.from('account_products').delete()
       .eq('account_id', id).eq('product_id', productId)
-    if (!error) loadData()
+    if (!error) { loadData(); toast("Product removed") }
   }
 
   const handleSave = async () => {
