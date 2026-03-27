@@ -292,7 +292,18 @@ export default function Projects() {
                       ) : '—'}
                     </td>
                     <td style={tdStyle}>
-                      {project.golive_target ? new Date(project.golive_target).toLocaleDateString() : '—'}
+                      {project.golive_target ? (() => {
+                        const days = Math.ceil((new Date(project.golive_target) - new Date()) / 86400000)
+                        return (
+                          <div>
+                            <span style={{ fontSize: "12px" }}>{new Date(project.golive_target).toLocaleDateString()}</span>
+                            <span style={{ display: "block", fontSize: "10px", fontWeight: "600",
+                              color: days <= 0 ? "#ef4444" : days <= 14 ? "#f59e0b" : days <= 30 ? "#3b82f6" : "#94a3b8" }}>
+                              {days > 0 ? `${days}d left` : days === 0 ? "Today!" : `${Math.abs(days)}d ago`}
+                            </span>
+                          </div>
+                        )
+                      })() : '—'}
                     </td>
                     <td style={tdStyle}>
                       <div style={{ display: "flex", gap: "4px" }}>
