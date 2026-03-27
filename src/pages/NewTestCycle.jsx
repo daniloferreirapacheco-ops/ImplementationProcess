@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import usePageTitle from "../hooks/usePageTitle"
 import { useToast } from "../components/Toast"
 
 export default function NewTestCycle() {
@@ -12,6 +13,7 @@ export default function NewTestCycle() {
   const [searchParams] = useSearchParams()
   const preProjectId = searchParams.get('project') || ''
   const [loading, setLoading] = useState(false)
+  usePageTitle("New Test Cycle")
   const [error, setError] = useState("")
   const [projects, setProjects] = useState([])
   const [form, setForm] = useState({

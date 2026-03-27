@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
+import usePageTitle from '../hooks/usePageTitle'
 import { useToast } from '../components/Toast'
 
 const riskFlags = [
@@ -47,6 +48,7 @@ export default function NewOpportunity() {
   const [searchParams] = useSearchParams()
   const preAccountId = searchParams.get('account_id') || ''
   const [loading, setLoading] = useState(false)
+  usePageTitle("New Opportunity")
   const [error, setError] = useState('')
   const [accounts, setAccounts] = useState([])
   const [form, setForm] = useState({

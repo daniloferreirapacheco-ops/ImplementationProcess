@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import usePageTitle from "../hooks/usePageTitle"
 import { useToast } from "../components/Toast"
 
 const workstreams = [
@@ -31,6 +32,7 @@ export default function NewScope() {
   const [searchParams] = useSearchParams()
   const discoveryId = searchParams.get("discovery")
   const [loading, setLoading] = useState(false)
+  usePageTitle("New Scope")
   const [error, setError] = useState("")
   const [opportunities, setOpportunities] = useState([])
   const [discoveries, setDiscoveries] = useState([])

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import usePageTitle from "../hooks/usePageTitle"
 import { useToast } from "../components/Toast"
 
 const PHASES = [

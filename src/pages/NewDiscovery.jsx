@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import usePageTitle from "../hooks/usePageTitle"
 import { useToast } from "../components/Toast"
 
 const productFamilies = [
@@ -31,6 +32,7 @@ export default function NewDiscovery() {
   const [searchParams] = useSearchParams()
   const opportunityId = searchParams.get("opportunity")
   const [loading, setLoading] = useState(false)
+  usePageTitle("New Discovery")
   const [error, setError] = useState("")
   const [opportunities, setOpportunities] = useState([])
   const [activeTab, setActiveTab] = useState("business")

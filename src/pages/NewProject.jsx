@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import usePageTitle from "../hooks/usePageTitle"
 import { useToast } from "../components/Toast"
 
 export default function NewProject() {
@@ -13,6 +14,7 @@ export default function NewProject() {
   const scopeId = searchParams.get("scope")
   const oppId = searchParams.get("opportunity")
   const [loading, setLoading] = useState(false)
+  usePageTitle("New Project")
   const [error, setError] = useState("")
   const [opportunities, setOpportunities] = useState([])
   const [accounts, setAccounts] = useState([])
