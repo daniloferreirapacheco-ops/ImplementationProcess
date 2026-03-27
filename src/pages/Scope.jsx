@@ -166,8 +166,7 @@ export default function Scope() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '22%' }}>Name</th>
-                  <th style={{ ...thStyle, width: '16%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '28%' }}>Scope</th>
                   <th style={{ ...thStyle, width: '12%' }}>Status</th>
                   <th style={{ ...thStyle, width: '10%' }}>Risk</th>
                   <th style={{ ...thStyle, width: '14%', textAlign: 'right' }}>Hours</th>
@@ -185,10 +184,10 @@ export default function Scope() {
                       cursor: 'pointer',
                       backgroundColor: hoveredRow === scope.id ? '#eff6ff' : 'white'
                     }}>
-                    <td style={{ ...tdStyle, fontWeight: '500' }}>
+                    <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                       {scope.name || scope.opportunities?.name || 'Untitled Scope'}
+                      {scope.opportunities?.accounts?.name && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#94a3b8' }}>{scope.opportunities.accounts.name}</span>}
                     </td>
-                    <td style={tdStyle}>{scope.opportunities?.accounts?.name || '—'}</td>
                     <td style={tdStyle}>
                       <span style={{
                         backgroundColor: (statusColors[scope.approval_status] || '#94a3b8') + '18',

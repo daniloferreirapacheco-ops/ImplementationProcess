@@ -212,10 +212,11 @@ export default function Opportunities() {
                     </td>
                     <td style={tdStyle}>
                       <span style={{
-                        backgroundColor: (urgencyColors[opp.urgency] || '#94a3b8') + '18',
+                        backgroundColor: (urgencyColors[opp.urgency] || '#94a3b8') + '15',
                         color: urgencyColors[opp.urgency] || '#94a3b8',
-                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px',
-                        fontWeight: '600', textTransform: 'capitalize' }}>
+                        padding: '3px 10px', borderRadius: '12px', fontSize: '11px',
+                        fontWeight: '600', textTransform: 'capitalize',
+                        border: `1px solid ${(urgencyColors[opp.urgency] || '#94a3b8')}30` }}>
                         {opp.urgency || '—'}
                       </span>
                     </td>
