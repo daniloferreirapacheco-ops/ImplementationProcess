@@ -217,7 +217,7 @@ export default function Opportunities() {
                         {opp.urgency || '—'}
                       </span>
                     </td>
-                    <td style={tdStyle}>
+                    <td style={{ ...tdStyle, fontWeight: opp.estimated_value ? '600' : '400', color: opp.estimated_value ? '#10b981' : '#cbd5e1' }}>
                       {opp.estimated_value ? `$${Number(opp.estimated_value).toLocaleString()}` : '—'}
                     </td>
                     <td style={tdStyle}>

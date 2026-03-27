@@ -70,6 +70,7 @@ export default function DiscoveryDetail() {
         .update({ stage: "discovery_complete", updated_at: new Date().toISOString() })
         .eq("id", record.opportunity_id)
     }
+    toast(`Discovery ${status.replace(/_/g, ' ')}`)
   }
 
   const closeQuestion = async (qId) => {

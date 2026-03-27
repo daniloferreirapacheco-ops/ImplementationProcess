@@ -84,6 +84,7 @@ export default function ScopeDetail() {
         .eq("id", scope.opportunity_id)
     }
     setSaving(false)
+    toast(`Scope ${status.replace(/_/g, ' ')}`)
   }
 
   const riskLevels = [
