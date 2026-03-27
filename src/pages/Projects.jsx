@@ -45,6 +45,8 @@ export default function Projects() {
   const [loading, setLoading] = useState(true)
   usePageTitle("Projects")
   const [filter, setFilter] = useState("active")
+  const [sortField, setSortField] = useState("name")
+  const [sortDir, setSortDir] = useState("asc")
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)
@@ -112,7 +114,27 @@ export default function Projects() {
     if (filter === "at_risk") return ["at_risk", "blocked"].includes(p.status)
     if (filter === "golive") return ["golive_planned", "hypercare"].includes(p.status)
     return p.status === filter
+  }).sort((a, b) => {
+    let va = a[sortField] || '', vb = b[sortField] || ''
+    if (sortField === 'name') { va = (a.name || '').toLowerCase(); vb = (b.name || '').toLowerCase() }
+    if (sortField === 'status') { va = a.status || ''; vb = b.status || '' }
+    if (sortField === 'health') { va = a.health || ''; vb = b.health || '' }
+    if (sortField === 'golive_target') { va = a.golive_target || '9999'; vb = b.golive_target || '9999' }
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+
+  const toggleSort = (field) => {
+    if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortField(field); setSortDir('asc') }
+  }
+
+  const SortHeader = ({ field, children, width, align }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, width, textAlign: align || 'left', cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
@@ -227,12 +249,12 @@ export default function Projects() {
               <thead>
                 <tr>
                   <th style={{ ...thStyle, width: '3%' }}></th>
-                  <th style={{ ...thStyle, width: '28%' }}>Project</th>
-                  <th style={{ ...thStyle, width: '12%' }}>Status</th>
+                  <SortHeader field="name" width="28%">Project</SortHeader>
+                  <SortHeader field="status" width="12%">Status</SortHeader>
                   <th style={{ ...thStyle, width: '8%' }}>Risk</th>
                   <th style={{ ...thStyle, width: '10%' }}>Cost</th>
                   <th style={{ ...thStyle, width: '9%' }}>Budget %</th>
-                  <th style={{ ...thStyle, width: '10%' }}>Go-Live</th>
+                  <SortHeader field="golive_target" width="10%">Go-Live</SortHeader>
                   <th style={{ ...thStyle, width: '14%' }}>Signals</th>
                 </tr>
               </thead>
