@@ -27,12 +27,20 @@ export default function TestCycleDetail() {
   useEffect(() => { fetchAll() }, [id])
 
   const fetchAll = async () => {
-    const [{ data: cyc }, { data: tcs }] = await Promise.all([
-      supabase.from("test_cycles").select("*, projects(name, accounts(name))").eq("id", id).single(),
-      supabase.from("test_cases").select("*").eq("cycle_id", id).order("created_at")
-    ])
-    setCycle(cyc)
-    setCases(tcs || [])
+    try {
+      let { data: cyc } = await supabase.from("test_cycles").select("*, projects(name, accounts(name))").eq("id", id).single()
+      if (!cyc) {
+        const res = await supabase.from("test_cycles").select("*, projects(name)").eq("id", id).single()
+        cyc = res.data
+      }
+      if (!cyc) {
+        const res = await supabase.from("test_cycles").select("*").eq("id", id).single()
+        cyc = res.data
+      }
+      setCycle(cyc)
+      const { data: tcs } = await supabase.from("test_cases").select("*").eq("cycle_id", id).order("created_at")
+      setCases(tcs || [])
+    } catch (err) { console.error(err) }
     setLoading(false)
   }
 
@@ -64,6 +72,13 @@ export default function TestCycleDetail() {
       completion_percentage: Math.round(((passed + failed) / updated.length) * 100)
     }).eq("id", id)
     setCycle(prev => ({ ...prev, pass_count: passed, fail_count: failed }))
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this test cycle and all its test cases? This cannot be undone.')) return
+    await supabase.from("test_cases").delete().eq("cycle_id", id)
+    await supabase.from("test_cycles").delete().eq("id", id)
+    navigate('/testing')
   }
 
   if (loading) return (
@@ -103,21 +118,33 @@ export default function TestCycleDetail() {
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <NavBar current="Testing" />
       <main style={{ marginLeft: "220px", flex: 1, padding: "32px", maxWidth: "1420px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px", fontSize: "13px" }}>
+          <span onClick={() => navigate("/dashboard")} style={{ color: "#94a3b8", cursor: "pointer" }}>Dashboard</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span onClick={() => navigate("/testing")} style={{ color: "#94a3b8", cursor: "pointer" }}>Testing</span>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ color: "#1e293b", fontWeight: "500" }}>{cycle?.name || "Test Cycle"}</span>
+        </div>
 
         <div style={{ display: "flex", justifyContent: "space-between",
           alignItems: "flex-start", marginBottom: "24px" }}>
           <div>
-            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
-              {cycle?.name}
+            <h1 style={{ fontSize: "24px", fontWeight: "700", color: "#1e293b", margin: "0 0 4px 0" }}>
+              {cycle?.name || "Test Cycle"}
             </h1>
-            <p style={{ color: "#64748b", margin: 0 }}>
-              📁 {cycle?.projects?.name}
+            <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+              {cycle?.projects?.name && (
+                <span onClick={() => navigate(`/projects/${cycle.project_id}`)} style={{ color: "#3b82f6", cursor: "pointer" }}>
+                  📁 {cycle.projects.name}
+                </span>
+              )}
+              {cycle?.start_date && <span style={{ marginLeft: "12px" }}>{cycle.start_date} → {cycle?.end_date || "TBD"}</span>}
             </p>
           </div>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <select value={cycle?.status || "not_started"}
               onChange={e => updateCycleStatus(e.target.value)}
-              style={{ padding: "8px 14px", borderRadius: "8px", fontSize: "14px",
+              style={{ padding: "8px 14px", borderRadius: "8px", fontSize: "13px",
                 fontWeight: "600", border: `2px solid ${cycleStatusColors[cycle?.status] || "#94a3b8"}`,
                 color: cycleStatusColors[cycle?.status] || "#94a3b8",
                 backgroundColor: "white", cursor: "pointer" }}>
@@ -127,6 +154,10 @@ export default function TestCycleDetail() {
               <option value="failed">Failed</option>
               <option value="blocked">Blocked</option>
             </select>
+            <button onClick={handleDelete}
+              style={{ padding: "8px 16px", backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+              Delete
+            </button>
           </div>
         </div>
 
