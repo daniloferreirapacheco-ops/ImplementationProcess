@@ -202,7 +202,12 @@ export default function Handoff() {
                       backgroundColor: hoveredRow === h.id ? '#eff6ff' : 'white'
                     }}>
                     <td style={{ ...tdStyle, fontWeight: '500' }}>
-                      {h.projects?.name || 'Untitled Handoff'}
+                      {h.project_id ? (
+                        <span onClick={(e) => { e.stopPropagation(); navigate(`/projects/${h.project_id}`) }}
+                          style={{ color: '#3b82f6', cursor: 'pointer' }}>
+                          {h.projects?.name || 'View Project'}
+                        </span>
+                      ) : 'Untitled Handoff'}
                     </td>
                     <td style={tdStyle}>{h.projects?.accounts?.name || '—'}</td>
                     <td style={tdStyle}>

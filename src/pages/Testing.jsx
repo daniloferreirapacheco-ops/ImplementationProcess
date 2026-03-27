@@ -193,7 +193,14 @@ export default function Testing() {
                         backgroundColor: hoveredRow === cycle.id ? '#eff6ff' : 'white'
                       }}>
                       <td style={{ ...tdStyle, fontWeight: '500' }}>{cycle.name}</td>
-                      <td style={tdStyle}>{cycle.projects?.name || '—'}</td>
+                      <td style={tdStyle}>
+                        {cycle.project_id ? (
+                          <span onClick={(e) => { e.stopPropagation(); navigate(`/projects/${cycle.project_id}`) }}
+                            style={{ color: '#3b82f6', cursor: 'pointer', fontWeight: '500' }}>
+                            {cycle.projects?.name || 'View Project'}
+                          </span>
+                        ) : '—'}
+                      </td>
                       <td style={tdStyle}>
                         <span style={{
                           backgroundColor: (statusColors[cycle.status] || '#94a3b8') + '18',
