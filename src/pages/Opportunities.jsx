@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
+import SearchInput from "../components/SearchInput"
 import LoadingSkeleton from "../components/LoadingSkeleton"
 
 const stageColors = {

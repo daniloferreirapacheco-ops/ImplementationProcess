@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
+import SearchInput from "../components/SearchInput"
 import LoadingSkeleton from "../components/LoadingSkeleton"
 
 const PER_PAGE = 25
