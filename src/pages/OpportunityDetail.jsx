@@ -218,6 +218,24 @@ return (
           </div>
         </div>
 
+        {/* Stage Progression */}
+        <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px 20px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {stageOptions.map((s, i) => {
+              const currentIdx = stageOptions.findIndex(x => x.value === stage)
+              const isCompleted = i < currentIdx
+              const isCurrent = i === currentIdx
+              const color = stageColors[s.value] || '#94a3b8'
+              return (
+                <div key={s.value} style={{ flex: 1, textAlign: 'center' }}>
+                  <div style={{ height: '6px', borderRadius: '3px', backgroundColor: isCompleted ? color : isCurrent ? color : '#e2e8f0', opacity: isCompleted ? 0.6 : 1, transition: 'all 0.3s' }} />
+                  {isCurrent && <p style={{ fontSize: '9px', fontWeight: '700', color, margin: '4px 0 0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
 
           {/* Left Column */}

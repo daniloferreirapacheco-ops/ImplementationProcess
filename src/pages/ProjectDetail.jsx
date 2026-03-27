@@ -312,6 +312,24 @@ export default function ProjectDetail() {
           </div>
         </div>
 
+        {/* Phase Progression */}
+        <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '12px 20px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', gap: '3px' }}>
+            {statusOptions.slice(0, 11).map((s, i) => {
+              const currentIdx = statusOptions.findIndex(x => x.value === project?.status)
+              const isCompleted = i < currentIdx
+              const isCurrent = i === currentIdx
+              const color = statusColors[s.value] || '#94a3b8'
+              return (
+                <div key={s.value} style={{ flex: 1, textAlign: 'center' }}>
+                  <div style={{ height: '5px', borderRadius: '3px', backgroundColor: isCompleted ? color : isCurrent ? color : '#e2e8f0', opacity: isCompleted ? 0.5 : 1 }} />
+                  {isCurrent && <p style={{ fontSize: '8px', fontWeight: '700', color, margin: '3px 0 0', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{s.label}</p>}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
         <div style={{ display: "flex", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
