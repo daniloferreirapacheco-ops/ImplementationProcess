@@ -96,7 +96,7 @@ export default function Scope() {
           </div>
           <button onClick={() => navigate("/scope/new")}
             style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
-              padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+              padding: "7px 16px", borderRadius: "8px", cursor: "pointer",
               fontWeight: "600", fontSize: "13px" }}>
             + New Scope
           </button>

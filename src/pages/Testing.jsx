@@ -95,7 +95,7 @@ export default function Testing() {
             </button>
             <button onClick={() => navigate("/testing/new")}
               style={{ backgroundColor: "#06b6d4", color: "white", border: "none",
-                padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+                padding: "7px 16px", borderRadius: "8px", cursor: "pointer",
                 fontWeight: "600", fontSize: "13px" }}>
               + New Test Cycle
             </button>

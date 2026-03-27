@@ -145,7 +145,7 @@ export default function Projects() {
             </button>
             <button onClick={() => navigate("/projects/new")}
               style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
-                padding: "7px 16px", borderRadius: "4px", cursor: "pointer",
+                padding: "7px 16px", borderRadius: "8px", cursor: "pointer",
                 fontWeight: "600", fontSize: "13px" }}>
               + New Project
             </button>
@@ -192,7 +192,7 @@ export default function Projects() {
             { key: "closed", label: "Closed" },
           ].map(f => (
             <button key={f.key} onClick={() => { setFilter(f.key); setPage(1) }}
-              style={{ padding: "4px 12px", borderRadius: "4px", border: '1px solid #d1d5db',
+              style={{ padding: "4px 12px", borderRadius: "8px", border: '1px solid #d1d5db',
                 cursor: "pointer", fontSize: "12px", fontWeight: "500",
                 backgroundColor: filter === f.key ? "#1a1a2e" : "white",
                 color: filter === f.key ? "white" : "#475569" }}>
