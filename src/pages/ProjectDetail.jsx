@@ -203,8 +203,8 @@ export default function ProjectDetail() {
     { id: "milestones", label: `Milestones (${milestones.length})` },
     { id: "blockers", label: `Blockers (${blockers.filter(b => b.status === "open").length})` },
     { id: "team", label: `Team (${team.length})` },
+    { id: "readiness", label: "Go-Live Readiness" },
     { id: "testing", label: `Testing (${testCycles.length})` },
-    { id: "usecases", label: "Use Cases" },
     { id: "notes", label: `Notes (${notes.length})` },
     { id: "handoff", label: `Handoff (${handoffs.length})` }
   ]
@@ -759,21 +759,21 @@ export default function ProjectDetail() {
           </div>
         )}
 
-        {activeTab === "usecases" && (
+        {activeTab === "readiness" && (
           <div style={{ textAlign: "center", padding: "60px", backgroundColor: "white",
             borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>&#9745;</p>
+            <p style={{ fontSize: "48px", margin: "0 0 16px 0" }}>🚀</p>
             <p style={{ color: "#1e293b", fontSize: "18px", fontWeight: "600", margin: "0 0 8px 0" }}>
-              Use Cases & Testing
+              Go-Live Readiness
             </p>
             <p style={{ color: "#64748b", fontSize: "14px", margin: "0 0 24px 0" }}>
-              Validate workflows, track test cycles, manage defects, and collect signoffs
+              Track test results, verify readiness across all areas, and collect sign-offs before go-live
             </p>
-            <button onClick={() => navigate(`/projects/${id}/usecases`)}
-              style={{ backgroundColor: "#3b82f6", color: "white", border: "none",
+            <button onClick={() => navigate(`/projects/${id}/readiness`)}
+              style={{ backgroundColor: "#10b981", color: "white", border: "none",
                 padding: "12px 28px", borderRadius: "8px", cursor: "pointer", fontWeight: "600",
                 fontSize: "15px" }}>
-              Open Use Cases & Testing
+              Open Readiness Dashboard
             </button>
           </div>
         )}

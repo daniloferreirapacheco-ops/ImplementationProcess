@@ -35,6 +35,7 @@ import NewContact from "./pages/NewContact"
 import ContactDetail from "./pages/ContactDetail"
 import Users from "./pages/Users"
 import ProjectPlan from "./pages/ProjectPlan"
+import ProjectReadiness from "./pages/ProjectReadiness"
 import { ToastProvider } from "./components/Toast"
 import useKeyboardShortcuts from "./hooks/useKeyboardShortcuts"
 import NotFound from "./pages/NotFound"
@@ -66,6 +67,7 @@ function AppRoutes() {
       <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
       <Route path="/projects/:id/usecases" element={<ProtectedRoute><ProjectUseCases /></ProtectedRoute>} />
       <Route path="/projects/:id/plan" element={<ProtectedRoute><ProjectPlan /></ProtectedRoute>} />
+      <Route path="/projects/:id/readiness" element={<ProtectedRoute><ProjectReadiness /></ProtectedRoute>} />
       <Route path="/projects/:id/roi" element={<ProtectedRoute><ROIDiscovery /></ProtectedRoute>} />
       <Route path="/testing" element={<ProtectedRoute><Testing /></ProtectedRoute>} />
       <Route path="/testing/new" element={<ProtectedRoute><NewTestCycle /></ProtectedRoute>} />
