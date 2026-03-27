@@ -58,6 +58,7 @@ export default function DiscoveryDetail() {
     setNewQuestion("")
     fetchQuestions()
     setAddingQuestion(false)
+    toast("Question added")
   }
 
   const updateStatus = async (status) => {
@@ -77,6 +78,7 @@ export default function DiscoveryDetail() {
     await supabase.from("open_questions")
       .update({ status: "closed" }).eq("id", qId)
     fetchQuestions()
+    toast("Question resolved")
   }
 
   const handleDelete = async () => {
