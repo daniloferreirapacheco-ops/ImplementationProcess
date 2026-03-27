@@ -179,8 +179,7 @@ export default function Opportunities() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '24%' }}>Name</th>
-                  <th style={{ ...thStyle, width: '18%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '30%' }}>Opportunity</th>
                   <th style={{ ...thStyle, width: '16%' }}>Stage</th>
                   <th style={{ ...thStyle, width: '10%' }}>Urgency</th>
                   <th style={{ ...thStyle, width: '12%' }}>Value</th>
@@ -198,8 +197,10 @@ export default function Opportunities() {
                       cursor: 'pointer',
                       backgroundColor: hoveredRow === opp.id ? '#eff6ff' : 'white'
                     }}>
-                    <td style={{ ...tdStyle, fontWeight: '500' }}>{opp.name}</td>
-                    <td style={tdStyle}>{opp.accounts?.name || '—'}</td>
+                    <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
+                      {opp.name}
+                      {opp.accounts?.name && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#94a3b8' }}>{opp.accounts.name}</span>}
+                    </td>
                     <td style={tdStyle}>
                       <span style={{
                         backgroundColor: (stageColors[opp.stage] || '#94a3b8') + '18',
