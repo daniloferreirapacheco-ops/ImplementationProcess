@@ -11,6 +11,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [resetSent, setResetSent] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleForgotPassword = async () => {
     if (!email) { setError('Enter your email address first'); return }
@@ -127,8 +128,9 @@ export default function Login() {
             }}>
               Password
             </label>
+            <div style={{ position: 'relative' }}>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -136,6 +138,7 @@ export default function Login() {
               style={{
                 width: '100%',
                 padding: '10px 14px',
+                paddingRight: '42px',
                 border: '1px solid #d1d5db',
                 borderRadius: '8px',
                 fontSize: '15px',
@@ -146,6 +149,11 @@ export default function Login() {
               onFocus={(e) => e.target.style.borderColor = '#6366f1'}
               onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             />
+            <button type="button" onClick={() => setShowPassword(!showPassword)}
+              style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#94a3b8', padding: '4px' }}>
+              {showPassword ? '🙈' : '👁️'}
+            </button>
+            </div>
           </div>
           <button
             type="submit"

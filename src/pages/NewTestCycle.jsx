@@ -3,10 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 export default function NewTestCycle() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [searchParams] = useSearchParams()
   const preProjectId = searchParams.get('project') || ''
   const [loading, setLoading] = useState(false)
@@ -47,6 +49,7 @@ export default function NewTestCycle() {
         .insert({ ...form, owner_id: profile?.id })
         .select().single()
       if (err) throw err
+      toast("Test cycle created successfully")
       navigate(`/testing/${data.id}`)
     } catch (err) {
       setError(err.message)

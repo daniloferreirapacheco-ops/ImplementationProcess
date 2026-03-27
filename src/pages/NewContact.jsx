@@ -3,10 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
+import { useToast } from "../components/Toast"
 
 export default function NewContact() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [searchParams] = useSearchParams()
   const preselectedAccount = searchParams.get('account_id') || ''
   const [accounts, setAccounts] = useState([])
@@ -50,7 +52,8 @@ export default function NewContact() {
       setSaving(false)
       return
     }
-    navigate(`/contacts/${data.id}`)
+    toast("Contact created successfully")
+      navigate(`/contacts/${data.id}`)
   }
 
   const fieldStyle = { width: '100%', padding: '10px', border: '1px solid #d1d5db',

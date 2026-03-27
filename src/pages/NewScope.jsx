@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 const workstreams = [
   { key: "discovery_design", label: "Discovery & Design", base: 40 },
@@ -26,6 +27,7 @@ const riskLevels = [
 export default function NewScope() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [searchParams] = useSearchParams()
   const discoveryId = searchParams.get("discovery")
   const [loading, setLoading] = useState(false)
@@ -112,6 +114,7 @@ export default function NewScope() {
         .insert(payload)
         .select().single()
       if (err) throw err
+      toast("Scope created successfully")
       navigate(`/scope/${data.id}`)
     } catch (err) {
       setError(err.message)

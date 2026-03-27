@@ -3,10 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 export default function NewProject() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [searchParams] = useSearchParams()
   const scopeId = searchParams.get("scope")
   const oppId = searchParams.get("opportunity")
@@ -147,6 +149,7 @@ export default function NewProject() {
         }
       }
 
+      toast("Project created successfully")
       navigate(`/projects/${data.id}`)
     } catch (err) {
       setError(err.message)

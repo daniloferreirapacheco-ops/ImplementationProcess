@@ -25,6 +25,8 @@ export default function Contacts() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
+  const [page, setPage] = useState(1)
+  const PER_PAGE = 25
 
   useEffect(() => {
     fetchContacts()
@@ -48,6 +50,10 @@ export default function Contacts() {
       c.title?.toLowerCase().includes(q) ||
       c.accounts?.name?.toLowerCase().includes(q)
   })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const paginated = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -138,7 +144,7 @@ export default function Contacts() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(contact => (
+                {paginated.map(contact => (
                   <tr key={contact.id}
                     onClick={() => navigate(`/contacts/${contact.id}`)}
                     onMouseEnter={() => setHoveredRow(contact.id)}
@@ -158,8 +164,15 @@ export default function Contacts() {
             </table>
           </div>
         )}
-        <div style={{ padding: '6px 12px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0' }}>
-          {filtered.length} record{filtered.length !== 1 ? 's' : ''} ({contacts.length} total)
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', fontSize: '12px', color: '#94a3b8' }}>
+          <span>{filtered.length} record{filtered.length !== 1 ? 's' : ''} ({contacts.length} total)</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage <= 1}
+              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '6px', backgroundColor: 'white', cursor: safePage <= 1 ? 'not-allowed' : 'pointer', fontSize: '12px', opacity: safePage <= 1 ? 0.5 : 1 }}>Prev</button>
+            <span>Page {safePage} of {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}
+              style={{ padding: '4px 10px', border: '1px solid #d1d5db', borderRadius: '6px', backgroundColor: 'white', cursor: safePage >= totalPages ? 'not-allowed' : 'pointer', fontSize: '12px', opacity: safePage >= totalPages ? 0.5 : 1 }}>Next</button>
+          </div>
         </div>
       </main>
     </div>

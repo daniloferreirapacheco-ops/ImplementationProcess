@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 const productFamilies = [
   "Web Offset", "Sheetfed Offset", "Digital Print", "Wide Format",
@@ -26,6 +27,7 @@ const maturityOptions = [
 export default function NewDiscovery() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [searchParams] = useSearchParams()
   const opportunityId = searchParams.get("opportunity")
   const [loading, setLoading] = useState(false)
@@ -104,6 +106,7 @@ export default function NewDiscovery() {
         .insert(payload)
         .select().single()
       if (err) throw err
+      toast("Discovery created successfully")
       navigate(`/discovery/${data.id}`)
     } catch (err) {
       setError(err.message)

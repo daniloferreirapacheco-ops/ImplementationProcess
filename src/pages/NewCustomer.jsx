@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
+import { useToast } from '../components/Toast'
 
 export default function NewCustomer() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [form, setForm] = useState({
     name: '', industry: '', website: '', phone: '',
     address: '', city: '', state: '', zip: '', notes: '', status: 'active'
@@ -41,6 +43,7 @@ export default function NewCustomer() {
       setSaving(false)
       return
     }
+    toast("Customer created successfully")
     navigate(`/customers/${data.id}`)
   }
 
