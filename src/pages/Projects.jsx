@@ -283,7 +283,7 @@ export default function Projects() {
                     </td>
                     <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                       {project.name}
-                      {project.accounts?.name && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#94a3b8' }}>{project.accounts.name}</span>}
+                      {project.accounts?.name && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#64748b' }}>🏢 {project.accounts.name}</span>}
                     </td>
                     <td style={tdStyle}>
                       <span style={{

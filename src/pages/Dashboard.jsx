@@ -226,6 +226,20 @@ export default function Dashboard() {
 
         {!stats ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
+        ) : stats.active === 0 && stats.openOpps === 0 && stats.discoveryCount === 0 ? (
+          <div style={{ backgroundColor: "white", borderRadius: "16px", padding: "60px 40px", border: "1px solid #e2e8f0", textAlign: "center" }}>
+            <div style={{ width: "80px", height: "80px", borderRadius: "20px", background: "linear-gradient(135deg, #3b82f6, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: "36px" }}>⚡</div>
+            <h2 style={{ fontSize: "24px", fontWeight: "700", color: "#1e293b", margin: "0 0 8px" }}>Welcome to Ecalc OS</h2>
+            <p style={{ fontSize: "15px", color: "#64748b", margin: "0 0 32px", maxWidth: "500px", marginLeft: "auto", marginRight: "auto", lineHeight: "1.6" }}>
+              Your implementation management platform is ready. Start by adding a customer, creating an opportunity, or exploring the demo data.
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+              <button onClick={() => navigate("/customers/new")} style={{ padding: "12px 24px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "600" }}>+ Add Customer</button>
+              <button onClick={() => navigate("/opportunities/new")} style={{ padding: "12px 24px", backgroundColor: "#f59e0b", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "600" }}>+ New Opportunity</button>
+              <button onClick={() => navigate("/projects/new")} style={{ padding: "12px 24px", backgroundColor: "#10b981", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "600" }}>+ New Project</button>
+            </div>
+            <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "24px" }}>Tip: Press <strong>Ctrl+K</strong> to search, or <strong>N</strong> on any list page to create new records</p>
+          </div>
         ) : (
           <>
             {/* KPI Cards */}
