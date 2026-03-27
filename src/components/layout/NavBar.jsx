@@ -257,11 +257,15 @@ export default function NavBar({ current }) {
           </div>
         </div>
         <button onClick={handleSignOut}
-          style={{ width: "100%", padding: "8px", backgroundColor: "transparent", border: "1px solid #475569", color: "#94a3b8", borderRadius: "6px", cursor: "pointer", fontSize: "12px" }}
+          style={{ width: "100%", padding: "8px", backgroundColor: "transparent", border: "1px solid #475569", color: "#94a3b8", borderRadius: "6px", cursor: "pointer", fontSize: "12px", marginBottom: "12px" }}
           onMouseEnter={e => { e.currentTarget.style.backgroundColor = "#ffffff10"; e.currentTarget.style.color = "#cbd5e1" }}
           onMouseLeave={e => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
           Sign Out
         </button>
+        <div style={{ fontSize: "9px", color: "#475569", textAlign: "center", lineHeight: "1.6" }}>
+          <span style={{ color: "#64748b" }}>Ctrl+K</span> Search &middot; <span style={{ color: "#64748b" }}>N</span> New<br/>
+          Ecalc OS v1.0
+        </div>
       </div>
     </nav>
   )
