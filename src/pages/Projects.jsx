@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
+import LoadingSkeleton from "../components/LoadingSkeleton"
 
 const healthColors = {
   green: "#10b981", yellow: "#f59e0b",
@@ -200,7 +201,7 @@ export default function Projects() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
+          <LoadingSkeleton rows={6} cols={6} />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 40px", color: '#94a3b8', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
             <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, #3b82f6, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "28px" }}>📁</div>

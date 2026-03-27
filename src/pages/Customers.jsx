@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
+import LoadingSkeleton from "../components/LoadingSkeleton"
 
 const thStyle = {
   padding: '6px 12px', textAlign: 'left', fontSize: '12px', fontWeight: '600',
@@ -127,7 +128,7 @@ export default function Customers() {
 
         {/* Table */}
         {loading ? (
-          <p style={{ textAlign: 'center', color: '#64748b', padding: '48px' }}>Loading...</p>
+          <LoadingSkeleton />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8' }}>
             <p style={{ fontSize: '14px', margin: 0 }}>No customers found</p>

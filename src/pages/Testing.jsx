@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
+import LoadingSkeleton from "../components/LoadingSkeleton"
 
 const statusColors = {
   not_started: "#94a3b8", in_progress: "#3b82f6",
@@ -146,7 +147,7 @@ export default function Testing() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>Loading...</div>
+          <LoadingSkeleton />
         ) : cycles.length === 0 || paginated.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 40px", backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
             <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, #06b6d4, #10b981)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "28px" }}>🧪</div>
