@@ -36,6 +36,7 @@ import ContactDetail from "./pages/ContactDetail"
 import Users from "./pages/Users"
 import ProjectPlan from "./pages/ProjectPlan"
 import { ToastProvider } from "./components/Toast"
+import useKeyboardShortcuts from "./hooks/useKeyboardShortcuts"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -44,6 +45,7 @@ const ProtectedRoute = ({ children }) => {
 
 function AppRoutes() {
   const { user } = useAuth()
+  useKeyboardShortcuts()
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
