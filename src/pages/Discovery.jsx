@@ -184,8 +184,7 @@ export default function Discovery() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '30%' }}>Opportunity</th>
-                  <th style={{ ...thStyle, width: '25%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '40%' }}>Discovery</th>
                   <th style={{ ...thStyle, width: '15%' }}>Status</th>
                   <th style={{ ...thStyle, width: '15%' }}>Created</th>
                   <th style={{ ...thStyle, width: '15%' }}>Updated</th>
@@ -201,10 +200,10 @@ export default function Discovery() {
                       cursor: 'pointer',
                       backgroundColor: hoveredRow === rec.id ? '#eff6ff' : 'white'
                     }}>
-                    <td style={{ ...tdStyle, fontWeight: '500' }}>
-                      {rec.opportunities?.name || 'Untitled Discovery'}
+                    <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
+                      {rec.opportunities?.name || 'Discovery Record'}
+                      {rec.opportunities?.accounts?.name && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#94a3b8' }}>{rec.opportunities.accounts.name}</span>}
                     </td>
-                    <td style={tdStyle}>{rec.opportunities?.accounts?.name || '—'}</td>
                     <td style={tdStyle}>
                       <span style={{
                         backgroundColor: (statusColors[rec.status] || '#94a3b8') + '18',

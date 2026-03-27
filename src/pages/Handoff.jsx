@@ -184,8 +184,7 @@ export default function Handoff() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '28%' }}>Project</th>
-                  <th style={{ ...thStyle, width: '22%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '38%' }}>Handoff</th>
                   <th style={{ ...thStyle, width: '18%' }}>Status</th>
                   <th style={{ ...thStyle, width: '16%' }}>Created</th>
                   <th style={{ ...thStyle, width: '16%' }}>Updated</th>
@@ -208,8 +207,8 @@ export default function Handoff() {
                           {h.projects?.name || 'View Project'}
                         </span>
                       ) : 'Untitled Handoff'}
+                      {h.projects?.accounts?.name && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#94a3b8' }}>{h.projects.accounts.name}</span>}
                     </td>
-                    <td style={tdStyle}>{h.projects?.accounts?.name || '—'}</td>
                     <td style={tdStyle}>
                       <span style={{
                         backgroundColor: (statusColors[h.approval_status] || '#94a3b8') + '18',
