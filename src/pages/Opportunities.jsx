@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import usePageTitle from "../hooks/usePageTitle"
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -46,6 +47,7 @@ export default function Opportunities() {
   const navigate = useNavigate()
   const [opportunities, setOpportunities] = useState([])
   const [loading, setLoading] = useState(true)
+  usePageTitle("Opportunities")
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)

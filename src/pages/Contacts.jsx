@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import usePageTitle from "../hooks/usePageTitle"
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -24,6 +25,7 @@ export default function Contacts() {
   const navigate = useNavigate()
   const [contacts, setContacts] = useState([])
   const [loading, setLoading] = useState(true)
+  usePageTitle("Contacts")
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)

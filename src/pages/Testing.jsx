@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import usePageTitle from "../hooks/usePageTitle"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
@@ -29,6 +30,7 @@ export default function Testing() {
   const navigate = useNavigate()
   const [cycles, setCycles] = useState([])
   const [loading, setLoading] = useState(true)
+  usePageTitle("Testing")
   const [hoveredRow, setHoveredRow] = useState(null)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')

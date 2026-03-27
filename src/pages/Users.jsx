@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import usePageTitle from "../hooks/usePageTitle"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
@@ -38,6 +39,7 @@ export default function Users() {
   const { profile } = useAuth()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  usePageTitle("Users")
   const [showCreate, setShowCreate] = useState(false)
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import usePageTitle from "../hooks/usePageTitle"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
@@ -6,6 +7,7 @@ import NavBar from "../components/layout/NavBar"
 export default function Intelligence() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
+  usePageTitle("Analytics")
   const [data, setData] = useState({})
 
   useEffect(() => { fetchAll() }, [])

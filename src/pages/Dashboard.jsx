@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect } from "react"
 import { supabase } from "../supabase"
+import usePageTitle from "../hooks/usePageTitle"
 import { useAuth } from "../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
 import NavBar from "../components/layout/NavBar"

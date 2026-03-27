@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import usePageTitle from "../hooks/usePageTitle"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
@@ -42,6 +43,7 @@ export default function Projects() {
   const [blockerMap, setBlockerMap] = useState({})
   const [milestoneMap, setMilestoneMap] = useState({})
   const [loading, setLoading] = useState(true)
+  usePageTitle("Projects")
   const [filter, setFilter] = useState("active")
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)

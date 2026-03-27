@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import usePageTitle from "../hooks/usePageTitle"
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -12,6 +13,7 @@ export default function TimeTracking() {
   const [tasks, setTasks] = useState([])
   const [selectedProject, setSelectedProject] = useState('')
   const [loading, setLoading] = useState(true)
+  usePageTitle("Time Tracking")
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
 
