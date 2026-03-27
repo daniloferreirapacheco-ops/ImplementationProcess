@@ -225,8 +225,7 @@ export default function Projects() {
               <thead>
                 <tr>
                   <th style={{ ...thStyle, width: '3%' }}></th>
-                  <th style={{ ...thStyle, width: '20%' }}>Project</th>
-                  <th style={{ ...thStyle, width: '14%' }}>Account</th>
+                  <th style={{ ...thStyle, width: '28%' }}>Project</th>
                   <th style={{ ...thStyle, width: '12%' }}>Status</th>
                   <th style={{ ...thStyle, width: '8%' }}>Risk</th>
                   <th style={{ ...thStyle, width: '10%' }}>Cost</th>
@@ -257,8 +256,10 @@ export default function Projects() {
                         backgroundColor: healthColors[project.health] || '#94a3b8',
                         display: 'inline-block' }} />
                     </td>
-                    <td style={{ ...tdStyle, fontWeight: '500' }}>{project.name}</td>
-                    <td style={tdStyle}>{project.accounts?.name || '—'}</td>
+                    <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
+                      {project.name}
+                      {project.accounts?.name && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#94a3b8' }}>{project.accounts.name}</span>}
+                    </td>
                     <td style={tdStyle}>
                       <span style={{
                         backgroundColor: (statusColors[project.status] || '#94a3b8') + '18',
