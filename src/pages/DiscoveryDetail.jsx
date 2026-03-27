@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 export default function DiscoveryDetail() {
   const { id } = useParams()
@@ -16,6 +17,7 @@ export default function DiscoveryDetail() {
   const [activeTab, setActiveTab] = useState("overview")
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
+  const { toast } = useToast()
 
   useEffect(() => { fetchRecord(); fetchQuestions() }, [id])
 
@@ -94,6 +96,7 @@ export default function DiscoveryDetail() {
     await supabase.from("discovery_records").update(payload).eq("id", id)
     setRecord(prev => ({ ...prev, ...payload }))
     setEditing(false)
+    toast("Discovery saved successfully")
   }
 
   const inputSm = { width: '100%', padding: '8px 10px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }

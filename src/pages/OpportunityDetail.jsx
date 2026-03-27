@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../supabase'
 import NavBar from '../components/layout/NavBar'
+import { useToast } from '../components/Toast'
 
 const stageOptions = [
   { value: 'new', label: 'New' },
@@ -59,6 +60,7 @@ export default function OpportunityDetail() {
   const [projects, setProjects] = useState([])
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchOpportunity()
@@ -115,6 +117,7 @@ export default function OpportunityDetail() {
     setOpp(prev => ({ ...prev, ...payload }))
     setEditing(false)
     setSaving(false)
+    toast("Opportunity saved successfully")
   }
 
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }))

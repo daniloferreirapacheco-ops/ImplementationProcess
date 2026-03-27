@@ -35,6 +35,7 @@ import NewContact from "./pages/NewContact"
 import ContactDetail from "./pages/ContactDetail"
 import Users from "./pages/Users"
 import ProjectPlan from "./pages/ProjectPlan"
+import { ToastProvider } from "./components/Toast"
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth()
@@ -90,7 +91,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ToastProvider>
+          <AppRoutes />
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )

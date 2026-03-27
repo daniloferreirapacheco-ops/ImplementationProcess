@@ -2,6 +2,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 const statusOptions = [
   { value: "draft", label: "Draft" },
@@ -28,6 +29,7 @@ export default function ScopeDetail() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const [wsForm, setWsForm] = useState({})
+  const { toast } = useToast()
 
   useEffect(() => { fetchScope() }, [id])
 
@@ -110,6 +112,7 @@ export default function ScopeDetail() {
     setScope(prev => ({ ...prev, ...payload }))
     setEditing(false)
     setSaving(false)
+    toast("Scope saved successfully")
   }
 
   const handleDelete = async () => {

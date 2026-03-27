@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 const PHASES = [
   { value: "discovery", label: "Discovery", color: "#8b5cf6" },
@@ -85,6 +86,7 @@ export default function ProjectPlan() {
   const [showAdd, setShowAdd] = useState(false)
   const [editId, setEditId] = useState(null)
   const [saving, setSaving] = useState(false)
+  const { toast } = useToast()
 
   const emptyForm = { name: "", phase: "configuration", workstream: "", assigned_to: "", assigned_name: "",
     planned_start: "", planned_end: "", estimated_hours: "", priority: "medium", description: "", is_milestone: false }
@@ -148,6 +150,7 @@ export default function ProjectPlan() {
       }
       setForm({ ...emptyForm })
       setShowAdd(false)
+      toast(editId ? "Task updated" : "Task added")
     } catch (err) {
       console.error("Save error:", err)
     } finally {
