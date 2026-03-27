@@ -118,6 +118,7 @@ export default function ScopeDetail() {
   const handleDelete = async () => {
     if (!window.confirm('Delete this scope? This cannot be undone.')) return
     await supabase.from("scopes").delete().eq("id", id)
+    toast("Scope deleted")
     navigate('/scope')
   }
 

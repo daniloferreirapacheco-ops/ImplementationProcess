@@ -88,7 +88,7 @@ export default function OpportunityDetail() {
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this opportunity? This action cannot be undone.')) return
     const { error } = await supabase.from('opportunities').delete().eq('id', id)
-    if (!error) navigate('/opportunities')
+    if (!error) { toast("Opportunity deleted"); navigate('/opportunities') }
   }
 
   const updateStage = async (newStage) => {

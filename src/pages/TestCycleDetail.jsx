@@ -2,6 +2,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 const severityColors = {
   low: "#10b981", medium: "#f59e0b", high: "#ef4444", critical: "#dc2626"
@@ -18,6 +19,7 @@ export default function TestCycleDetail() {
   const [cases, setCases] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("cases")
   const [newCase, setNewCase] = useState({
     name: "", scenario: "", expected_result: "", severity: "medium"
@@ -78,6 +80,7 @@ export default function TestCycleDetail() {
     if (!window.confirm('Delete this test cycle and all its test cases? This cannot be undone.')) return
     await supabase.from("test_cases").delete().eq("cycle_id", id)
     await supabase.from("test_cycles").delete().eq("id", id)
+    toast("Test cycle deleted")
     navigate('/testing')
   }
 

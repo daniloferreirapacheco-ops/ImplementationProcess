@@ -81,6 +81,7 @@ export default function DiscoveryDetail() {
   const handleDelete = async () => {
     if (!window.confirm('Delete this discovery record? This cannot be undone.')) return
     await supabase.from("discovery_records").delete().eq("id", id)
+    toast("Discovery deleted")
     navigate('/discovery')
   }
 

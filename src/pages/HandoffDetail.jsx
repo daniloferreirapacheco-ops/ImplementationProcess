@@ -61,6 +61,7 @@ export default function HandoffDetail() {
   const handleDelete = async () => {
     if (!window.confirm('Delete this handoff package? This cannot be undone.')) return
     await supabase.from("handoff_packages").delete().eq("id", id)
+    toast("Handoff deleted")
     navigate('/handoff')
   }
 

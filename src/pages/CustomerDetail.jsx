@@ -116,7 +116,7 @@ export default function CustomerDetail() {
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) return
     const { error } = await supabase.from('accounts').delete().eq('id', id)
-    if (!error) navigate('/customers')
+    if (!error) { toast("Customer deleted"); navigate('/customers') }
   }
 
   if (loading) return (

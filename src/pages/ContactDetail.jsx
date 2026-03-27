@@ -54,6 +54,7 @@ export default function ContactDetail() {
     if (!window.confirm('Delete this contact?')) return
     const { error } = await supabase.from('contacts').delete().eq('id', id)
     if (error) { alert(error.message); return }
+    toast("Contact deleted")
     navigate('/contacts')
   }
 
