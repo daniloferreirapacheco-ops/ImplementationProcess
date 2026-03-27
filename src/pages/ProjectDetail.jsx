@@ -1,7 +1,9 @@
 ﻿import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
+import { useAuth } from "../contexts/AuthContext"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 const statusOptions = [
   { value: "not_started", label: "Not Started" },
@@ -34,6 +36,7 @@ const statusColors = {
 export default function ProjectDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { profile } = useAuth()
   const [project, setProject] = useState(null)
   const [milestones, setMilestones] = useState([])
   const [blockers, setBlockers] = useState([])
@@ -47,6 +50,7 @@ export default function ProjectDetail() {
   const [newMember, setNewMember] = useState({ member_name: "", role: "consultant" })
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState("")
+  const { toast } = useToast()
   const [testCycles, setTestCycles] = useState([])
   const [handoffs, setHandoffs] = useState([])
   const [planTasks, setPlanTasks] = useState([])
@@ -107,12 +111,14 @@ export default function ProjectDetail() {
     } catch { /* table may not exist */ }
     setNewMember({ member_name: "", role: "consultant" })
     setSaving(false)
+    toast("Team member added")
   }
 
   const removeTeamMember = async (memberId) => {
     try {
       await supabase.from("project_team_members").delete().eq("id", memberId)
       setTeam(prev => prev.filter(m => m.id !== memberId))
+      toast("Team member removed")
     } catch { /* table may not exist */ }
   }
 
@@ -121,11 +127,12 @@ export default function ProjectDetail() {
     setSaving(true)
     try {
       const { data } = await supabase.from("project_notes")
-        .insert({ project_id: id, note: newNote, author_name: "System" }).select().single()
+        .insert({ project_id: id, note: newNote, author_name: profile?.full_name || "System" }).select().single()
       if (data) setNotes(prev => [data, ...prev])
     } catch { /* table may not exist */ }
     setNewNote("")
     setSaving(false)
+    toast("Note added")
   }
 
   const updateProject = async (field, value) => {
@@ -133,6 +140,7 @@ export default function ProjectDetail() {
     await supabase.from("projects").update({ [field]: value, updated_at: new Date() }).eq("id", id)
     setProject(prev => ({ ...prev, [field]: value }))
     setSaving(false)
+    toast("Project updated")
   }
 
   const addMilestone = async () => {
@@ -143,12 +151,14 @@ export default function ProjectDetail() {
     if (data) setMilestones(prev => [...prev, data])
     setNewMilestone({ name: "", due_date: "" })
     setSaving(false)
+    toast("Milestone added")
   }
 
   const toggleMilestone = async (mId, currentStatus) => {
     const newStatus = currentStatus === "completed" ? "pending" : "completed"
     await supabase.from("milestones").update({ status: newStatus }).eq("id", mId)
     setMilestones(prev => prev.map(m => m.id === mId ? { ...m, status: newStatus } : m))
+    toast(newStatus === "completed" ? "Milestone completed!" : "Milestone reopened")
   }
 
   const addBlocker = async () => {
@@ -159,17 +169,19 @@ export default function ProjectDetail() {
     if (data) setBlockers(prev => [data, ...prev])
     setNewBlocker({ title: "", severity: "medium" })
     setSaving(false)
+    toast("Blocker added")
   }
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this project and all its milestones and blockers? This action cannot be undone.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
-    if (!error) navigate('/projects')
+    if (!error) { toast("Project deleted"); navigate('/projects') }
   }
 
   const resolveBlocker = async (bId) => {
     await supabase.from("blockers").update({ status: "resolved" }).eq("id", bId)
     setBlockers(prev => prev.map(b => b.id === bId ? { ...b, status: "resolved" } : b))
+    toast("Blocker resolved")
   }
 
   if (loading || !project) return (

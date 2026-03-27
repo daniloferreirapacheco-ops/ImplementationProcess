@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { supabase } from "../supabase"
 import NavBar from "../components/layout/NavBar"
+import { useToast } from "../components/Toast"
 
 const statusOptions = [
   { value: "not_started", label: "Not Started" },
@@ -33,6 +34,7 @@ export default function HandoffDetail() {
   const [activeTab, setActiveTab] = useState("overview")
 
   const [milestones, setMilestones] = useState([])
+  const { toast } = useToast()
 
   // Training & Readiness local state
   const [trainingSessions, setTrainingSessions] = useState(defaultTrainingSessions)
@@ -77,6 +79,7 @@ export default function HandoffDetail() {
       }
     }
     setSaving(false)
+    toast(`Handoff ${status.replace(/_/g, ' ')}`)
   }
 
   const toggleTraining = (index) => {
