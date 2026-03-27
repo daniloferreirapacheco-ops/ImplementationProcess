@@ -219,10 +219,10 @@ export default function Handoff() {
                         {h.approval_status?.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td style={tdStyle}>
+                    <td style={{ ...tdStyle, fontSize: '12px', color: '#94a3b8' }}>
                       {h.created_at ? new Date(h.created_at).toLocaleDateString() : '—'}
                     </td>
-                    <td style={tdStyle}>
+                    <td style={{ ...tdStyle, fontSize: '12px', color: '#94a3b8' }}>
                       {h.updated_at ? new Date(h.updated_at).toLocaleDateString() : '—'}
                     </td>
                   </tr>

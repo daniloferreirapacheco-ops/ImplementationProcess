@@ -271,8 +271,9 @@ export default function Projects() {
                       </span>
                     </td>
                     <td style={tdStyle}>
-                      <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px',
-                        borderRadius: '3px', backgroundColor: risk.color + '18', color: risk.color }}>
+                      <span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 10px',
+                        borderRadius: '12px', backgroundColor: risk.color + '15', color: risk.color,
+                        border: `1px solid ${risk.color}30` }}>
                         {risk.label}
                       </span>
                     </td>
