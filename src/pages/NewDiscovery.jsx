@@ -185,7 +185,7 @@ export default function NewDiscovery() {
                 <label style={labelStyle}>Business Segment</label>
                 <input value={form.business_segment}
                   onChange={e => update("business_segment", e.target.value)}
-                  placeholder="e.g. Commercial Print, Packaging..."
+                  autoFocus placeholder="e.g. Commercial Print, Packaging..."
                   style={inputStyle} />
               </div>
               <div>

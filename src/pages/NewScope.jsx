@@ -160,7 +160,7 @@ export default function NewScope() {
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={labelStyle}>Scope Name *</label>
                   <input value={form.name} onChange={e => update("name", e.target.value)}
-                    placeholder="e.g. Acme - Full Implementation Scope v1"
+                    autoFocus placeholder="e.g. Acme - Full Implementation Scope v1"
                     style={inputStyle} />
                 </div>
                 <div>

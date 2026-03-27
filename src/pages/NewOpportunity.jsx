@@ -309,7 +309,7 @@ return (
               </h2>
               <textarea value={form.notes}
                 onChange={e => updateForm('notes', e.target.value)}
-                placeholder="Any additional context..."
+                autoFocus placeholder="Any additional context..."
                 rows={4}
                 style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db',
                   borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box', resize: 'vertical' }}

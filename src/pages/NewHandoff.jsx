@@ -127,7 +127,7 @@ export default function NewHandoff() {
           <div style={{ display: "flex", gap: "12px", marginBottom: "12px" }}>
             <input value={moduleInput} onChange={e => setModuleInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && addModule()}
-              placeholder="e.g. iQuote / Estimating"
+              autoFocus placeholder="e.g. iQuote / Estimating"
               style={{ flex: 1, padding: "10px", border: "1px solid #d1d5db",
                 borderRadius: "6px", fontSize: "14px" }} />
             <button onClick={addModule}

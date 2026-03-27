@@ -82,7 +82,7 @@ export default function NewCustomer() {
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyle}>Company Name *</label>
               <input value={form.name} onChange={e => updateForm('name', e.target.value)}
-                placeholder="Enter company name" style={fieldStyle} />
+                autoFocus placeholder="Enter company name" style={fieldStyle} />
             </div>
             <div>
               <label style={labelStyle}>Industry</label>

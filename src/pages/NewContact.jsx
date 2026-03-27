@@ -91,7 +91,7 @@ export default function NewContact() {
             <div>
               <label style={labelStyle}>Full Name *</label>
               <input value={form.name} onChange={e => updateForm('name', e.target.value)}
-                placeholder="John Smith" style={fieldStyle} />
+                autoFocus placeholder="John Smith" style={fieldStyle} />
             </div>
             <div>
               <label style={labelStyle}>Title / Position</label>

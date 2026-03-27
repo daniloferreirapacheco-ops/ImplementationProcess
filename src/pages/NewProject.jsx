@@ -207,7 +207,7 @@ export default function NewProject() {
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Project Name *</label>
               <input value={form.name} onChange={e => update("name", e.target.value)}
-                placeholder="e.g. Acme Printing - Full Implementation"
+                autoFocus placeholder="e.g. Acme Printing - Full Implementation"
                 style={inputStyle} />
             </div>
             <div>

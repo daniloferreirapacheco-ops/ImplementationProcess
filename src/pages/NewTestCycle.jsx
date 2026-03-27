@@ -95,7 +95,7 @@ export default function NewTestCycle() {
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Cycle Name *</label>
               <input value={form.name} onChange={e => update("name", e.target.value)}
-                placeholder="e.g. UAT Round 1 — Estimating Module"
+                autoFocus placeholder="e.g. UAT Round 1 — Estimating Module"
                 style={inputStyle} />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
