@@ -137,11 +137,11 @@ export default function Contacts() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '22%' }}>Name</th>
-                  <th style={{ ...thStyle, width: '18%' }}>Title</th>
-                  <th style={{ ...thStyle, width: '20%' }}>Company</th>
+                  <th style={{ ...thStyle, width: '24%' }}>Contact</th>
+                  <th style={{ ...thStyle, width: '18%' }}>Company</th>
                   <th style={{ ...thStyle, width: '22%' }}>Email</th>
-                  <th style={{ ...thStyle, width: '18%' }}>Phone</th>
+                  <th style={{ ...thStyle, width: '16%' }}>Phone</th>
+                  <th style={{ ...thStyle, width: '12%' }}>Created</th>
                 </tr>
               </thead>
               <tbody>
@@ -154,11 +154,14 @@ export default function Contacts() {
                       cursor: 'pointer',
                       backgroundColor: hoveredRow === contact.id ? '#eff6ff' : 'white'
                     }}>
-                    <td style={{ ...tdStyle, fontWeight: '500' }}>{contact.name}</td>
-                    <td style={tdStyle}>{contact.title || '—'}</td>
+                    <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
+                      {contact.name}
+                      {contact.title && <span style={{ display: 'block', fontSize: '11px', fontWeight: '400', color: '#8b5cf6' }}>{contact.title}</span>}
+                    </td>
                     <td style={tdStyle}>{contact.accounts?.name || '—'}</td>
                     <td style={tdStyle}>{contact.email || '—'}</td>
                     <td style={tdStyle}>{contact.phone || '—'}</td>
+                    <td style={{ ...tdStyle, fontSize: '12px', color: '#94a3b8' }}>{contact.created_at ? new Date(contact.created_at).toLocaleDateString() : '—'}</td>
                   </tr>
                 ))}
               </tbody>
