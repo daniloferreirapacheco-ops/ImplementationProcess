@@ -35,6 +35,8 @@ export default function Testing() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [sortField, setSortField] = useState('name')
+  const [sortDir, setSortDir] = useState('asc')
 
   useEffect(() => { fetchCycles() }, [])
 
@@ -53,7 +55,21 @@ export default function Testing() {
       (c.projects?.name || '').toLowerCase().includes(search.toLowerCase())
     const matchesFilter = filter === 'all' || c.status === filter
     return matchesSearch && matchesFilter
+  }).sort((a, b) => {
+    let va = '', vb = ''
+    if (sortField === 'name') { va = (a.name || '').toLowerCase(); vb = (b.name || '').toLowerCase() }
+    else if (sortField === 'status') { va = a.status || ''; vb = b.status || '' }
+    else { va = a[sortField] || ''; vb = b[sortField] || '' }
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+  const toggleSort = (field) => { if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc'); else { setSortField(field); setSortDir('asc') } }
+  const SortHeader = ({ field, children, ...rest }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, ...rest, cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
@@ -172,8 +188,8 @@ export default function Testing() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '36%' }}>Test Cycle</th>
-                  <th style={{ ...thStyle, width: '14%' }}>Status</th>
+                  <SortHeader field="name" width="36%">Test Cycle</SortHeader>
+                  <SortHeader field="status" width="14%">Status</SortHeader>
                   <th style={{ ...thStyle, width: '10%', textAlign: 'right' }}>Passed</th>
                   <th style={{ ...thStyle, width: '10%', textAlign: 'right' }}>Failed</th>
                   <th style={{ ...thStyle, width: '10%', textAlign: 'right' }}>Pass Rate</th>

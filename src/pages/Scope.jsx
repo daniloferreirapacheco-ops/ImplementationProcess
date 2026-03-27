@@ -35,6 +35,8 @@ export default function Scope() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [sortField, setSortField] = useState('name')
+  const [sortDir, setSortDir] = useState('asc')
 
   useEffect(() => { fetchScopes() }, [])
 
@@ -57,7 +59,22 @@ export default function Scope() {
     }
     if (filter === 'all') return true
     return scope.approval_status === filter
+  }).sort((a, b) => {
+    let va = '', vb = ''
+    if (sortField === 'name') { va = (a.name || '').toLowerCase(); vb = (b.name || '').toLowerCase() }
+    else if (sortField === 'approval_status') { va = a.approval_status || ''; vb = b.approval_status || '' }
+    else if (sortField === 'confidence_score') { va = Number(a.confidence_score) || 0; vb = Number(b.confidence_score) || 0 }
+    else { va = a[sortField] || ''; vb = b[sortField] || '' }
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+  const toggleSort = (field) => { if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc'); else { setSortField(field); setSortDir('asc') } }
+  const SortHeader = ({ field, children, ...rest }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, ...rest, cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
@@ -168,11 +185,11 @@ export default function Scope() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '28%' }}>Scope</th>
-                  <th style={{ ...thStyle, width: '12%' }}>Status</th>
+                  <SortHeader field="name" width="28%">Scope</SortHeader>
+                  <SortHeader field="approval_status" width="12%">Status</SortHeader>
                   <th style={{ ...thStyle, width: '10%' }}>Risk</th>
                   <th style={{ ...thStyle, width: '14%', textAlign: 'right' }}>Hours</th>
-                  <th style={{ ...thStyle, width: '12%', textAlign: 'center' }}>Confidence</th>
+                  <SortHeader field="confidence_score" width="12%" textAlign="center">Confidence</SortHeader>
                   <th style={{ ...thStyle, width: '14%' }}>Created</th>
                 </tr>
               </thead>

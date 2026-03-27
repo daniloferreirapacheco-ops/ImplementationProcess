@@ -29,6 +29,8 @@ export default function Contacts() {
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)
+  const [sortField, setSortField] = useState('name')
+  const [sortDir, setSortDir] = useState('asc')
   const PER_PAGE = 25
 
   useEffect(() => {
@@ -52,7 +54,19 @@ export default function Contacts() {
       c.email?.toLowerCase().includes(q) ||
       c.title?.toLowerCase().includes(q) ||
       c.accounts?.name?.toLowerCase().includes(q)
+  }).sort((a, b) => {
+    const va = (a[sortField] || '').toString().toLowerCase()
+    const vb = (b[sortField] || '').toString().toLowerCase()
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+  const toggleSort = (field) => { if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc'); else { setSortField(field); setSortDir('asc') } }
+  const SortHeader = ({ field, children, ...rest }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, ...rest, cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
@@ -139,9 +153,9 @@ export default function Contacts() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '24%' }}>Contact</th>
+                  <SortHeader field="name" width="24%">Contact</SortHeader>
                   <th style={{ ...thStyle, width: '18%' }}>Company</th>
-                  <th style={{ ...thStyle, width: '22%' }}>Email</th>
+                  <SortHeader field="email" width="22%">Email</SortHeader>
                   <th style={{ ...thStyle, width: '16%' }}>Phone</th>
                   <th style={{ ...thStyle, width: '12%' }}>Created</th>
                 </tr>
