@@ -126,6 +126,11 @@ export default function ContactDetail() {
                     border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
                   Edit
                 </button>
+                <button onClick={() => window.print()}
+                  style={{ padding: '10px 20px', backgroundColor: '#f1f5f9', color: '#475569',
+                    border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
+                  Print
+                </button>
                 <button onClick={handleDelete}
                   style={{ padding: '10px 20px', backgroundColor: '#fef2f2', color: '#dc2626',
                     border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>
