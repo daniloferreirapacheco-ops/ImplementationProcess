@@ -203,6 +203,10 @@ export default function HandoffDetail() {
                 backgroundColor: "white", cursor: "pointer" }}>
               {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
+            <button onClick={() => window.print()}
+              style={{ padding: "8px 16px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #d1d5db", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
+              Print
+            </button>
             <button onClick={handleDelete}
               style={{ padding: "8px 16px", backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>
               Delete
