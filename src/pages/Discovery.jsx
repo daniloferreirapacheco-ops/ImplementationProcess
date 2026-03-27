@@ -240,14 +240,14 @@ export default function Discovery() {
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={safePage <= 1}
-              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: safePage <= 1 ? 'default' : 'pointer', backgroundColor: safePage <= 1 ? '#f1f5f9' : 'white', color: safePage <= 1 ? '#94a3b8' : '#475569' }}>
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '6px', cursor: safePage <= 1 ? 'default' : 'pointer', backgroundColor: safePage <= 1 ? '#f1f5f9' : 'white', color: safePage <= 1 ? '#94a3b8' : '#475569' }}>
               Prev
             </button>
             <span>Page {safePage} of {totalPages}</span>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={safePage >= totalPages}
-              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '3px', cursor: safePage >= totalPages ? 'default' : 'pointer', backgroundColor: safePage >= totalPages ? '#f1f5f9' : 'white', color: safePage >= totalPages ? '#94a3b8' : '#475569' }}>
+              style={{ padding: '2px 8px', fontSize: '11px', border: '1px solid #d1d5db', borderRadius: '6px', cursor: safePage >= totalPages ? 'default' : 'pointer', backgroundColor: safePage >= totalPages ? '#f1f5f9' : 'white', color: safePage >= totalPages ? '#94a3b8' : '#475569' }}>
               Next
             </button>
           </div>
