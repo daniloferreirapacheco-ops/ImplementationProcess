@@ -184,10 +184,11 @@ export default function Discovery() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '40%' }}>Discovery</th>
-                  <th style={{ ...thStyle, width: '15%' }}>Status</th>
-                  <th style={{ ...thStyle, width: '15%' }}>Created</th>
-                  <th style={{ ...thStyle, width: '15%' }}>Updated</th>
+                  <th style={{ ...thStyle, width: '35%' }}>Discovery</th>
+                  <th style={{ ...thStyle, width: '14%' }}>Status</th>
+                  <th style={{ ...thStyle, width: '12%', textAlign: 'center' }}>Complexity</th>
+                  <th style={{ ...thStyle, width: '14%' }}>Created</th>
+                  <th style={{ ...thStyle, width: '14%' }}>Updated</th>
                 </tr>
               </thead>
               <tbody>
@@ -214,10 +215,17 @@ export default function Discovery() {
                         {rec.status?.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td style={tdStyle}>
+                    <td style={{ ...tdStyle, textAlign: 'center' }}>
+                      {(() => {
+                        const c = rec.complexity_score || 0
+                        const color = c >= 70 ? '#ef4444' : c >= 40 ? '#f59e0b' : '#10b981'
+                        return c > 0 ? <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '12px', backgroundColor: `${color}15`, color, border: `1px solid ${color}30` }}>{c}</span> : '—'
+                      })()}
+                    </td>
+                    <td style={{ ...tdStyle, fontSize: '12px', color: '#94a3b8' }}>
                       {rec.created_at ? new Date(rec.created_at).toLocaleDateString() : '—'}
                     </td>
-                    <td style={tdStyle}>
+                    <td style={{ ...tdStyle, fontSize: '12px', color: '#94a3b8' }}>
                       {rec.updated_at ? new Date(rec.updated_at).toLocaleDateString() : '—'}
                     </td>
                   </tr>

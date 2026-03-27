@@ -216,7 +216,7 @@ export default function Testing() {
                       <td style={{ ...tdStyle, textAlign: 'right', color: '#ef4444', fontWeight: '600' }}>
                         {cycle.fail_count || 0}
                       </td>
-                      <td style={{ ...tdStyle, textAlign: 'right' }}>
+                      <td style={{ ...tdStyle, textAlign: 'right', fontWeight: '600', color: passRate >= 80 ? '#10b981' : passRate >= 60 ? '#f59e0b' : total > 0 ? '#ef4444' : '#cbd5e1' }}>
                         {total > 0 ? `${passRate}%` : '—'}
                       </td>
                       <td style={{ ...tdStyle, textAlign: 'center', color: '#94a3b8' }}>→</td>
