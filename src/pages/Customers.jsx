@@ -32,6 +32,8 @@ export default function Customers() {
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)
+  const [sortField, setSortField] = useState('name')
+  const [sortDir, setSortDir] = useState('asc')
 
   useEffect(() => {
     fetchAccounts()
@@ -53,7 +55,23 @@ export default function Customers() {
     if (filter === 'active') return a.status === 'active' || !a.status
     if (filter === 'inactive') return a.status === 'inactive'
     return true
+  }).sort((a, b) => {
+    const va = (a[sortField] || '').toString().toLowerCase()
+    const vb = (b[sortField] || '').toString().toLowerCase()
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+
+  const toggleSort = (field) => {
+    if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortField(field); setSortDir('asc') }
+  }
+  const SortHeader = ({ field, children, ...rest }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, ...rest, cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   const totalActive = accounts.filter(a => a.status === 'active' || !a.status).length
 
@@ -141,10 +159,10 @@ export default function Customers() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '32%' }}>Customer</th>
+                  <SortHeader field="name" width="32%">Customer</SortHeader>
                   <th style={{ ...thStyle, width: '18%' }}>Location</th>
                   <th style={{ ...thStyle, width: '16%' }}>Phone</th>
-                  <th style={{ ...thStyle, width: '12%' }}>Status</th>
+                  <SortHeader field="status" width="12%">Status</SortHeader>
                   <th style={{ ...thStyle, width: '12%' }}>Created</th>
                 </tr>
               </thead>
