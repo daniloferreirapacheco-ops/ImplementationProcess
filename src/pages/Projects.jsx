@@ -235,7 +235,7 @@ export default function Projects() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(project => {
+                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((project, i) => {
                   const cost = costMap[project.id] || { hours: 0, cost: 0 }
                   const blk = blockerMap[project.id] || { total: 0, critical: 0 }
                   const mls = milestoneMap[project.id] || { overdue: 0 }
@@ -249,7 +249,8 @@ export default function Projects() {
                     onMouseLeave={() => setHoveredRow(null)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: hoveredRow === project.id ? '#eff6ff' : 'white'
+                      backgroundColor: hoveredRow === project.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white',
+                      transition: 'background-color 0.15s'
                     }}>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
                       <span style={{ width: '10px', height: '10px', borderRadius: '50%',

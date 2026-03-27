@@ -188,14 +188,14 @@ export default function Opportunities() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(opp => (
+                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((opp, i) => (
                   <tr key={opp.id}
                     onClick={() => navigate(`/opportunities/${opp.id}`)}
                     onMouseEnter={() => setHoveredRow(opp.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: hoveredRow === opp.id ? '#eff6ff' : 'white'
+                      backgroundColor: hoveredRow === opp.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white'
                     }}>
                     <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                       {opp.name}

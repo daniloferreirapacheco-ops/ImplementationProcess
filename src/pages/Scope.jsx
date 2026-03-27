@@ -175,14 +175,14 @@ export default function Scope() {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map(scope => (
+                {paginated.map((scope, i) => (
                   <tr key={scope.id}
                     onClick={() => navigate(`/scope/${scope.id}`)}
                     onMouseEnter={() => setHoveredRow(scope.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: hoveredRow === scope.id ? '#eff6ff' : 'white'
+                      backgroundColor: hoveredRow === scope.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white'
                     }}>
                     <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                       {scope.name || scope.opportunities?.name || 'Untitled Scope'}

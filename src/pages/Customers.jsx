@@ -147,14 +147,14 @@ export default function Customers() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(account => (
+                {filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((account, i) => (
                   <tr key={account.id}
                     onClick={() => navigate(`/customers/${account.id}`)}
                     onMouseEnter={() => setHoveredRow(account.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: hoveredRow === account.id ? '#eff6ff' : 'white'
+                      backgroundColor: hoveredRow === account.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white'
                     }}>
                     <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                       {account.name}

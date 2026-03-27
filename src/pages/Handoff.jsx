@@ -69,7 +69,7 @@ export default function Handoff() {
 
   const exportCSV = () => {
     const headers = ['Project', 'Account', 'Status', 'Created', 'Updated']
-    const rows = filtered.map(h => [
+    const rows = filtered.map((h, i) => [
       h.projects?.name || '',
       h.projects?.accounts?.name || '',
       h.approval_status?.replace(/_/g, ' ') || '',
@@ -101,7 +101,7 @@ export default function Handoff() {
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => {
               const headers = ['Project', 'Status', 'Created']
-              const rows = filtered.map(h => [h.projects?.name, h.approval_status, h.created_at ? new Date(h.created_at).toLocaleDateString() : ''].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+              const rows = filtered.map((h, i) => [h.projects?.name, h.approval_status, h.created_at ? new Date(h.created_at).toLocaleDateString() : ''].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
               const csv = [headers.join(','), ...rows].join('\n')
               const blob = new Blob([csv], { type: 'text/csv' })
               const url = URL.createObjectURL(blob)
@@ -191,14 +191,14 @@ export default function Handoff() {
                 </tr>
               </thead>
               <tbody>
-                {paged.map(h => (
+                {paged.map((h, i) => (
                   <tr key={h.id}
                     onClick={() => navigate(`/handoff/${h.id}`)}
                     onMouseEnter={() => setHoveredRow(h.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: hoveredRow === h.id ? '#eff6ff' : 'white'
+                      backgroundColor: hoveredRow === h.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white'
                     }}>
                     <td style={{ ...tdStyle, fontWeight: '500' }}>
                       {h.project_id ? (

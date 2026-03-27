@@ -76,7 +76,7 @@ export default function Discovery() {
 
   const exportCSV = () => {
     const headers = ['Opportunity', 'Account', 'Status', 'Created', 'Updated']
-    const rows = filtered.map(rec => [
+    const rows = filtered.map((rec, i) => [
       rec.opportunities?.name || '',
       rec.opportunities?.accounts?.name || '',
       rec.status?.replace(/_/g, ' ') || '',
@@ -192,14 +192,14 @@ export default function Discovery() {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map(rec => (
+                {paginated.map((rec, i) => (
                   <tr key={rec.id}
                     onClick={() => navigate(`/discovery/${rec.id}`)}
                     onMouseEnter={() => setHoveredRow(rec.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: hoveredRow === rec.id ? '#eff6ff' : 'white'
+                      backgroundColor: hoveredRow === rec.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white'
                     }}>
                     <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                       {rec.opportunities?.name || 'Discovery Record'}

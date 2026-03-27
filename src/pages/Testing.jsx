@@ -179,7 +179,7 @@ export default function Testing() {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map(cycle => {
+                {paginated.map((cycle, i) => {
                   const total = (cycle.pass_count || 0) + (cycle.fail_count || 0)
                   const passRate = total > 0 ? Math.round((cycle.pass_count / total) * 100) : 0
                   return (
@@ -189,7 +189,7 @@ export default function Testing() {
                       onMouseLeave={() => setHoveredRow(null)}
                       style={{
                         cursor: 'pointer',
-                        backgroundColor: hoveredRow === cycle.id ? '#eff6ff' : 'white'
+                        backgroundColor: hoveredRow === cycle.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white'
                       }}>
                       <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                         {cycle.name}

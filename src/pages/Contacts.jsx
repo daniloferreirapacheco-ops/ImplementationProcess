@@ -145,14 +145,14 @@ export default function Contacts() {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map(contact => (
+                {paginated.map((contact, i) => (
                   <tr key={contact.id}
                     onClick={() => navigate(`/contacts/${contact.id}`)}
                     onMouseEnter={() => setHoveredRow(contact.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: hoveredRow === contact.id ? '#eff6ff' : 'white'
+                      backgroundColor: hoveredRow === contact.id ? '#eff6ff' : i % 2 === 1 ? '#fafbfc' : 'white'
                     }}>
                     <td style={{ ...tdStyle, fontWeight: '600', color: '#1e293b' }}>
                       {contact.name}
