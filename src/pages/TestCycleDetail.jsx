@@ -370,6 +370,12 @@ export default function TestCycleDetail() {
             )}
           </div>
         )}
+        {/* Record Footer */}
+        <div style={{ marginTop: "24px", padding: "12px 0", borderTop: "1px solid #e2e8f0", display: "flex", gap: "24px", fontSize: "11px", color: "#94a3b8" }}>
+          <span>Created: {cycle?.created_at ? new Date(cycle.created_at).toLocaleString() : "—"}</span>
+          <span>Updated: {cycle?.updated_at ? new Date(cycle.updated_at).toLocaleString() : "—"}</span>
+          <span style={{ fontFamily: "monospace", fontSize: "10px" }}>ID: {cycle?.id?.substring(0, 8)}</span>
+        </div>
       </main>
     </div>
   )
