@@ -3,9 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
+import { useToast } from '../components/Toast'
 
 export default function ContactDetail() {
   const { id } = useParams()
+  const { toast } = useToast()
   const { profile } = useAuth()
   const navigate = useNavigate()
   const [contact, setContact] = useState(null)
@@ -44,6 +46,7 @@ export default function ContactDetail() {
     if (!error) {
       loadData()
       setEditing(false)
+      toast("Contact saved successfully")
     }
   }
 

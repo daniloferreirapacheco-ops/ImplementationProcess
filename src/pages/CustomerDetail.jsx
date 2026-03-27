@@ -3,9 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/layout/NavBar'
+import { useToast } from '../components/Toast'
 
 export default function CustomerDetail() {
   const { id } = useParams()
+  const { toast } = useToast()
   const { profile } = useAuth()
   const navigate = useNavigate()
   const [account, setAccount] = useState(null)
@@ -105,6 +107,7 @@ export default function CustomerDetail() {
     if (!error) {
       setAccount({ ...account, ...form })
       setEditing(false)
+      toast("Customer saved successfully")
     }
   }
 
