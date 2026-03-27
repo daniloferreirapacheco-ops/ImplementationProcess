@@ -203,9 +203,10 @@ export default function Opportunities() {
                     </td>
                     <td style={tdStyle}>
                       <span style={{
-                        backgroundColor: (stageColors[opp.stage] || '#94a3b8') + '18',
+                        backgroundColor: (stageColors[opp.stage] || '#94a3b8') + '15',
                         color: stageColors[opp.stage] || '#94a3b8',
-                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px', fontWeight: '600' }}>
+                        padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '600',
+                        border: `1px solid ${(stageColors[opp.stage] || '#94a3b8')}30` }}>
                         {stageLabels[opp.stage] || opp.stage}
                       </span>
                     </td>
