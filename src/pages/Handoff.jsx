@@ -213,8 +213,9 @@ export default function Handoff() {
                       <span style={{
                         backgroundColor: (statusColors[h.approval_status] || '#94a3b8') + '18',
                         color: statusColors[h.approval_status] || '#94a3b8',
-                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px',
-                        fontWeight: '600', textTransform: 'capitalize' }}>
+                        padding: '3px 10px', borderRadius: '12px', fontSize: '11px',
+                        fontWeight: '600', textTransform: 'capitalize',
+                        border: `1px solid ${(statusColors[h.approval_status] || '#94a3b8')}30` }}>
                         {h.approval_status?.replace(/_/g, ' ')}
                       </span>
                     </td>

@@ -208,8 +208,9 @@ export default function Discovery() {
                       <span style={{
                         backgroundColor: (statusColors[rec.status] || '#94a3b8') + '18',
                         color: statusColors[rec.status] || '#94a3b8',
-                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px',
-                        fontWeight: '600', textTransform: 'capitalize' }}>
+                        padding: '3px 10px', borderRadius: '12px', fontSize: '11px',
+                        fontWeight: '600', textTransform: 'capitalize',
+                        border: `1px solid ${(statusColors[rec.status] || '#94a3b8')}30` }}>
                         {rec.status?.replace(/_/g, ' ')}
                       </span>
                     </td>

@@ -193,8 +193,9 @@ export default function Scope() {
                       <span style={{
                         backgroundColor: (statusColors[scope.approval_status] || '#94a3b8') + '18',
                         color: statusColors[scope.approval_status] || '#94a3b8',
-                        padding: '2px 8px', borderRadius: '3px', fontSize: '11px',
-                        fontWeight: '600', textTransform: 'capitalize' }}>
+                        padding: '3px 10px', borderRadius: '12px', fontSize: '11px',
+                        fontWeight: '600', textTransform: 'capitalize',
+                        border: `1px solid ${(statusColors[scope.approval_status] || '#94a3b8')}30` }}>
                         {scope.approval_status?.replace(/_/g, ' ')}
                       </span>
                     </td>
