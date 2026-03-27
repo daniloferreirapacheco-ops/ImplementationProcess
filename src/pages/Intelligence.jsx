@@ -11,27 +11,18 @@ export default function Intelligence() {
   useEffect(() => { fetchAll() }, [])
 
   const fetchAll = async () => {
-    const [
-      { data: projects },
-      { data: opps },
-      { data: discoveries },
-      { data: scopes },
-      { data: handoffs },
-      { data: timeEntries },
-      { data: blockers },
-      { data: milestones },
-      { data: defects }
-    ] = await Promise.all([
-      supabase.from("projects").select("id, name, status, health, budget_cost, budget_hours, golive_target, accounts(name), created_at"),
-      supabase.from("opportunities").select("id, stage, name, estimated_value, accounts(name), created_at"),
-      supabase.from("discovery_records").select("id, status, complexity_score, created_at"),
-      supabase.from("scopes").select("id, approval_status, confidence_score, estimated_hours_min, estimated_hours_max, workstream_hours, created_at"),
-      supabase.from("handoff_packages").select("id, approval_status, created_at"),
-      supabase.from("time_entries").select("project_id, hours, cost, category"),
-      supabase.from("blockers").select("project_id, severity, status"),
-      supabase.from("milestones").select("project_id, name, status, due_date"),
-      supabase.from("defects").select("id, severity, status, project_id")
-    ]).catch(() => Array(9).fill({ data: null }))
+    const safe = async (fn) => { try { const r = await fn(); return r.data || [] } catch { return [] } }
+    const [projects, opps, discoveries, scopes, handoffs, timeEntries, blockers, milestones, defects] = await Promise.all([
+      safe(() => supabase.from("projects").select("id, name, status, health, budget_cost, budget_hours, golive_target, created_at")),
+      safe(() => supabase.from("opportunities").select("id, stage, name, estimated_value, created_at")),
+      safe(() => supabase.from("discovery_records").select("id, status, complexity_score, created_at")),
+      safe(() => supabase.from("scopes").select("id, approval_status, confidence_score, estimated_hours_min, estimated_hours_max, workstream_hours, created_at")),
+      safe(() => supabase.from("handoff_packages").select("id, approval_status, created_at")),
+      safe(() => supabase.from("time_entries").select("project_id, hours, cost")),
+      safe(() => supabase.from("blockers").select("project_id, severity, status")),
+      safe(() => supabase.from("milestones").select("project_id, name, status, due_date")),
+      safe(() => supabase.from("defects").select("id, severity, status, project_id")),
+    ])
 
     const p = projects || [], o = opps || [], d = discoveries || [], s = scopes || [],
       h = handoffs || [], t = timeEntries || [], b = blockers || [], m = milestones || [],
