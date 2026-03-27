@@ -52,6 +52,8 @@ export default function Opportunities() {
   const [search, setSearch] = useState('')
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)
+  const [sortField, setSortField] = useState('name')
+  const [sortDir, setSortDir] = useState('asc')
 
   useEffect(() => { fetchOpportunities() }, [])
 
@@ -79,7 +81,28 @@ export default function Opportunities() {
     if (filter === 'active') return !['closed_lost', 'converted', 'rejected'].includes(o.stage)
     if (filter === 'at_risk') return o.early_risk_indicators?.length > 0
     return o.stage === filter
+  }).sort((a, b) => {
+    let va = '', vb = ''
+    if (sortField === 'name') { va = (a.name || '').toLowerCase(); vb = (b.name || '').toLowerCase() }
+    else if (sortField === 'stage') { va = a.stage || ''; vb = b.stage || '' }
+    else if (sortField === 'estimated_value') { va = Number(a.estimated_value) || 0; vb = Number(b.estimated_value) || 0 }
+    else if (sortField === 'target_golive_date') { va = a.target_golive_date || '9999'; vb = b.target_golive_date || '9999' }
+    else { va = a[sortField] || ''; vb = b[sortField] || '' }
+    if (va < vb) return sortDir === 'asc' ? -1 : 1
+    if (va > vb) return sortDir === 'asc' ? 1 : -1
+    return 0
   })
+
+  const toggleSort = (field) => {
+    if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortField(field); setSortDir('asc') }
+  }
+
+  const SortHeader = ({ field, children, ...rest }) => (
+    <th onClick={() => toggleSort(field)} style={{ ...thStyle, ...rest, cursor: 'pointer', userSelect: 'none' }}>
+      {children} {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+    </th>
+  )
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -181,11 +204,11 @@ export default function Opportunities() {
             <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '30%' }}>Opportunity</th>
-                  <th style={{ ...thStyle, width: '16%' }}>Stage</th>
+                  <SortHeader field="name" width="30%">Opportunity</SortHeader>
+                  <SortHeader field="stage" width="16%">Stage</SortHeader>
                   <th style={{ ...thStyle, width: '10%' }}>Urgency</th>
-                  <th style={{ ...thStyle, width: '12%' }}>Value</th>
-                  <th style={{ ...thStyle, width: '12%' }}>Go-Live</th>
+                  <SortHeader field="estimated_value" width="12%">Value</SortHeader>
+                  <SortHeader field="target_golive_date" width="12%">Go-Live</SortHeader>
                   <th style={{ ...thStyle, width: '8%' }}>Risk</th>
                 </tr>
               </thead>
