@@ -37,18 +37,19 @@ export default function Projects() {
   const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState("active")
+  const [filter, setFilter] = useState("all")
   const [hoveredRow, setHoveredRow] = useState(null)
   const [page, setPage] = useState(1)
 
   useEffect(() => { fetchProjects() }, [])
 
   const fetchProjects = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("projects")
       .select("*, accounts(name)")
       .order("created_at", { ascending: false })
-    setProjects(data || [])
+    if (error) console.error("Failed to fetch projects:", error)
+    else setProjects(data || [])
     setLoading(false)
   }
 
